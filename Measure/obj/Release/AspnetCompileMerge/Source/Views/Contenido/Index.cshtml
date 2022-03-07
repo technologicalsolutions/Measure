@@ -1,0 +1,169 @@
+﻿@using Measure.ViewModels.Contenidos
+@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model ViewContenidoEncuesta
+@{
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    ViewBag.formShow = "show";
+    ViewBag.ContenidoActive = "active";
+    ViewBag.Title = "Contenido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string Nombre = string.Empty;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Encuestas</h1>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginForm("CreateOrEdit", "Contenido", FormMethod.Post))
+    {
+        <div class="row mt-4">
+            @Html.AntiForgeryToken()
+            <div class="col-12 col-md-2">
+                <div class="mt-4">
+                    <input type="hidden" name="Accion" value="0" />
+                    <button class="btn btn-primary rounded-pill py-0 mt-1" type="submit"><i class="bi-plus-circle"></i> Crear Contenido</button>
+                </div>
+            </div>
+            <div class="col-12 col-md-2">
+                <label class="control-label">Idioma</label>
+                <select class="form-select" name="Idioma" id="Idioma" required>
+                    <option value="1">@Measure.Recursos.Recurso.IdiomaEspanol</option>
+                    <option value="2">@Measure.Recursos.Recurso.IdiomaIngles</option>
+                    <option value="3">@Measure.Recursos.Recurso.IdiomaPortugues</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="form-group" id="Maestras">
+                    <label class="control-label">Tipo Componente</label>
+                    @Html.DropDownList("TipoComponente", Model.TipoComponente, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                </div>
+            </div>
+            <div class="col-12 col-md-5">
+                @if (Model.Clientes.Count() > 0)
+                {
+                    <div class="form-group" id="Maestras">
+                        <label class="control-label">Clientes</label>
+                        @Html.DropDownList("ClienteId", Model.Clientes, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" name="ClienteId" value="@Model.Modelo.ClienteId" />
+                }
+            </div>
+        </div>
+    }
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Idioma</th>
+                        <th>Nombre</th>
+                        <th>Posición</th>
+                        <th>Estado</th>
+                        <th class="text-center" width="20%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lista)
+                    {
+                        <tr>
+                            <td>@(((TipoComponente)item.TipoContenido).ToString())</td>
+                            <td>@(((Measure.Enums.Idiomas)item.Idioma).ToString())</td>
+                            <td>
+                                @{
+                                    Nombre = !string.IsNullOrEmpty(item.es_Es) ? item.es_Es : !string.IsNullOrEmpty(item.en_US) ? item.en_US : item.pt_BR;
+                                }
+                                @Nombre
+                            </td>
+                            <td>@((item.Posicion) ? "Inicio" : "Fin")</td>
+                            <td>
+                                @if (item.Estado)
+                                {
+                                    @Measure.Recursos.Recurso.EstadoActivo
+                                }
+                                else
+                                {
+                                    @Measure.Recursos.Recurso.EstadoInactivo
+                                }
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        @using (Html.BeginForm("CreateOrEdit", "Contenido", FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="Accion" value="2" />
+                                            <button name="Id" value="@item.Id" class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="submit">Editar</button>
+                                        }
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@Nombre')">Eliminar</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "Contenido", FormMethod.Post, new { id = "ContenidoDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="DeleteCont" value="" />
+}
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar el contenido: " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteCont").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#ContenidoDelete").submit();
+                }
+            });
+        }
+    </script>
+}

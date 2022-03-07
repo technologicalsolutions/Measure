@@ -1,0 +1,552 @@
+﻿@using Measure.Enums
+@using Measure.ViewModels.Respuesta
+@using Measure.ViewModels.Usuario
+
+@model ViewAnswerResult
+@{
+    Layout = ViewBag.Layout;
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    List<string> Imagenes = ViewBag.Imagenes as List<string>;
+}
+@section scriptsHead{
+    <script type="text/javascript">
+        $("#loader").show();
+    </script>
+}
+<div id="contentReport" style="width:1054px">
+    <div style="font-family: Barlow Condensed">
+        @if (Model.Wellcome != null)
+        {
+            <div style="page-break-after: always;height:800px">
+                <div style="text-align:center">
+                    <div>
+                        <img src="@Imagenes[0]" style="width:100%" />
+                    </div>
+                </div>
+                <div style="margin:30px;padding-top:40px">
+                    <p style="color: #59033B; font-family: Ubuntu !important;font-weight: bold; font-size: 22px; text-transform: capitalize;">@Model.Wellcome.Nombres</p>
+                    <p style="color: #59033B; font-weight: 400; font-size: 18px; text-transform: uppercase; ">@Model.Wellcome.NombreEmpresa</p>
+                    @if (login.Idioma == 1)
+                    {
+                        <p style="color: #1Ec6D9; font-weight: 400; font-size: 16px;">Fecha: @Model.DataEncuesta.FechaRespuesta.ToString()</p>
+                        <p style="color: #59033B; font-family: Ubuntu !important; font-size: 8px; text-align: justify;">
+                            El informe contenido en el presente documento se ha generado utilizando el software de análisis y generación de informes de patrones de respuesta de ConsulTree Analytics, LLC. CONSULTREE International LLC no será, bajo ninguna circunstancia, responsable de ningún daño, directo, indirecto o consecuente, que surja o esté relacionado con el uso del contenido en el presente documento y con respecto a los consejos brindados por terceros basados en los resultados presentados en este reporte. El uso del presente material queda a su entera discreción.
+                        </p>
+                    }
+                    else
+                    {
+                        <p style="color: #1Ec6D9; font-weight: 400; font-size: 18px; font-style: oblique; ">Date: @Model.DataEncuesta.FechaRespuesta.ToString()</p>
+                        <p style="color: #59033B; font-family: Ubuntu !important; font-size: smaller; text-align: justify;">
+                            The report contained in the present document has been generated using answer pattern analysis and reporting software of ConsulTree Analytics, LLC. CONSULTREE International LLC shall not, under any circumstances, be liable for any damages, direct, indirect or consequental, arising from or related to the use of the content in the present document and regarding advice given by third party based on the results presented in this report. Use of the present material is at your own discretion only.
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+        <div style="page-break-after: always;height:800px">
+            <div style="text-align:center; margin-top:5px">
+                <div>
+                    <img src="@Imagenes[2]" style="width:100%" />
+                </div>
+            </div>
+            <table id="charCanvas" style="width:100%;height:630px">
+                <tr>
+                    <td style="width:50%; text-align:center">
+                        <div id="char-consolidadoPolar"></div>
+                    </td>
+                    <td style="width:50%; text-align:center">
+                        <div id="char-consolidadoBarra"></div>
+                    </td>
+                </tr>
+            </table>
+            <table id="charCanvas" style="width:100%">
+                <tr>
+                    <td style="width:50%; text-align:center">
+                        <img id="canvasPolar" />
+                    </td>
+                    <td style="width:50%; text-align:center">
+                        <img id="canvasBarra" />
+                    </td>
+                </tr>
+            </table>
+            <div style="padding-top: 15px;height: 60px">
+                <img src="@Imagenes[1]" style="width: 100%;" />
+            </div>
+        </div>
+        @for (int a = 0; a < Model.Grupos.Count(); a++)
+        {
+            ViewAnswerGroupPoll Grupo = Model.Grupos[a];
+            switch ((TipoDeControl)Grupo.Group.TipoReporte)
+            {
+                case TipoDeControl.ControlMatriz:
+                    <div style="page-break-after: always;height:800px">
+                        <div style="margin: 5px 10px">
+                            <div style="letter-spacing: 0.24px; text-align: left; padding-top: 5px; height:90px">
+                                <strong style="color: @Grupo.Group.Color  !important; font-family: Ubuntu !important; font-weight: bold; font-size: 32px; text-align: justify; ">                                    
+                                    @if (login.Idioma == 1)
+                                    {
+                                        <label>@Model.Grupos[a].Group.es_Es</label>
+                                    }
+                                    else
+                                    {
+                                        <label>@Model.Grupos[a].Group.en_US</label>
+                                    }
+                                </strong>
+                                @{
+                                    var pregunta = Grupo.RespuestasMatriz.FirstOrDefault().Question.Texto.Split(':')[0];
+                                }
+                                <p style="color: @Grupo.Group.Color !important;font-size: 24px;margin-bottom: 0;">@pregunta</p>
+                            </div>
+                            <div style="padding-top: 10px">
+                                <table style="width:100%;">
+                                    <tr style="height: 620px">
+                                        @foreach (var item in Grupo.RespuestasMatriz)
+                                        {
+                                        <td style="width: 10%; text-align: center">
+                                            @{
+                                                string heightCol = (item.ResultQuestionMatrizRange.Barra.Count() * 50).ToString() + "px";
+                                                string heigthCont = item.ResultQuestionMatrizRange.Radial.Serie < 10 ? "10%" : item.ResultQuestionMatrizRange.Radial.Serie.ToString() + "%";
+                                            }
+                                            <div style=" height: @heightCol; background-color: gray; border-radius: 15px; max-width: 50px; padding: 0; margin: auto; display: flex; flex-wrap: wrap; align-items: flex-end !important;" id="@("col_" + Grupo.Group.Id.ToString())">
+                                                <div style="background-color: @Grupo.Group.Color; height: @heigthCont; border-radius: 15px; font-size: medium; font-weight: 500; padding-top: 3px; width: 50px; flex: 1 0 0%;margin-top: 0;max-width: 100%;padding-left: calc( 24px*.5);padding-right: calc( 24px*.5);color: #fff;">
+                                                    <p>@item.ResultQuestionMatrizRange.Radial.Serie</p>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top: 0.5rem !important">
+                                                <div style="background-color:@Grupo.Group.Color;width: 30px; height: 30px; border-radius: 8px; margin: auto;"></div>
+                                            </div>
+                                            <div style="margin-top: 0.5rem !important;">
+                                                <strong style="color:@Grupo.Group.Color !important; width: 30px; height: 30px; border-radius: 8px; margin: auto; font-weight: bold; font-size: large; text-align: justify;">
+                                                    @Measure.Recursos.Recurso.Resultado
+                                                </strong>
+                                            </div>
+                                        </td>
+                                            <td style="width: 90%;" id="@("matriz_" + Grupo.Group.Id.ToString())">
+                                                <div onload="widthDiv(this)">
+                                                    @foreach (var SubItem in item.ResultQuestionMatrizRange.Barra)
+                                                    {
+                                                        int valor = 0;
+                                                        int percentaje = 0;
+                                                        if (SubItem.Item1 > 0)
+                                                        {
+                                                            valor = SubItem.Item1;
+                                                            percentaje = 100 * valor / (((int)item.ControlM.Maximo - (int)item.ControlM.Minimo) + 1);
+                                                        }
+                                                        <div>
+                                                            <strong style="color: #59033B; font-weight: bold; font-size: 16px; text-align: justify;">@SubItem.Item2</strong>
+                                                        </div>
+                                                        <div style="background-color: gray; height: 28px; border-radius: 12px;">
+                                                            <div style="background-color:@Grupo.Group.Color ;width: @percentaje%;border-radius: 12px; color: #fff; font-size: medium; font-weight: 500; height: 28px; text-align: right; padding-right: 8px;">@SubItem.Item1</div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="padding-top: 5px; height: 60px">
+                            <img src="@Imagenes[1]" style="width: 100%;" />
+                        </div>
+                    </div>
+                    break;
+            }
+
+        }
+        <div style="page-break-after: always; height: 800px;">
+            <div style=" margin: 0 30px; height:720px;">
+                @if (login.Idioma == 1)
+                {
+                    <div style="padding-top: 15px">
+                        <strong style="font-size: 32px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">¿Cuál es su nivel de madurez en su viaje de transformación digital?</strong>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: 20px; ">
+                            La Evaluación del Índice de Transformación Digital* se ha desarrollado utilizando nuestra experiencia colectiva como fundadores y operadores de ecosistemas digitales e innovación durante décadas.  Diseñada para cubrir seis dimensiones principales de un proceso efectivo de transformación empresarial, esta herramienta apoyará sus necesidades de T.D.  y, más importante aún, le apoyará en la atracción, desarrollo y retención del talento digital más alineado a las necesidades de su empresa.
+                        </p>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <strong style="font-size: 32px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">Evaluación de DTI Analítica**</strong>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: 20px; ">
+                            Para profundizar en otros aspectos relacionados con el proceso de transformación de su organización, le recomendamos el "DTI Analytics Report".
+                            Este informe proporcionará información sobre las áreas donde el cambio es más necesario en la estructura de su organización. Le permitirá::<br />
+                            1. Obtener un informe agregado de ‘gaps’, señalando qué causa exactamente las discrepancias entre la transformación real y óptima. <br />
+                            2. Organizar un taller para definir una puntuación óptima en cada una de las 6 dimensiones autónomas.<br />
+                            3. Medir la efectividad de la comunicación organizacional en cuanto a los objetivos y logros del proceso de T.D.<br />
+                            4. Identificar y gestionar los riesgos y promover los aciertos alcanzados en su proceso de T.D. <br />
+                            5. Una referencia de como otras industrias u otra organización de su industria están alcanzando sus objetivos y evitar cometer errores que retrasen su proceso de T.D
+                        </p>
+                    </div>
+                    <div style="padding-top: 5px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: smaller; ">
+                            *La Evaluación del Índice de Transformación Digital es una herramienta patentada de CONSULTREE International y sus compañías afiliadas, CONSULTREE, LLC y CONSULTREE ANALYTICS, LLC. <br />
+                            **La evaluación del "Analítica DTI" requiere un conocimiento detallado de análisis de información y generación de conocimiento profundo mediante la identificación de patrones ocultos en los datos. Por lo tanto, el facilitador del taller debe ser un consultor certificado por CONSULTREE ANALYTICS.  Contáctenos y le recomendaremos un consultor para su organización con experiencia relevante en su industria y su idioma o certifíquese asistiendo a uno de nuestros cursos de certificación.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <strong style="font-size: 32px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">What is the level of maturity in your Digital Transformation journey?</strong>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: 20px; ">
+                            The Digital Transformation Index Assessment* has been developed from our collective experience as founders and operators of digital and innovation ecosystems over decades.  Designed to cover six main dimensions of an effective business transformation journey, this tool will support with your Digital Transformation needs and more importantly to attract, develop, and retain the right digital talent for your organization.
+                        </p>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <strong style="font-size: 32px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">DTI Analytics Assessment**</strong>
+                    </div>
+                    <div style="padding-top: 15px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: 20px; ">
+                            To dive deeper into other aspects regarding your organization’s transformation journey, we recommend the DTI Analytics Assessment.
+                            The DTI Analytics Report will provide information of the areas where change is most needed in your organization structure:<br /><br />
+                            1. Get a comprehensive aggregated gap report, pointing out what exactly causes the discrepancies between actual and optimal transformation. <br />
+                            2. Take a workshop to define an optimal score on each of the 6 autonomous dimensions <br />
+                            3. Measure the effectiveness of organizational communication in terms of the objectives and achievements of the D.T. process.<br />
+                            4. Identify and manage risks and promote the successes achieved in your D.T. process. <br />
+                            5. Have a reference on how other industry or another organization in your industry is achieving its objectives and avoid making mistakes that will delay your D.T. processes.
+                        </p>
+                    </div>
+                    <div style="padding-top: 5px; margin-right: 10px; ">
+                        <p style="text-align: justify; color: black; font-size: smaller; ">
+                            * The Digital Transformation Index Assessment is a proprietary tool of CONSULTREE International and its affiliated companies, CONSULTREE, LLC and CONSULTREE ANALYTICS, LLC. <br />
+                            **The ""DTI Analytics Assessment"" requires a deep understanding of information analysis and generation of deep knowledge by identifying hidden patterns in the data. Therefore, the workshop facilitator must be a CONSULTREE ANALYTICIS certified consultant. Contact us and we will recommend a consultant for your organization with relevant industry expertise and your preferred language or get certified yourself by attending one of our certification courses.
+                        </p>
+                    </div>
+                }
+            </div>
+            <div style="height: 60px">
+                <img src="@Imagenes[1]" style="width: 100%;" />
+            </div>
+        </div>
+        <div style="page-break-after: always; height: 800px;">
+            <div style=" margin: 0 30px; height:700px;">
+                @if (login.Idioma == 1)
+                {
+                    <div style="padding-top: 10px">
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <strong style="font-size: 34px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">Descargue nuestro folleto de productos</strong>
+                        </div>
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                Hemos diseñado productos que se pueden adaptar fácilmente a la medida de sus necesidades específicas en su proceso de T.D. Para obtener una lista de servicios relacionados, descargue nuestro folleto de servicios <a style="color: #1EC6D9">aquí</a>.
+                            </p>
+                        </div>
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <strong style="font-size: 34px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">Contáctenos para obtener asistencia adicional</strong>
+                        </div>
+                        <div style="padding-top: 10px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                Con la compra de este informe tiene acceso a una consulta de 15 minutos. También puede ver una Lista de 12 Tópicos que se pueden analizar en función del "DTI Analytics Report". Para obtener más información entre <a style="color: #1EC6D9">aquí</a>.<br />
+                                Contáctenos o simplemente envíenos un correo a <a style="color: #1EC6D9">infoDTI@consultree.com</a>, adjunte su informe e indíquenos de qué tópico le gustaría hablar y cualquier otra preferencia que pueda tener (por ejemplo, idioma). Uno de nuestros consultores certificados le contactará.
+                            </p>
+                        </div>
+                        <div style="padding-top: 5px; margin-right: 10px; ">
+                            <strong style="font-size: 34px; font-weight: bold; text-align: justify; color: #1EC6D9 !important">¿Preguntas abiertas?</strong>
+                        </div>
+                        <div style="padding-top: 5px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                ¿Tiene alguna pregunta sobre este informe?<br />
+                                ¿No está seguro de cómo continuar?<br />
+                                ¿Le gustaría hablar con un experto que pueda interpretar el informe por usted?<br />
+                                Contáctenos a <a style="color: #1EC6D9">infoDTI@consultree.com</a>
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div style="padding-top: 10px">
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <strong style="font-size: 34px; color: #1EC6D9 !important">Download our Products Brochure</strong>
+                        </div>
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                We have designed products that can be easily customized to meet your specific needs in your Digital Transformation process. For a list of related services, please download our services brochure <a style="color: #1EC6D9">here</a>.
+                            </p>
+                        </div>
+                        <div style="padding-top: 15px; margin-right: 10px; ">
+                            <strong style="font-size: 34px; color: #1EC6D9 !important ">Contact us for Additional Support</strong>
+                        </div>
+                        <div style="padding-top: 10px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                By having purchased this report you are entitled to a 15-minute consultation. You can also view a List of over 12 Topics that can be analyzed based on this report <a style="color: #1EC6D9">here</a>.<br />
+                                Contact us or simply send an email to <a style="color: #1EC6D9">infoDTI@consultree.com</a>, attach your report, let us know what you’d like to talk about and any other preferences you may have (e.g. language). We will have a certified consultant get in touch with you.
+                            </p>
+                        </div>
+                        <div style="padding-top: 5px; margin-right: 10px; ">
+                            <strong style="font-size: 38px; color: #1EC6D9 !important ">Open questions?</strong>
+                        </div>
+                        <div style="padding-top: 5px; margin-right: 10px; ">
+                            <p style="text-align: justify; color: black; font-size: 24px; ">
+                                Do you have any questions about this report?<br />
+                                You're not sure how to continue from here on?<br />
+                                You'd like to speak to an expert who can interpret the report for you?<br />
+                                Please contact us at <a style="color: #1EC6D9">infoDTI@consultree.com</a>
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div style="height: 60px">
+                <img src="@Imagenes[1]" style="width: 100%;" />
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loader" style=" display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url( @Url.Content("~/Content/images/loader.gif") ) center no-repeat, #fff;
+        z-index: 1000;
+">
+
+</div>
+<div class="visually-hidden">
+    @if (Model.Email)
+    {
+
+        <form action="@Url.RouteUrl("SendEMail")" method="post" id="FrmGenerate">
+            <input type="hidden" name="Contenido" id="Contenido" />
+            <input type="hidden" name="Report" value="@Model.Report" />
+            <input type="hidden" name="Mac" id="Mac" />
+            <input type="hidden" name="DataEncuesta" value='@Html.Raw(Json.Encode(Model.DataEncuesta))' />
+            <input type="hidden" name="DataUser" id="DataUser" />
+            <button id="BtnSubmit" type="submit">Enviar</button>
+        </form>
+    }
+    else
+    {
+        <form action="@Url.RouteUrl("GeneratePdf")" method="post" id="FrmGenerate">
+            <input type="hidden" name="Contenido" id="Contenido" />
+            <input type="hidden" name="Mac" id="Mac" />
+            <button id="BtnSubmit" type="submit">Enviar</button>
+        </form>
+    }
+</div>
+
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    <script type="text/javascript">
+        (function () {
+            document.getElementById("BtnSubmit").onclick = function () {
+                document.getElementById("FrmGenerate").onValidate = false;
+            }
+        })();
+
+        const Menus = [].slice.call(document.querySelectorAll('#tab-result .nav-link'));
+        const ColoresGrupos = ('@string.Join("|", Model.Grupos.Where(g => g.Group.TipoReporte == 3).Select(s => Html.Raw(s.Group.Color)).ToList())').split('|');
+        var chartPolar;
+        var chartCol;
+
+        function DetailRadialBar(TextCategories, TextData, Selector) {
+            var Categories = TextCategories.split('|');
+            var Data = TextData.split('|');
+            var optionsPolar = {
+                colors: ColoresGrupos,
+                series: Data,
+                chart: {
+                    type: 'polarArea',
+                    height: '560px',
+                    toolbar: {
+                        show: false,
+                    },
+                    animations: {
+                        enabled: false,
+                        dynamicAnimation: {
+                            enabled: false,
+                        }
+                    },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.dataURI().then(({ imgURI, blob }) => {
+                                $("#canvasPolar").prop('src', imgURI);
+                            });
+                        }
+                    }
+                },
+                theme: {
+                    mode: 'light',
+                    palette: 'palette10',
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: 0,
+                        endAngle: 270,
+                        dataLabels: {
+                            name: {
+                                show: false,
+                            },
+                            value: {
+                                show: false,
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total'
+                        }
+                    }
+                },
+                yaxis: {
+                    min: 0,
+                    max: 100,
+                },
+                labels: Categories,
+                legend: {
+                    show: true,
+                    position: "bottom",
+                    floating: false,
+                    labels: {
+                        colors: '#000',
+                        useSeriesColors: false,
+                    },
+                    formatter: function (seriesName, opts) {
+                        return seriesName
+                    },
+                },
+            };
+            chartPolar = new ApexCharts(document.querySelector(Selector), optionsPolar);
+            chartPolar.render();
+        }
+
+        function DetailColumnBar(TextCategories, TextData, Selector) {
+            var Categories = TextCategories.split('|');
+            var Data = TextData.split('|');
+
+            var optionsColumn = {
+                series: [{
+                    name: 'Value',
+                    data: Data
+                }],
+                chart: {
+                    type: 'bar',
+                    height: '560px',
+                    toolbar: {
+                        show: false,
+                    },
+                    animations: {
+                        enabled: false,
+                        dynamicAnimation: {
+                            enabled: false,
+                        }
+                    },
+                    events: {
+                        mounted: function (chartContext, config) {
+                            chartContext.dataURI().then(({ imgURI, blob }) => {
+                                $("#canvasBarra").prop('src', imgURI);
+                                sendImages();
+                            });
+                        }
+                    }
+                },
+                theme: {
+                    mode: 'light',
+                    palette: 'palette10',
+                },
+                colors: ColoresGrupos,
+                plotOptions: {
+                    bar: {
+                        columnWidth: '45%',
+                        distributed: true,
+                    }
+                },
+                legend: {
+                    show: false,
+                },
+                yaxis: {
+                    min: 0,
+                    max: 100,
+                },
+                xaxis: {
+                    categories: Categories,
+                    labels: {
+                        rotate: -45,
+                        style: {
+                            colors: "#000",
+                            fontSize: '12px'
+                        }
+                    }
+                },
+            };
+
+            chartCol = new ApexCharts(document.querySelector(Selector), optionsColumn);
+            chartCol.render();
+        }
+    </script>
+
+    @for (int a = 0; a < Model.Grupos.Count(); a++)
+    {
+        ViewAnswerGroupPoll Grupo = Model.Grupos[a];
+
+        switch (Grupo.Group.TipoReporte)
+        {
+            case 3:
+                if (a == (Model.Grupos.Count() - 1))
+                {
+                    <script type="text/javascript">
+                        var TextCategories = '@Html.Raw(string.Join("|", Model.ConsolidadoMatriz.Select(s => s.Item2).ToList()))';
+                        var TextData = '@Html.Raw(string.Join("|",Model.ConsolidadoMatriz.Select(s => s.Item1).ToList()))';
+                        DetailRadialBar(TextCategories, TextData, '#char-consolidadoPolar');
+                        DetailColumnBar(TextCategories, TextData, '#char-consolidadoBarra');
+                    </script>
+                }
+                break;
+            case 0:
+                <script type="text/javascript">
+                    var Data = Array();
+                </script>
+
+                foreach (var Respuesta in Grupo.RespuestasAbierta)
+                {
+                    <script>
+                        Data.push({
+                            'Pregunta': '@Respuesta.Contenido.Item2',
+                            'Respuesta': '@Respuesta.Contenido.Item3'
+                        });
+                    </script>
+                }
+
+                if (Model.Email)
+                {
+                    <script type="text/javascript">
+                        $("#DataUser").val(JSON.stringify(Data));
+                    </script>
+                }
+                break;
+        }
+    }
+    <script type="text/javascript">
+        function sendImages() {
+            if (chartPolar.ohYeahThisChartHasBeenRendered) {
+                chartPolar.destroy();
+                chartPolar.ohYeahThisChartHasBeenRendered = false;
+            }
+            if (chartCol.ohYeahThisChartHasBeenRendered) {
+                chartCol.destroy();
+                chartCol.ohYeahThisChartHasBeenRendered = false;
+            }
+
+            $("#charCanvas").hide();
+            debugger;
+            $("#loader").show();
+            $("#Contenido").val($("#contentReport").html().toString());
+
+            document.getElementById("Mac").value = false;
+            $("#FrmGenerate").submit();
+
+        }
+
+    </script>
+}

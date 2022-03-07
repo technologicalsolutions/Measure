@@ -1,0 +1,278 @@
+﻿@using Measure.ViewModels.Pregunta
+@model ViewPreguntasFilter
+@{
+    ViewBag.formShow = "show";
+    ViewBag.PreguntasActive = "active";
+    ViewBag.Title = "Preguntas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string col = Model.Clientes.Count() > 0 ? "4" : "6";
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Preguntas</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @if (Model.Clientes.Count() > 0)
+        {
+            <div class="col-sm-12 col-md-@col">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Clientes</label>
+                    <div class="col-md-10">
+                        <select class="form-select" name="ClienteId" id="ClienteId" data-init-plugin="select2" onchange="LoadPoll(this.value)">
+                            @foreach (var item in Model.Clientes)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(m => m.ClienteId);
+        }        
+        <div class="col-sm-12 col-md-@col">
+            <div class="form-group">
+                <label class="control-label col-md-2">Idiomas</label>
+                <div class="col-md-10">
+                    <select class="form-select" name="Idioma" id="Idioma" data-init-plugin="select2">
+                        @foreach (var item in Model.Idiomas)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-@col">
+            <div class="form-group">
+                <label class="control-label col-md-6">Tipo de control</label>
+                <div class="col-md-10">
+                    <select class="form-select" name="TipoControl" id="TipoControl" data-init-plugin="select2">
+                        @foreach (var item in Model.TipoControl)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-6 text-center mt-4">
+            @using (Html.BeginRouteForm("Pregunta", FormMethod.Post, new { id = "FrmPrg" }))
+            {
+                <div class="col-sm-12">
+                    <input type="hidden" name="Accion" value="0" />
+                    <input type="hidden" name="ClienteId" value="" id="ClienteIdFrm" />                    
+                    <input type="hidden" name="Idioma" value="" id="IdiomaFrm" />
+                    <button class="btn btn-primary rounded-pill py-0" type="button" onclick="CrearPregunta()"><i class="bi-plus-circle"></i> Crear Pregunta</button>
+                </div>
+            }
+        </div>
+        <div class="col-12 col-sm-6 text-center mt-4">
+            <button class="btn btn-primary rounded-pill py-0" type="button" onclick="Buscar()"><i class="bi-search"></i> Filtrar</button>
+        </div>
+    </div>
+    <div class="row" id="Preguntas">
+        <div class="col-lg-12 mt-4" id="DivPreguntas">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th style="width:35%">Pregunta</th>
+                        <th>Idioma</th>                                                
+                        <th>Estado</th>
+                        <th style="width:30%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ListaPreguntas)
+                    {
+                        <tr>
+                            <td>@item.Texto</td>
+                            <td>@item.IdiomaName</td>                            
+                            <td>@item.EstadoName</td>
+                            <td>
+                                <div class="row text-center">
+                                    <div class="col-12 col-lg-4">
+                                        <form action="@Url.RouteUrl("Pregunta")" method="post">
+                                            <input type="hidden" name="Id" value="@item.Id" /> <input type="hidden" />
+                                            <input type="hidden" name="Accion" value="2" /> <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="submit">Editar</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-12 col-lg-4">
+                                        <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.Id')">Detalles</a>
+                                    </div>
+                                    <div class="col-12 col-lg-4">
+                                        <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@(item.Texto.Replace("'","´"))')">Eliminar</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "Preguntas", FormMethod.Post, new { id = "PregDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="DeletePrg" value="" />
+}
+@section ModalSection{
+    <div class="modal fade" tabindex="-1" id="PrgModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle Usuario</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('PrgModal')"></button>
+                </div>
+                <div class="modal-body" id="CrearOEditar"></div>
+            </div>
+        </div>
+    </div>
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-absolute top-0 end-0 p-3" id="DivErrors">
+            <div class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="ErrorToast_ClienteId">
+                <div class="toast-header"><strong class="me-auto">Error</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div>
+            </div>
+            <div class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="ErrorToast_GrupoId">
+                <div class="toast-header"><strong class="me-auto">Error</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div>
+            </div>
+            <div class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="ErrorToast_EncuestaId">
+                <div class="toast-header"><strong class="me-auto">Error</strong><button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div>
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadDataTable("TblLista", false, true, null, 10);
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+        });
+
+        function Buscar() {
+            var params = {
+                Data: {
+                    VisibleCliente : $("#ClienteId option").length > 0,
+                    ClienteId: $("#ClienteId option").length > 0 ? $("#ClienteId").val() : $("#HClienteId").val(),
+                    EncuestaId: $("#EncuestaId").val(),
+                    GrupoId: $("#GrupoId").val(),
+                    Idioma: $("#Idioma").val(),
+                    TipoControl: $("#TipoControl").val()
+                }
+            };
+
+            if (params.Data.GrupoId != "") {
+                $("#GrupoIdFrm").val($("#GrupoId").val());
+            }
+
+            $.ajax({
+                url: '@Url.Action("BuscarPreguntas", "Preguntas")',
+                method: 'Post',
+                data: params,
+                success: function (result) {
+                    var Html = tableBase();
+                    $.each(result, function (pos, item) {
+                        Html += '<tr><td>' + item.Texto + '</td>';
+                        Html += '<td>' + item.IdiomaName + '</td>';                        
+                        Html += '<td>' + item.EstadoName + '</td><td> <div class="row">';
+                        Html += '<div class="col-12 col-lg-4"> <form action="@Url.RouteUrl("Pregunta")" method="post">  <input type="hidden" name="Id" value="' + item.Id + '" /> <input type="hidden" name="Accion" value="2" /> <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="submit">Editar</button> </form> </div>';
+                        Html += '<div class="col-12 col-lg-4"> <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles(\'' + item.Id + '\')">Detalles</a> </div>';
+                        Html += '<div class="col-12 col-lg-4"> <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar(\'' + item.Id + '\',\'' + item.Texto + '\')">Eliminar</a> </div>';
+                        Html += '</td></tr>';
+                    });
+                    Html += '</tbody>';
+                    $("#DivPreguntas").html('');
+                    $("#DivPreguntas").html(Html);
+                    LoadDataTable("TblLista", false, true, null, 10);
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function tableBase() {
+            return '<table class="table table-striped" style="width:100%" id="TblLista">' +
+                '<thead> <tr> <th style="width:35%">Pregunta</th> <th>Idioma</th> <th>Estado</th> <th>Acciones</th> </tr> </thead> <tbody>';
+        }
+        
+        function CrearPregunta() {
+            var ClienteId = $("#ClienteId").val();
+            if (ClienteId !="0") {
+                $("#ClienteIdFrm").val(ClienteId);                
+                $("#IdiomaFrm").val($("#Idioma").val());
+                $("#FrmPrg").submit();
+            } else {
+                if (ClienteId == "0") {
+                    $("#ErrorToast_ClienteId").append('<div class="toast-body">No hay clientes para crear una pregunta.</div>');
+                    $('#ErrorToast_ClienteId').toast({
+                        autohide: false
+                    });
+                    $('#ErrorToast_ClienteId').toast('show');
+                }                
+            }
+        }
+
+        function Detalles(Id) {
+            $.ajax({
+                url: '@Url.Action("Detail", "Preguntas")',
+                dataType: 'html',
+                method: 'Post',
+                data: { Data: { 'Id': Id } },
+                success: function (result) {
+                    $("#CrearOEditar").html('').html(result);
+                    ShowModal("PrgModal");
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar la pregunta: " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeletePrg").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#PregDelete").submit();
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,106 @@
+﻿@using Measure.Enums
+@using Measure.ViewModels.PreguntasPorGrupo
+@using Measure.ViewModels.Usuario
+
+@model ViewAsnwerForGroup
+@{
+    ViewBag.formShow = "show";
+    ViewBag.GruposActive = "active";
+    ViewBag.Title = "Contenido Grupo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    string Nombre = login.Idioma == (int)Idiomas.es_ES ? Model.Group.es_Es : login.Idioma == (int)Idiomas.es_ES ? Model.Group.en_US : Model.Group.pt_BR;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Contenido Grupo: <strong>@Nombre</strong></h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-md-3">
+            @using (Html.BeginForm("AddItem", "PreguntasPorGrupo", FormMethod.Post))
+            {
+                @Html.HiddenFor(m => m.Modelo.GrupoId)
+                <button class="btn btn-primary rounded-pill py-0 mt-1" type="submit"><i class="bi-plus-circle"></i>Enlazar Pregunta</button>
+            }
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Pregunta</th>
+                        <th>Idioma</th>
+                        <th>Orden</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Questions)
+                    {
+                        <tr>
+                            <td>@item.Texto</td>
+                            <td>@(((Idiomas)item.Idioma).ToString())</td>
+                            <td>@item.Orden</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@item.Texto')">Eliminar</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "ContenidoEncuesta", FormMethod.Post, new { id = "preguntaDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="DeleteQuest" value="" />
+}
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea desenlazar la pregunta: " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteQuest").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#preguntaDelete").submit();
+                }
+            });
+        }
+    </script>
+}

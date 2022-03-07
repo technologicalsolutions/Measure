@@ -1,0 +1,128 @@
+﻿@using Measure.Enums
+@using Measure.ViewModels.Usuario
+
+@model Measure.Models.ControlCerrado
+@{
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    List<SelectListItem> Control = new List<SelectListItem>();
+    string[] Valores = Model.Valores.Split('|');
+    string[] Textos = Model.Textos.Split('|');
+
+    if (Model.Textos.Contains(';'))
+    {
+        for (int a = 0; a < Textos.Length; a++)
+        {
+            string[] subValor = Textos[a].Split(';');
+            Control.Add(new SelectListItem { Value = Valores[a], Text = login.Idioma == (int)Idiomas.es_ES ? subValor[0] : login.Idioma == (int)Idiomas.en_US ? subValor[1] : subValor[2] });
+        }
+    }
+    else
+    {
+        for (int a = 0; a < Textos.Length; a++)
+        {
+            Control.Add(new SelectListItem { Value = Valores[a], Text = Textos[a] });
+        }
+    }
+}
+<div class="row">
+    @switch ((Measure.Enums.ControlCerrado)Model.TipoCerrada)
+    {
+        case Measure.Enums.ControlCerrado.Cc_Desplegable:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Desplegable)" data-crid="@Model.Id">
+                <div class="form-group">
+                    <select class="form-select" id="@Model.Id" data-init-plugin="select2">
+                        <option value="@Measure.Recursos.Recurso.Seleccione">@Measure.Recursos.Recurso.Seleccione</option>
+                        @foreach (var item in Control)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            break;
+        case Measure.Enums.ControlCerrado.Cc_Enlistada:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Enlistada)" data-crid="@Model.Id">
+                @for (int a = 0; a < Valores.Length; a++)
+                {
+                    string hijo = Model.TieneControl == null ? string.Empty : (bool)Model.TieneControl ? Model.Id.ToString() : string.Empty;
+                    <div class="form-check">
+                        <input class="form-check-input enlistada" name="@Model.Id" type="radio" value="@Valores[a]" data-hijo="@hijo">
+                        <label class="form-check-label">
+                            @Textos[a]
+                        </label>
+                    </div>
+                }
+            </div>
+            break;
+        case Measure.Enums.ControlCerrado.Cc_Enlistada_Otro:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Enlistada_Otro)" data-crid="@Model.Id">
+                @for (int a = 0; a < Valores.Length; a++)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="@Model.Id" value="@Valores[a]">
+                        <label class="form-check-label">
+                            @Textos[a]
+                        </label>
+                    </div>
+                }
+                <div class="form-check">
+                    <input class="form-check-input" name="@Model.Id" type="radio" value="-1">
+                    <label class="form-check-label">
+                        @Model.ValorControl
+                    </label>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" id="@Model.Id" />
+                </div>
+            </div>
+            break;
+        case Measure.Enums.ControlCerrado.Cc_Enlistada_Anidada:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Enlistada_Anidada)" data-crid="@Model.Id">
+                @for (int a = 0; a < Valores.Length; a++)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input Padre_@Model.PadreId" type="radio" name="@Model.Id" value="@Valores[a]" data-modelvalue="@Model.RespuestaCorrecta">
+                        <label class="form-check-label">
+                            @Textos[a]
+                        </label>
+                    </div>
+                }
+            </div>
+            break;
+        case Measure.Enums.ControlCerrado.Cc_Opcion_Multiple:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Opcion_Multiple)" data-crid="@Model.Id">
+                @for (int a = 0; a < Valores.Length; a++)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="@(a.ToString() + "|" + Model.Id.ToString())" data-val="@Valores[a]">
+                        <label class="form-check-label">
+                            @Textos[a]
+                        </label>
+                    </div>
+                }
+            </div>
+            break;
+        case Measure.Enums.ControlCerrado.Cc_Opcion_Multiple_Otro:
+            <div class="col-12 mt-2 cerrado" data-subcontrol="@((int)Measure.Enums.ControlCerrado.Cc_Opcion_Multiple_Otro)" data-crid="@Model.Id">
+                @for (int a = 0; a < Valores.Length; a++)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" data-val="@Valores[a]">
+                        <label class="form-check-label">
+                            @Textos[a]
+                        </label>
+                    </div>
+                }
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="@((Valores.Length + 1).ToString()+"_"+ Model.Id.ToString())">
+                    <label class="form-check-label">
+                        @Model.ValorControl
+                    </label>
+                </div>
+                <div class="form-group">
+                    <input class="form-control cerrado" id="@((Valores.Length + 1).ToString()+"_"+ Model.Id.ToString())" data-val="@Model.ValorControl" type="checkbox" />
+                </div>
+            </div>
+            break;
+    }
+</div>

@@ -1,0 +1,114 @@
+﻿@model Measure.ViewModels.Encuesta.ViewPollUser
+
+@{
+    ViewBag.EncuestaActive = "active";
+    ViewBag.Title = Measure.Recursos.Recurso.Tablero;
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    string disable = string.Empty;
+}
+
+@section style{
+    @Styles.Render("~/Content/tables")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@Measure.Recursos.Recurso.Tablero</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div>
+                <table class="table table-striped" style="width:100%" id="TblLista">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Measure.Recursos.Recurso.Cliente
+                            </th>
+                            <th>
+                                @Measure.Recursos.Recurso.Nombre_Encuesta
+                            </th>
+                            <th>
+                                @Measure.Recursos.Recurso.Estado
+                            </th>
+                            <th>
+                                @Measure.Recursos.Recurso.Fecha
+                            </th>
+                            <th style="text-align:center">
+                                @Measure.Recursos.Recurso.Accion
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Lista)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NombreCliente)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Nombre)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Estado)
+                                </td>
+                                <td>
+                                    @if (item.FechaRespuesta == null)
+                                    {
+                                        <label>@Measure.Recursos.Recurso.Sin_responder</label>
+                                    }
+                                    else
+                                    {
+                                        <label>@item.FechaRespuesta.ToString()</label>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="row text-center">
+                                        @if (item.FechaRespuesta == null)
+                                        {
+                                            <div class="col-12 text-center">
+                                                @using (Html.BeginForm("ResponderEncuesta", "Encuestas", FormMethod.Post))
+                                                {
+                                                    <button class="btn btn-secondary btn-lg rounded-pill py-0 editLink" type="submit" name="Id" value="@item.IdAsignacion">@Measure.Recursos.Recurso.Responder</button>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-12 col-md-6 text-center">
+                                                @using (Html.BeginRouteForm("Respuesta", FormMethod.Post, new { target = "_blank" }))
+                                                {
+                                                    <input type="hidden" name="report" value="true" />
+                                                    <button class="btn btn-secondary btn-lg rounded-pill py-0 editLink" type="submit" name="Id" value="@item.IdAsignacion">@Measure.Recursos.Recurso.Descargar</button>
+                                                }
+                                            </div>
+                                            <div class="col-12 col-md-6 text-center">
+                                                @using (Html.BeginRouteForm("Respuesta", FormMethod.Post))
+                                                {
+                                                    <button class="btn btn-secondary btn-lg rounded-pill py-0 editLink" type="submit" name="Id" value="@item.IdAsignacion">@Measure.Recursos.Recurso.Reporte</button>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadDataTable("TblLista", false, true, null, 10);
+        })
+    </script>
+}

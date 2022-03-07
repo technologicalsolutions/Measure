@@ -1,0 +1,313 @@
+﻿@using Measure.ViewModels.Dashboard
+@model ViewDashboard
+@{
+    ViewBag.Title = "Dashboard";
+    ViewBag.DashShow = "show";
+    ViewBag.DsgActive = "active";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string col = string.IsNullOrEmpty(Model.ClienteId) ? "col-md-5" : "col-md-10";
+}
+<div class="container">
+    <div class="row">
+        @if (string.IsNullOrEmpty(Model.ClienteId))
+        {
+            <div class="col-12 @col mt-4">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Clientes</label>
+                    <div class="col-md-10">
+                        <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Modelo_ClienteId" onchange="LoadPoll(this.value)">
+                            @foreach (var item in Model.Clientes)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-12 @col mt-4">
+            <div class="form-group">
+                <label class="control-label col-md-2">Encuestas</label>
+                <div class="col-md-10">
+                    <select class="form-select" data-init-plugin="select2" name="Modelo.EncuestaId" id="Modelo_EncuestaId">
+                        @foreach (var item in Model.Encuestas)
+                        {
+                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-2 mt-4">
+            <button class="btn btn-primary mt-3" onclick="Graph()">Graficar</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div id="Char-General"></div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-sm-12">
+            <div id="Char-RespuestasXGrupo"></div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-sm-6">
+            <div id="Char-DatosBasicos"></div>
+        </div>
+        <div class="col-12 col-sm-6">
+            <div id="Char-DistPais"></div>
+        </div>
+    </div>
+</div>
+
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        function LoadPoll(ClienteId) {
+
+            if (ClienteId != "0") {
+                var params = {
+                    'ClienteId': ClienteId
+                };
+
+                $.ajax({
+                    data: params,
+                    url: '@Url.Action("ListaEncuestas", "Encuestas")',
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        $("#Modelo_EncuestaId").html("");
+
+                        var Html = '';
+                        $.each(data, function (pos, item){
+                            Html += '<option value="' + item.Value+'" ';
+                            Html += '>' + item.Text+'</option>';
+                        });
+                        $("#Modelo_EncuestaId").html(Html);
+
+                        $("#Modelo_EncuestaId").select2("destroy");
+                        $("#Modelo_EncuestaId").select2({
+                            "width": 'resolve',
+                            "theme": "bootstrap-5",
+                            "language": SelectedTranslate
+                        });
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    },
+                });
+            }
+
+        }
+
+        function DetailColumn(Categorias, Data, IdSelector) {
+            var DataCol = Data.split('|');
+            var CatCol = Categorias.split('|');
+
+            var options = {
+                series: [{
+                    name: 'Encuestas',
+                    data: DataCol
+                }],
+                chart: {
+                    height: '400px',
+                    type: 'bar',
+                    events: {
+                        click: function (chart, w, e) {
+                            console.log(chart, w, e)
+                        }
+                    }
+                },
+                title: {
+                    text: 'Encuestas por cliente',
+                    align: 'center',
+                },
+                theme: {
+                    mode: 'light',
+                    palette: 'palette10',
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    bar: {
+                        columnWidth: '45%',
+                        distributed: true,
+                    }
+                },
+                xaxis: {
+                    categories: CatCol
+                },
+                responsive: [{
+                    breakpoint: 1000,
+                    options: {
+                        chart: {
+                            height: '400px'
+                        },
+                        legend: {
+                            position: "bottom",
+                            floating: false,
+                        }
+                    }
+                }]
+            };
+
+            var chart = new ApexCharts(document.querySelector(IdSelector), options);
+            chart.render();
+        }
+
+        function Graph() {
+            if ($("#Modelo_EncuestaId").val() != "0") {
+                var params = {
+                    'Id': $("#Modelo_EncuestaId").val()
+                };
+
+                $.ajax({
+                    data: params,
+                    url: '@Url.RouteUrl("BasicGraph")',
+                    type: "POST",
+                    async: true,
+                    success: function (Result) {
+                        DatosBasicos(Result.DatosBasicos);
+                        DistPais(Result.DistPais);
+                        RespuestasXGrupo(Result.RespuestasXGrupo);
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+
+        function DatosBasicos(Data) {
+            var options = {
+                series: [Data.Value, (Data.Max - Data.Value)],
+                title: {
+                    text: 'Respuestas por usuarios',
+                    align: 'center',
+                },
+                chart: {
+                    width: '100%',
+                    height: '400px',
+                    type: 'pie',
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                labels: ['Respondieron ' + Data.Label, 'No han respondido ' + Data.Label],
+
+            };
+            var chart = new ApexCharts(document.querySelector("#Char-DatosBasicos"), options);
+            if (chart.ohYeahThisChartHasBeenRendered) {
+                chart.destroy();
+            }
+            chart.render();
+        }
+
+        function DistPais(Data) {
+            var Labels = Array();
+            var Series = Array();
+
+            $.each(Data, function (pos, item) {
+                Labels.push(item.Label);
+                Series.push(item.Value);
+            });
+
+            var options = {
+                series: Series,
+                chart: {
+                    width: '100%',
+                    height: '400px',
+                    type: 'pie',
+                },
+                title: {
+                    text: 'Usuarios asignados por pais',
+                    align: 'center',
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                labels: Labels,
+
+            };
+            var chart = new ApexCharts(document.querySelector("#Char-DistPais"), options);
+            if (chart.ohYeahThisChartHasBeenRendered) {
+                chart.destroy();
+            }
+            chart.render();
+        }
+
+        function RespuestasXGrupo(Data) {
+            var Series =[
+            {
+                name: 'Respondidas',
+                data: Array()
+            }];
+
+            $.each(Data, function (pos, item) {
+                Series[0].data.push({
+                    x: item.Label,
+                    y: item.Value,
+                    goals: [
+                        {
+                            name: 'A Responder',
+                            value: item.Max,
+                            strokeHeight: 6,
+                            strokeColor: '#59033B'
+                        }
+                    ]
+                });
+            });
+
+            var options = {
+                series: Series,
+                chart: {
+                    width: '100%',
+                    height: '400px',
+                    type: 'bar'
+                },
+                plotOptions: {
+                    bar: {
+                        columnWidth: '60%'
+                    }
+                },
+                colors: ['#00E396'],
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    show: true,
+                    showForSingleSeries: true,
+                    customLegendItems: ['Respondidas', 'A Responder'],
+                    markers: {
+                        fillColors: ['#00E396', '#59033B']
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#Char-RespuestasXGrupo"), options);
+            if (chart.ohYeahThisChartHasBeenRendered) {
+                chart.destroy();
+            }
+            chart.render();
+        }
+
+    </script>
+}
+@section scriptsPost{
+    @if (Model.GraphGeneral.Count() > 0)
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var textCategories = '@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Cliente).ToList()))';
+                var dataGraph = '@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Encuestas).ToList()))';
+                DetailColumn(textCategories, dataGraph, "#Char-General");
+            });
+        </script>
+    }
+}

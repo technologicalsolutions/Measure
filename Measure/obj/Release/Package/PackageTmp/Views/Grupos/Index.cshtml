@@ -1,0 +1,185 @@
+﻿@using Measure.Enums
+@using Measure.ViewModels.Grupo
+@using Measure.ViewModels.Usuario
+
+@model ViewGrupoEncuestas
+@{
+    ViewBag.formShow = "show";
+    ViewBag.GruposActive = "active";
+    ViewBag.Title = "Grupos de Encuestas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    string nombre = string.Empty;
+    string descripcion = string.Empty;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Categorías</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-sm-5">
+            <div class="row mt-4">
+                @using (Html.BeginRouteForm("Categoria", FormMethod.Post))
+                {
+                    <input type="hidden" name="Accion" value="0" />
+                    <input type="hidden" name="ClienteId" value="@Model.ClienteId" />
+                    <button class="btn btn-primary rounded-pill py-0" type="submit"><i class="bi-plus-circle"></i> Crear Categorías</button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div>
+                <table class="table table-striped" style="width:100%" id="TblLista">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Lista)
+                        {
+                            <tr>
+                                <td>
+                                    @{
+                                        nombre = login.Idioma == (int)Idiomas.en_US ? item.en_US : login.Idioma == (int)Idiomas.es_ES ? item.es_Es : item.pt_BR;
+                                    }
+                                    @nombre
+                                </td>
+                                <td>
+                                    @{
+                                        descripcion = login.Idioma == (int)Idiomas.en_US ? item.Desc_en_US : login.Idioma == (int)Idiomas.es_ES ? item.Desc_es_Es : item.Desc_pt_BR;
+                                    }
+                                    @descripcion
+                                </td>
+                                <td>
+                                    @if (item.Estado)
+                                    {
+                                        @Measure.Recursos.Recurso.EstadoActivo
+                                    }
+                                    else
+                                    {
+                                        @Measure.Recursos.Recurso.EstadoInactivo
+                                    }
+                                </td>
+                                <td>
+                                    <div class="row text-center">
+                                        <div class="col-12 col-lg-3">
+                                            @using (Html.BeginRouteForm("PreguntasPorGrupo", FormMethod.Get))
+                                            {
+                                                <input type="hidden" name="GrupoId" value="@item.Id" />                                                
+                                                <button class="btn btn-info btn-sm rounded-pill py-0 editLink" type="submit">Preguntas</button>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-lg-3">
+                                            @using (Html.BeginRouteForm("Categoria", FormMethod.Post))
+                                            {
+                                                <input type="hidden" name="Modelo.Id" value="@item.Id" />
+                                                <input type="hidden" name="Accion" value="2" />
+                                                <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="submit">Editar</button>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-lg-3">
+                                            <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.Id')">Detalles</a>
+                                        </div>
+                                        <div class="col-12 col-lg-3">
+                                            <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@nombre')">Eliminar</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "Grupos", FormMethod.Post, new { id = "GrupoDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="DeleteGrp" value="" />
+}
+@section ModalSection{
+    <div class="modal fade" tabindex="-1" id="GrpModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle Usuario</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('GrpModal')"></button>
+                </div>
+                <div class="modal-body" id="CrearOEditar"></div>
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+            LoadDataTable("TblLista", false, true, null, 10);
+        })
+
+        function Detalles(Id) {
+            $.ajax({
+                url: '@Url.Action("Detail", "Grupos")',
+                dataType: 'html',
+                method: 'Post',
+                data: { Data: { Modelo: { 'id': Id } } },
+                success: function (result) {
+                    $("#CrearOEditar").html('').html(result);
+                    ShowModal("GrpModal");
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar la categoria: " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteGrp").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#GrupoDelete").submit();
+                }
+            });
+        }
+    </script>
+}

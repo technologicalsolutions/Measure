@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+@{
+    string lang = @HttpContext.Current.Session["BaseIdioma"].ToString().Replace("_", "-");
+}
+<html lang="@lang">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/base")
+    <link href="@Url.Content("~/Content/base/Login.css")" rel="stylesheet" />
+    @RenderSection("style", required: false)
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/base")
+</head>
+<body style="background-image: url('@Url.Content("~/Content/images/BackGroundLogin.jpeg")')">
+    @RenderBody()
+    <script type="text/javascript">
+        var BaseIdioma = '@lang';
+    </script>
+    <script src="@Url.Content("~/js/app.js")"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,65 @@
+﻿@model Measure.ViewModels.Encuesta.ViewEncuesta
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Nombre)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Nombre)
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Proposito)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Proposito)
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Modelo.FechaCreacion)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.FechaCreacion)
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Modelo.ActualizaUsuario)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.ActualizaUsuario)
+            <label>
+                @if (Model.Modelo.ActualizaUsuario)
+                {
+                    @Measure.Recursos.Recurso.EstadoActivo
+                }
+                else
+                {
+                    @Measure.Recursos.Recurso.EstadoInactivo
+                }
+            </label>
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Estado)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Estado)
+            <label>
+                @if (Model.Modelo.Estado)
+                {
+                    @Measure.Recursos.Recurso.EstadoActivo
+                }
+                else
+                {
+                    @Measure.Recursos.Recurso.EstadoInactivo
+                }
+            </label>
+        </dd>
+    </dl>
+</div>

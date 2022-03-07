@@ -1,0 +1,191 @@
+﻿@using Measure.ViewModels.Usuario
+
+@model ViewUpdateUser
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.Nombres</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Nombres, new { @class = "form-control update" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.Apellidos *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Apellidos, new { @class = "form-control confirm update" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Empresa *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Empresa, new { @class = "form-control confirm update" })                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Titulo *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Titulo, new { @class = "form-control confirm update" })                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_CorreoT *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.CorreoTrabajo, new { @type="email", @class = "form-control update confirm compare" })
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_CorreoTC *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.ConfirmarCorreoTrabajo, new { @type = "email", @class = "form-control update confirm compare" })
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12" style="display:block">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Industria *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2 cerrado" data-subcontrol="0" data-crid="c2170e4e-69f6-44ae-9891-5b11003bd202">
+                    <div class="form-group">
+                        @Html.DropDownList("IndustriaId", Model.Industrias, htmlAttributes: new { @class = "form-select update", data_init_plugin = "select2", required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12" style="display:block">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_CEmple *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2 cerrado" data-subcontrol="0" data-crid="ce0b8764-c574-4260-987a-0278405d3d17">
+                    <div class="form-group">
+                        @Html.DropDownList("CEmpleadosId", Model.CEmpleados, htmlAttributes: new { @class = "form-select update", data_init_plugin = "select2", required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12" style="display:block">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.Pais *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="form-group">                    
+                    @Html.DropDownList("PaisId", Model.Paises, htmlAttributes: new { @class = "form-select update", data_init_plugin = "select2", required = "required" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Provincia *</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Provincia, new { @class = "form-control update confirm" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_DirT</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.DireccionTrabajo, new { @class = "form-control update" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Telefono</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control update" })                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-12">
+    <div class="row mt-1">
+        <div class="col-12">
+            <strong>@Measure.Recursos.Recurso.UpdateU_Subsi</strong>
+        </div>
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 mt-2">
+                    @Html.TextBoxFor(m => m.Subsidiario, new { @class = "form-control update" })                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

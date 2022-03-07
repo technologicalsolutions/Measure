@@ -1,0 +1,94 @@
+﻿@using Measure.ViewModels.Respuesta
+ 
+@model ViewResultAnswer
+@{
+    ViewBag.formShow = "show";
+    ViewBag.RespuestasActive = "active";
+    ViewBag.Title = "Respuestas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Respuestas</h1>
+            </div>
+        </div>
+    </div>
+    @if (Model.Clientes != null)
+    {
+        <div class="row mt-4">
+            <div class="col-12">
+                @using (Html.BeginRouteForm("FiltrarRespuestas", FormMethod.Post, new { @class = "row" }))
+                {
+                    <div class="row">
+                        <div class="col-12 col-sm-8">
+                            <div class="form-group">
+                                <label class="control-label col-md-2">Encuestas</label>
+                                <div class="col-md-10">
+                                    <select class="form-select" id="Cliente" name="Cliente" data-init-plugin="select2">
+                                        @foreach (var item in Model.Clientes)
+                                        {
+                                            string selected = item.Selected ? "selected" : string.Empty;
+                                            <option value="@item.Value" @selected>@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4 mt-4">
+                            <button class="btn btn-primary rounded-pill py-0" type="submit"><i class="bi-search"></i> Filtrar</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Nombre Cliente</th>
+                        <th>Correo</th>
+                        <th>Nombre Usuario</th>
+                        <th>Fecha Respuesta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lista)
+                    {
+                        <tr>
+                            <td>@item.NombreCliente</td>
+                            <td>@item.Correo</td>
+                            <td>@item.Usuario</td>
+                            <td>@item.FechaRespuesta</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+
+            LoadDataTable("TblLista", false, true, null, 10);
+        })
+    </script>
+}

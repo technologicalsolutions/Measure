@@ -1,0 +1,14 @@
+﻿@model Measure.Models.ControlBooleano
+
+<div class="row">
+    <div class="col-12 mt-2">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input booleano" id="@Model.Id" type="radio" name="inlineRadioOptions" value="1">
+            <label class="form-check-label" for="inlineRadio2">@(!Model.TipoValor ? "Si" : "Verdadero")</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" id="@Model.Id" type="radio" name="inlineRadioOptions" value="0">
+            <label class="form-check-label" for="inlineRadio1">@(!Model.TipoValor ? "No" : "Falso")</label>
+        </div>
+    </div>
+</div>

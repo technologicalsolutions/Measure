@@ -1,0 +1,510 @@
+﻿@using Measure.ViewModels.Pregunta
+@model ViewQuestion
+@{
+    ViewBag.formShow = "show";
+    ViewBag.PreguntasActive = "active";
+    ViewBag.Title = "Preguntas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    <script type="text/javascript">
+        var Textos = ('@Model.ControlC.Textos').split('|');
+        var Valores = ('@Model.ControlC.Valores').split('|');
+        var TipoCerrada = @Model.ControlC.TipoCerrada;
+    </script>
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Pregunta Cerrada</h1>
+                @Html.HiddenFor(m => m.ControlId)
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.ClienteId)
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label class="form-label">Texto Pregunta</label>
+                <div class="col-md-12">
+                    @Html.TextAreaFor(m => m.Texto, new { @class = "form-control", id = "PreguntaControlC", rows = "3" })
+                </div>
+            </div>
+        </div>        
+    </div>
+    <div class="row mt-2">
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label class="form-label">Idioma Pregunta</label>
+                <div class="col-md-12">
+                    <select class="form-select idioma" data-init-plugin="select2" id="IdiomaControlC">
+                        <option value="1" @(Model.Idioma == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaEspanol</option>
+                        <option value="2" @(Model.Idioma == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaIngles</option>
+                        <option value="3" @(Model.Idioma == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaPortugues</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="form-group">
+                <label class="form-check-label" for="EstadoControlC">
+                    Estado: Activo / Inactivo
+                </label>
+                <br />
+                <div class="mt-3">
+                    @Html.CheckBoxFor(m => m.Estado, new { @class = "form-check-input", id = "EstadoControlC" })
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="form-group">
+                <label>Tipo de Pregunta</label>
+                <div class="col-md-12">
+                    <select class="form-select" data-init-plugin="select2" style="width:100%" id="CerradoId" onchange="ActiveOptions(this.value)">
+                        <option value="Cc_Desplegable" @(Model.ControlC.TipoCerrada == 0 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Desplegable</option>
+                        <option value="Cc_Enlistada" @(Model.ControlC.TipoCerrada == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Enlistada</option>
+                        <option value="Cc_Enlistada_Otro" @(Model.ControlC.TipoCerrada == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Enlistada_Otro</option>
+                        <option value="Cc_Enlistada_Anidada" @(Model.ControlC.TipoCerrada == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Enlistada_Anidada</option>
+                        <option value="Cc_Opcion_Multiple" @(Model.ControlC.TipoCerrada == 4 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Opcion_Multiple</option>
+                        <option value="Cc_Opcion_Multiple_Otro" @(Model.ControlC.TipoCerrada == 5 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Cc_Opcion_Multiple_Otro</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group" id="Maestras" style="display:none">
+                <label>Clientes</label>
+                @Html.DropDownList("opciones", Model.Maestras, htmlAttributes: new { @class = "form-select mt-2", data_init_plugin = "select2" })
+            </div>
+            <div class="form-group" id="Cantidad" style="display:none">
+                <label>Cantidad de opciones</label>
+                <input type="text" class="form-control mt-2" onkeypress="NumberOnly(event)" value="1" id="CantidadOpciones" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-3 text-center mt-2">
+            <button class="btn btn-primary" id="MotrarCerrados" type="button" onclick="MotrarCerrados()"><i class="bi-binoculars"></i> Mostrar</button>
+        </div>
+        <div class="col-12 col-sm-3 text-center mt-2">
+            <button class="btn btn-success" type="button" onclick="ActualizarPreguntaCerrad()" id="BtnSaveCerrado"><i class="bi-binoculars"></i> Actualizar Pregunta</button>
+        </div>
+        <div class="col-12 col-sm-3 text-center mt-2">
+            <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Cancelar</button>
+        </div>
+        <div class="col-12 col-sm-3 text-center mt-2">
+            <a href="@Url.RouteUrl("Home")" class="btn btn-primary"><i class="bi-skip-backward"></i> Volver</a>
+        </div>
+    </div>
+    <div class="row tipoCerrado" id="ControlDesplegable"></div>
+    <div class="row tipoCerrado" id="ControlEnlistados" style="display:none">
+        <div class="col-12 mt-2">
+            <div class="row" id="DivOtraRespuesta" style="display:none">
+                <div class="col-12 col-sm-8 mt-2">
+                    <div class="form-group">
+                        <label class="form-label">Texto otra respuesta</label>
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" id="TextOtraRespuesta" name="TextOtraRespuesta" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-4 mt-2">
+                    <div class="form-group">
+                        <label class="control-label">Tipo Campo</label>
+                        <div class="col-md-12 mt-2">
+                            <select name="TipoDatoIdAbierta" id="TipoDatoIdAbierta" class="form-select" data-init-plugin="select2" style="width:100%">
+                                <option value="0">@Measure.Recursos.Recurso.Td_datetime</option>
+                                <option value="1">@Measure.Recursos.Recurso.Td_email</option>
+                                <option value="2">@Measure.Recursos.Recurso.Td_number</option>
+                                <option value="4">@Measure.Recursos.Recurso.Td_tel</option>
+                                <option value="5">@Measure.Recursos.Recurso.Td_text</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="RenderCerrado"></div>
+        </div>
+    </div>
+    <div class="row tipoCerrado" id="ControlAnidado" style="display:none">
+        <div class="row">
+            <div class="col-12 col-sm-6 mt-2">
+                <div class="form-group">
+                    <label>Tipo de Pregunta</label>
+                    <div class="col-md-12 mt-2">
+                        <select class="form-select" data-init-plugin="select2" style="width:100%" id="PrAnidadas" onchange="LoadValores(this.value)"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 mt-2">
+                <div class="row">
+                    <div class="col-12">
+                        <label>Valores anidar</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-2" id="ValoresControl"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="ControlesCerrados"></div>
+    </div>
+</div>
+<div class="row">
+    @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPrg" }))
+    {
+        <input type="hidden" name="Cliente" id="Cliente" />
+    }
+</div>
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate
+            });
+
+            if (TipoCerrada == 0) {
+                $("#Cantidad").hide();
+                $("#MotrarCerrados").hide();
+                $("#Maestras").show();
+            } else {
+                $("#CantidadOpciones").val(Textos.length);
+                MotrarCerrados(Valores, Textos);
+            }
+
+        });
+
+        function ActiveOptions(Valor) {
+            if (Valor == 'Cc_Desplegable') {
+                $("#Cantidad").hide();
+                $("#MotrarCerrados").hide();
+                $("#Maestras").show();
+            } else {
+                $("#Cantidad").show();
+                $("#MotrarCerrados").show();
+                $("#Maestras").hide();
+            }
+        }
+
+        function MotrarCerrados(valores, textos) {
+            $(".tipoCerrado").hide();
+            var Html = '';
+
+            if (valores != undefined) {
+                Html += '<div class="row"><div class="col-12 col-sm-6 mt-2">';
+                for (var a = 0; a < valores.length; a++) {
+                    Html += '<div class="row mt-2"><div class="col-12 mt-2">';
+                    Html += '<label>Valor Opción Nro. ' + (a + 1) + '</label> <input class="form-control" name="OpcionValor" value="' + valores[a] +'"/>';
+                    Html += '</div></div>';
+                }
+                Html += '</div>';
+                Html += '<div class="col-12 col-sm-6 mt-2">';
+                for (var b = 0; b < textos.length; b++) {
+                    Html += '<div class="row mt-2"><div class="col-12 mt-2">';
+                    Html += '<label>Texto Opción Nro. ' + (b + 1) + '</label> <input class="form-control" name="OpcionText" value="' + textos[b] +'"/>';
+                    Html += '</div></div>';
+                }
+                Html += '</div></div>';
+            } else {
+                var columnas = parseInt($("#CantidadOpciones").val());
+                Html += '<div class="row"><div class="col-12 col-sm-6 mt-2">';
+                for (var a = 0; a < columnas; a++) {
+                    Html += '<div class="row mt-2"><div class="col-12 mt-2">';
+                    Html += '<label>Valor Opción Nro. ' + (a + 1) + '</label> <input class="form-control" name="OpcionValor" />';
+                    Html += '</div></div>';
+                }
+                Html += '</div>';
+                Html += '<div class="col-12 col-sm-6 mt-2">';
+                for (var b = 0; b < columnas; b++) {
+                    Html += '<div class="row mt-2"><div class="col-12 mt-2">';
+                    Html += '<label>Texto Opción Nro. ' + (b + 1) + '</label> <input class="form-control" name="OpcionText" />';
+                    Html += '</div></div>';
+                }
+                Html += '</div></div>';
+            }
+
+            if (TipoCerrada == 3) {
+                $("#Cantidad").show();
+                $("#MotrarCerrados").show();
+                $("#Maestras").hide();
+
+                $("#RenderCerrado").html('')
+                if (valores != undefined) {
+                    BuscarPreguntas('@Model.ControlC.PadreId');
+                } else {
+                    AnidarPreguntas();
+                }
+                $("#ControlesCerrados").html('').html(Html);
+                $("#ControlAnidado").show();
+            }
+            else {
+                if (TipoCerrada == 2 || TipoCerrada == 5) {
+                    if (valores != undefined) {
+                        $("#TextOtraRespuesta").val('@Model.ControlC.ValorControl');
+                        $("#TipoDatoIdAbierta").val('@Model.ControlC.TipoDato');
+                    } else {
+                        $("#TextOtraRespuesta").val('');
+                        $("#TipoDatoIdAbierta").val('');
+                    }
+                    $("#DivOtraRespuesta").show();
+                } else {
+                    $("#DivOtraRespuesta").hide();
+                }
+                $("#ControlDesplegable").html('');
+                $("#ControlEnlistados").show();
+                $("#RenderCerrado").html('').html(Html);
+            }
+        }
+
+        function BuscarPreguntas(controlId) {
+            var params = {
+                Data: {
+                    ClientId: $("#ClientId").val(),
+                    Idioma: $("#IdiomaControlC").val(),
+                    ControlId: $("#ControlId").val(),
+                    ChildControlId: controlId
+                }
+            };
+
+            $.ajax({
+                url: '@Url.Action("BuscarPreguntaAnidada", "Preguntas")',
+                method: 'Post',
+                data: params,
+                success: function (result) {
+                    var Html = '';
+                    $.each(result, function (pos, item) {
+                        var selected = item.Selected ? 'selected' : '';
+                        Html += '<option value="' + item.Value + '" ' + selected + '>' + item.Text + '</option>';
+                        if (selected == 'selected') {
+                            LoadValores(item.Value, '@Model.ControlC.RespuestaCorrecta');
+                        }
+                    });
+                    $("#PrAnidadas").html(Html);
+                    $("#PrAnidadas").select2("destroy");
+                    $("#PrAnidadas").select2({
+                        "width": 'resolve',
+                        "theme": "bootstrap-5",
+                        "language": SelectedTranslate
+                    });
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function AnidarPreguntas() {
+            var params = {
+                Data: {
+                    ClientId: $("#ClientId").val(),
+                    Idioma: $("#IdiomaControlC").val(),
+                }
+            };
+            $.ajax({
+                url: '@Url.Action("BuscarAnidarPreguntas", "Preguntas")',
+                method: 'Post',
+                data: params,
+                success: function (result) {
+                    var Html = '';
+                    $.each(result, function (pos, item) {
+                        Html += '<option value="' + item.Value + '">' + item.Text + '</option>';
+                        if (pos == 0) {
+                            LoadValores(item.Value);
+                        }
+                    });
+                    $("#PrAnidadas").html(Html);
+                    $("#PrAnidadas").select2("destroy");
+                    $("#PrAnidadas").select2({
+                        "width": 'resolve',
+                        "theme": "bootstrap-5",
+                        "language": SelectedTranslate
+                    });
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function LoadValores(ControlId,Value) {
+            var params = {
+                Data: {
+                    ControlId: ControlId,
+                }
+            };
+            $.ajax({
+                url: '@Url.Action("BuscarValoreControl", "Preguntas")',
+                method: 'Post',
+                data: params,
+                success: function (result) {
+                    var DataTextos = result.Textos.split('|');
+                    var DataValores = result.Valores.split('|');
+
+                    var Html = '';
+                    for (var a = 0; a < DataTextos.length; a++) {
+                        Html += '<div class="row"><div class="col-12"><div class="form-check form-check-inline mt-2">';
+                        if (Value != undefined) {
+                            var checked = DataValores[a] == Value ? 'checked' : '';
+                            Html += '<input class="form-check-input" type="radio" name="PadreId" value="' + DataValores[a] + '" ' + checked + '>';
+                        } else {
+                            Html += '<input class="form-check-input" type="radio" name="PadreId" value="' + DataValores[a] + '">';
+                        }
+                        Html += '<label class="form-check-label">' + DataTextos[a] +'</label>';
+                        Html += '</div></div></div>';
+                    }
+
+                    $("#ValoresControl").html(Html);
+
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function ActualizarPreguntaCerrad() {
+            var message = '';
+            var params = {
+                Data: {
+                    PreguntaId: $("#Id").val(),
+                    ControlId: $("#ControlId").val(),
+                    ClientId: $("#ClientId").val(),
+                    TextoPregunta: $("#PreguntaControlC").val(),
+                    Idioma: parseInt($("#IdiomaControlC").val()),
+                    EstadoPregunta: document.getElementById("EstadoControlC").checked,
+                    Orden: $("#OrdenControlC").val()
+                }
+            };
+
+            if (params.Data.TextoPregunta == "") {
+                message += '<p>Debe de escribir el texto de la pregunta.</p>';
+            }
+
+            var tipo = $("#CerradoId").val();
+            var _TipoCerrada = 0; //default Cc_Desplegable
+
+            if (tipo == 'Cc_Enlistada') {
+                _TipoCerrada = 1;
+                params.Data.Radio = true;
+            } else if (tipo == 'Cc_Enlistada_Otro') {
+                _TipoCerrada = 2;
+                params.Data.Radio = true;
+                params.Data.TieneControl = true;
+                params.Data.ValorControl = $("#TextOtraRespuesta").val();
+                params.Data.TipoDato = $("#TipoDatoIdAbierta").val();
+            } else if (tipo == 'Cc_Enlistada_Anidada') {
+                _TipoCerrada = 3;
+                params.Data.Radio = true;
+                params.Data.PadreId = $("#PrAnidadas").val();
+                params.Data.RespuestaCorrecta = $('input:radio[name=PadreId]:checked').val();
+            } else if (tipo == 'Cc_Opcion_Multiple') {
+                _TipoCerrada = 4;
+                params.Data.Radio = false;
+            } else if (tipo == 'Cc_Opcion_Multiple_Otro') {
+                _TipoCerrada = 5;
+                params.Data.Radio = false;
+                params.Data.TieneControl = true;
+                params.Data.ValorControl = $("#TextOtraRespuesta").val();
+                params.Data.TipoDato = $("#TipoDatoIdAbierta").val();
+            }
+
+            params.Data.TipoCerrada = _TipoCerrada;
+            var _OpcionValor = '';
+            var _OpcionText = '';
+
+            if (_TipoCerrada == 0) {
+                _OpcionValor = $("#opciones").val();
+
+                if (_OpcionValor == "") {
+                    message += '<p>Debe de crear maestras para seleccionar.</p>';
+                } else {
+                    _OpcionText = $("#opciones option[value=" + _OpcionValor + "]").text();
+                }
+            } else {
+
+                $.each(document.getElementsByName("OpcionValor"), function (pos, item) {
+                    if (item.value != '') {
+                        _OpcionValor += item.value + '|';
+                    }
+                })
+                _OpcionValor = _OpcionValor.substring(0, (_OpcionValor.length - 1));
+
+                $.each(document.getElementsByName("OpcionText"), function (pos, item) {
+                    _OpcionText += item.value + '|';
+                })
+                _OpcionText = _OpcionText.substring(0, (_OpcionText.length - 1));
+
+                if (_OpcionValor == "") {
+                    message += '<p>Debe de escribir todos los valores de las opciones</p>';
+                }
+                if (_OpcionValor.split(',').length != document.getElementsByName("OpcionValor").length) {
+                    message += '<p>Debe de escribir todos los valores de las opciones</p>';
+                }
+                if (_OpcionText == "") {
+                    message += '<p>Debe de escribir todos los textos de las opciones</p>';
+                }
+                if (_OpcionText.split(',').length != document.getElementsByName("OpcionText").length) {
+                    message += '<p>>Debe de escribir todos los textos de las opciones</p>';
+                }
+
+                if (params.Data.TieneControl) {
+                    if ($("#TextOtraRespuesta").val() == '') {
+                        message += '<p>Se requiere el texto adicional.</p>';
+                    } else {
+                        params.Data.TieneControl = true;
+                        params.Data.ValorControl = $("#TextOtraRespuesta").val();
+                    }
+                }
+            }
+
+            params.Data.Textos = _OpcionText;
+            params.Data.Valores = _OpcionValor;
+
+            if (message == '') {
+                 $.ajax({
+                    url: '@Url.Action("ActualizarControlCerrado", "Preguntas")',
+                    method: 'Post',
+                    data: params,
+                    success: function (result) {
+                         $("#Cliente").val(result);
+                         $("#FrmPrg").submit();
+                     },
+                     error: function (Error) {
+                         console.log(Error);
+                     }
+                 });
+            } else {
+                ErrorCreate(message);
+            }
+        }
+
+        function ErrorCreate(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

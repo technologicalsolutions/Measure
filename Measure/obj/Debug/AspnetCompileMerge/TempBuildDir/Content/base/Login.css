@@ -1,0 +1,182 @@
+﻿:root {
+    --main-bg-color-1: #4A0051;
+    --main-bg-color-2: #00c0de;
+    --main-bg-color-3: #2c2a29;
+}
+
+@font-face {
+    font-family: PageFont;
+    font-style: normal;
+    src: url(../fonts/Avenir-Roman.ttf);
+}
+
+html, body {
+    font-family: PageFont !important;
+}
+
+.custom-backgroun-1 {
+    background: var(--main-bg-color-1) !important;
+}
+
+.custom-backgroun-2 {
+    background: var(--main-bg-color-2);
+}
+
+.custom-backgroun-3 {
+    background-color: var(--main-bg-color-3) !important;
+}
+
+body {    
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: right;
+    height: 100%;
+}
+
+.vh-100 {
+    height: 48rem !important;
+}
+
+input:focus,
+button:focus {
+    border: 1px solid var(--main-bg-color-1) !important;
+    box-shadow: none !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--main-bg-color-1) !important;
+    border-color: #e91e63 !important;
+}
+
+.form-outline label {
+    color: var(--main-bg-color-1);
+}
+
+.card,
+.btn,
+input {
+    border-radius: 0 !important;
+}
+
+.logoSup{
+    margin-top: 10px;
+    color:white;
+}
+
+    .logoSup img {
+        width:100%;
+    }
+
+    .logoSup p {
+        font-size: smaller;
+        text-align: right;
+        font-weight: bolder;
+    }
+
+.text-language {
+    position: relative;
+    width: 100px;
+    font-size: medium;
+    font-weight: bolder;
+    color: white;
+}
+
+.text-logo p{
+    font-size: 2.2rem;    
+    font-weight: bold;
+    color: white;
+    line-height: 1.2em;
+}
+
+.btn-rounded {
+    border-radius: 50rem !important;
+}
+
+.knobs, .layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.button {
+    position: relative;
+    top: 50%;
+    width: 100px;
+    height: 50px;
+    overflow: hidden;
+}
+
+    .button.b2 {
+        border-radius: 2px;
+    }
+
+.checkbox {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.knobs {
+    z-index: 2;
+}
+
+.layer {
+    width: 100%;
+    background-color: #00B2C2;
+    transition: .4s;
+    border-radius: 50px;
+    z-index: 1;
+}
+
+.btn-toggle .knobs:before, .btn-toggle .knobs:after, .btn-toggle .knobs span {
+    position: absolute;
+    top: 4px;
+    width: 45px;
+    height: 42px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding: 9px 4px;
+    border-radius: 25px;
+    transition: 0.3s ease all;
+}
+
+.btn-toggle .knobs:before {
+    content: '';
+    left: 52px;
+    background-color: #fff;
+}
+
+.btn-toggle .knobs:after {
+    content: attr(data-content);
+    right: 4px;
+    color: #00B2C2;
+    top: 10px;
+}
+
+.btn-toggle .knobs span {
+    display: inline-block;
+    left: 4px;
+    color: #00B2C2;
+    z-index: 1;
+    top: 10px;
+}
+
+.left:before {
+    left: 52px !important;
+}
+
+.btn-primary {
+    background-color: var(--main-bg-color-1) !important;
+    border-color: var(--main-bg-color-1) !important;
+    color: #fff;
+}

@@ -1,0 +1,505 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{54D6C4DF-94DB-4725-B233-B4D2180C124F}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Measure</RootNamespace>
+    <AssemblyName>Measure</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44376</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Select.HtmlToPdf, Version=21.2.0.0, Culture=neutral, PublicKeyToken=e0ae9f6e27a97018, processorArchitecture=MSIL">
+      <HintPath>..\packages\Select.HtmlToPdf.21.2.0\lib\net40\Select.HtmlToPdf.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ContenidoController.cs" />
+    <Compile Include="Controllers\ContenidoEncuestaController.cs" />
+    <Compile Include="Controllers\ContenidoEncuestas.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\EncuestasController.cs" />
+    <Compile Include="Controllers\GruposController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\MaestraController.cs" />
+    <Compile Include="Controllers\PreguntasController.cs" />
+    <Compile Include="Controllers\PreguntasPorGrupoController.cs" />
+    <Compile Include="Controllers\RespuestasController.cs" />
+    <Compile Include="Controllers\UsuarioController.cs" />
+    <Compile Include="Enums\ControlMatriz.cs" />
+    <Compile Include="Enums\ControlCerrado.cs" />
+    <Compile Include="Enums\ControlAbierto.cs" />
+    <Compile Include="Enums\DbAcciones.cs" />
+    <Compile Include="Enums\Idiomas.cs" />
+    <Compile Include="Enums\TipoComponente.cs" />
+    <Compile Include="Enums\TipoDato.cs" />
+    <Compile Include="Enums\TipoDeControl.cs" />
+    <Compile Include="Enums\UserRol.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Contenido.cs" />
+    <Compile Include="Models\ContenidoPorEncuesta.cs" />
+    <Compile Include="Models\ControlAbierto.cs" />
+    <Compile Include="Models\ControlBooleano.cs" />
+    <Compile Include="Models\ControlCerrado.cs" />
+    <Compile Include="Models\ControlMatriz.cs" />
+    <Compile Include="Models\ControlMatrizColumna.cs" />
+    <Compile Include="Models\ControlMatrizFila.cs" />
+    <Compile Include="Models\Encuesta.cs" />
+    <Compile Include="Models\Grupo.cs" />
+    <Compile Include="Models\Maestras.cs" />
+    <Compile Include="Models\MaestrasDetalle.cs" />
+    <Compile Include="Models\ModeloEncuesta.cs" />
+    <Compile Include="Models\Pregunta.cs" />
+    <Compile Include="Models\PreguntasPorGrupo.cs" />
+    <Compile Include="Models\Respuesta.cs" />
+    <Compile Include="Models\sysdiagrams.cs" />
+    <Compile Include="Models\Usuario.cs" />
+    <Compile Include="Models\UsuariosPorEncuenta.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recursos\Recurso.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Recurso.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Utilidades\ClsProcedures.cs" />
+    <Compile Include="Utilidades\ClsUtilities.cs" />
+    <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContenidosEncuesta.cs" />
+    <Compile Include="ViewModels\Contenidos\ViewContenidoEncuesta.cs" />
+    <Compile Include="ViewModels\Contenidos\ViewContent.cs" />
+    <Compile Include="ViewModels\Contenidos\ViewContentForPoll.cs" />
+    <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContentList.cs" />
+    <Compile Include="ViewModels\ContenidoPorEncuesta\ViewSurveyContent.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboard.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardBasic.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardBasicGraphic.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardClientForPoll.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardDistCount.cs" />
+    <Compile Include="ViewModels\Encuesta\ViewEncuesta.cs" />
+    <Compile Include="ViewModels\Encuesta\ViewFindPollAssign.cs" />
+    <Compile Include="ViewModels\Encuesta\ViewPollAssign.cs" />
+    <Compile Include="ViewModels\Encuesta\ViewPollUser.cs" />
+    <Compile Include="ViewModels\Error\ViewCatchError.cs" />
+    <Compile Include="ViewModels\Error\ViewModelError.cs" />
+    <Compile Include="ViewModels\Grupo\ViewContentGroup.cs" />
+    <Compile Include="ViewModels\Grupo\ViewGroupPoll.cs" />
+    <Compile Include="ViewModels\Grupo\ViewGrupoEncuestas.cs" />
+    <Compile Include="ViewModels\Grupo\ViewLoadGroupPoll.cs" />
+    <Compile Include="ViewModels\Grupo\ViewPoll.cs" />
+    <Compile Include="ViewModels\Maestra\ViewDetailsMaster.cs" />
+    <Compile Include="ViewModels\Maestra\ViewMaster.cs" />
+    <Compile Include="ViewModels\PreguntasPorGrupo\ViewAnswerGroup.cs" />
+    <Compile Include="ViewModels\PreguntasPorGrupo\ViewAsnwerForGroup.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewControlAbierto.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewControlBool.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewControlCerrado.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewControlMatriz.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewDetailQuestion.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewLoadQuestion.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewPregunta.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewPreguntasFilter.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewPreguntasFind.cs" />
+    <Compile Include="ViewModels\Pregunta\ViewQuestion.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswer.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswerControlMatriz.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswerGroupPoll.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswerQuestionBase.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswerResult.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAnswerSurvey.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAsnwerQuestionMatriz.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewAsnwerQuestionOpen.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewCaptureResponse.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewContentListAnswer.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewDownload.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewEmail.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewPresentation.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewReport.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewResultList.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewResultMatrizRange.cs" />
+    <Compile Include="ViewModels\Usuario\ViewLogin.cs" />
+    <Compile Include="ViewModels\Usuario\ViewUpdateUser.cs" />
+    <Compile Include="ViewModels\Usuario\ViewUser.cs" />
+    <Compile Include="ViewModels\Usuario\ViewUsuario.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewResultAnswer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Apexchart\apexcharts.css" />
+    <Content Include="Content\base\Login.css" />
+    <Content Include="Content\base\Site.css" />
+    <Content Include="Content\datatables\buttons.dataTables.min.css" />
+    <Content Include="Content\datatables\jquery.dataTables.min.css" />
+    <Content Include="Content\datatables\select.dataTables.min.css" />
+    <Content Include="Content\images\BackGroundLogin.jpeg" />
+    <Content Include="Content\images\creador-de-encuestas.png" />
+    <Content Include="Content\images\creador-de-encuestas_2.png" />
+    <Content Include="Content\images\Dti_en.png" />
+    <Content Include="Content\images\Dti_es.png" />
+    <Content Include="Content\images\dti_example.png" />
+    <Content Include="Content\images\FondoBienvenida.png" />
+    <Content Include="Content\images\foother_pdf.png" />
+    <Content Include="Content\images\Icono.png" />
+    <Content Include="Content\images\Icono.svg" />
+    <Content Include="Content\images\loader.gif" />
+    <Content Include="Content\images\logo-user.png" />
+    <Content Include="Content\images\logo_login.png" />
+    <Content Include="Content\images\logo_login_2.png" />
+    <Content Include="Content\images\logo_login_2w.png" />
+    <Content Include="Content\images\logo_login_w.png" />
+    <Content Include="Content\select2\select2-bootstrap-5-theme.min.css" />
+    <Content Include="Content\select2\select2-bootstrap-5-theme.rtl.min.css" />
+    <Content Include="Content\select2\select2.css" />
+    <Content Include="Content\sweetalert2\sweetalert2.css" />
+    <Content Include="Content\sweetalert2\sweetalert2.min.css" />
+    <Content Include="css\dark.css" />
+    <Content Include="css\light.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\fa-brands-400.svg" />
+    <Content Include="fonts\fa-regular-400.svg" />
+    <Content Include="fonts\fa-solid-900.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="js\app.js" />
+    <Content Include="js\app.js.LICENSE.txt" />
+    <Content Include="js\settings.js" />
+    <Content Include="Content\fonts\Avenir-Roman.ttf" />
+    <Content Include="Content\fonts\BarlowCondensed-Regular.ttf" />
+    <Content Include="Content\fonts\bootstrap-icons.woff" />
+    <Content Include="Content\fonts\bootstrap-icons.woff2" />
+    <Content Include="Content\fonts\Ubuntu-Bold.ttf" />
+    <Content Include="fonts\fa-brands-400.eot" />
+    <Content Include="fonts\fa-brands-400.ttf" />
+    <Content Include="fonts\fa-brands-400.woff" />
+    <Content Include="fonts\fa-brands-400.woff2" />
+    <Content Include="fonts\fa-regular-400.eot" />
+    <Content Include="fonts\fa-regular-400.ttf" />
+    <Content Include="fonts\fa-regular-400.woff" />
+    <Content Include="fonts\fa-regular-400.woff2" />
+    <Content Include="fonts\fa-solid-900.eot" />
+    <Content Include="fonts\fa-solid-900.ttf" />
+    <Content Include="fonts\fa-solid-900.woff" />
+    <Content Include="fonts\fa-solid-900.woff2" />
+    <Content Include="libman.json" />
+    <Content Include="Scripts\ckeditor5\ckeditor.js.map" />
+    <Content Include="Scripts\apexcharts\apexcharts.js" />
+    <Content Include="Scripts\base\jquery-3.4.1.js" />
+    <Content Include="Scripts\base\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\base\jquery.unobtrusive-ajax.min.js" />
+    <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
+    <None Include="Scripts\base\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\base\jquery.validate.js" />
+    <Content Include="Scripts\base\jquery.validate.min.js" />
+    <Content Include="Scripts\base\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\base\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\base\Site.js" />
+    <Content Include="Scripts\ckeditor5\ckeditor.js" />
+    <Content Include="Scripts\ckeditor5\translations\af.js" />
+    <Content Include="Scripts\ckeditor5\translations\ar.js" />
+    <Content Include="Scripts\ckeditor5\translations\ast.js" />
+    <Content Include="Scripts\ckeditor5\translations\az.js" />
+    <Content Include="Scripts\ckeditor5\translations\bg.js" />
+    <Content Include="Scripts\ckeditor5\translations\ca.js" />
+    <Content Include="Scripts\ckeditor5\translations\cs.js" />
+    <Content Include="Scripts\ckeditor5\translations\da.js" />
+    <Content Include="Scripts\ckeditor5\translations\de-ch.js" />
+    <Content Include="Scripts\ckeditor5\translations\de.js" />
+    <Content Include="Scripts\ckeditor5\translations\el.js" />
+    <Content Include="Scripts\ckeditor5\translations\en-au.js" />
+    <Content Include="Scripts\ckeditor5\translations\en-gb.js" />
+    <Content Include="Scripts\ckeditor5\translations\eo.js" />
+    <Content Include="Scripts\ckeditor5\translations\es.js" />
+    <Content Include="Scripts\ckeditor5\translations\et.js" />
+    <Content Include="Scripts\ckeditor5\translations\eu.js" />
+    <Content Include="Scripts\ckeditor5\translations\fa.js" />
+    <Content Include="Scripts\ckeditor5\translations\fi.js" />
+    <Content Include="Scripts\ckeditor5\translations\fr.js" />
+    <Content Include="Scripts\ckeditor5\translations\gl.js" />
+    <Content Include="Scripts\ckeditor5\translations\gu.js" />
+    <Content Include="Scripts\ckeditor5\translations\he.js" />
+    <Content Include="Scripts\ckeditor5\translations\hi.js" />
+    <Content Include="Scripts\ckeditor5\translations\hr.js" />
+    <Content Include="Scripts\ckeditor5\translations\hu.js" />
+    <Content Include="Scripts\ckeditor5\translations\id.js" />
+    <Content Include="Scripts\ckeditor5\translations\it.js" />
+    <Content Include="Scripts\ckeditor5\translations\ja.js" />
+    <Content Include="Scripts\ckeditor5\translations\kk.js" />
+    <Content Include="Scripts\ckeditor5\translations\km.js" />
+    <Content Include="Scripts\ckeditor5\translations\kn.js" />
+    <Content Include="Scripts\ckeditor5\translations\ko.js" />
+    <Content Include="Scripts\ckeditor5\translations\ku.js" />
+    <Content Include="Scripts\ckeditor5\translations\lt.js" />
+    <Content Include="Scripts\ckeditor5\translations\lv.js" />
+    <Content Include="Scripts\ckeditor5\translations\nb.js" />
+    <Content Include="Scripts\ckeditor5\translations\ne.js" />
+    <Content Include="Scripts\ckeditor5\translations\nl.js" />
+    <Content Include="Scripts\ckeditor5\translations\no.js" />
+    <Content Include="Scripts\ckeditor5\translations\oc.js" />
+    <Content Include="Scripts\ckeditor5\translations\pl.js" />
+    <Content Include="Scripts\ckeditor5\translations\pt-br.js" />
+    <Content Include="Scripts\ckeditor5\translations\pt.js" />
+    <Content Include="Scripts\ckeditor5\translations\ro.js" />
+    <Content Include="Scripts\ckeditor5\translations\ru.js" />
+    <Content Include="Scripts\ckeditor5\translations\si.js" />
+    <Content Include="Scripts\ckeditor5\translations\sk.js" />
+    <Content Include="Scripts\ckeditor5\translations\sl.js" />
+    <Content Include="Scripts\ckeditor5\translations\sq.js" />
+    <Content Include="Scripts\ckeditor5\translations\sr-latn.js" />
+    <Content Include="Scripts\ckeditor5\translations\sr.js" />
+    <Content Include="Scripts\ckeditor5\translations\sv.js" />
+    <Content Include="Scripts\ckeditor5\translations\th.js" />
+    <Content Include="Scripts\ckeditor5\translations\tk.js" />
+    <Content Include="Scripts\ckeditor5\translations\tr.js" />
+    <Content Include="Scripts\ckeditor5\translations\tt.js" />
+    <Content Include="Scripts\ckeditor5\translations\ug.js" />
+    <Content Include="Scripts\ckeditor5\translations\uk.js" />
+    <Content Include="Scripts\ckeditor5\translations\vi.js" />
+    <Content Include="Scripts\ckeditor5\translations\zh-cn.js" />
+    <Content Include="Scripts\ckeditor5\translations\zh.js" />
+    <Content Include="Scripts\datatables\buttons.flash.min.js" />
+    <Content Include="Scripts\datatables\buttons.html5.min.js" />
+    <Content Include="Scripts\datatables\dataTables.bootstrap5.min.js" />
+    <Content Include="Scripts\datatables\dataTables.buttons.min.js" />
+    <Content Include="Scripts\datatables\dataTables.fixedColumns.min.js" />
+    <Content Include="Scripts\datatables\dataTables.select.js" />
+    <Content Include="Scripts\datatables\dataTables.select.min.js" />
+    <Content Include="Scripts\datatables\jquery.dataTables.min.js" />
+    <Content Include="Scripts\jscolor\jscolor.js" />
+    <Content Include="Scripts\jscolor\jscolor.min.js" />
+    <Content Include="Scripts\pdf\addimage.js" />
+    <Content Include="Scripts\pdf\FileSaver.js" />
+    <Content Include="Scripts\pdf\html2canvas.js" />
+    <Content Include="Scripts\pdf\jspdf.js" />
+    <Content Include="Scripts\select2\i18n\en.js" />
+    <Content Include="Scripts\select2\i18n\es.js" />
+    <Content Include="Scripts\select2\i18n\pt-BR.js" />
+    <Content Include="Scripts\select2\select2.full.js" />
+    <Content Include="Scripts\select2\select2.full.min.js" />
+    <Content Include="Scripts\select2\select2.js" />
+    <Content Include="Scripts\select2\select2.min.js" />
+    <Content Include="Scripts\sweetalert2\sweetalert2.all.min.js" />
+    <Content Include="Scripts\sweetalert2\sweetalert2.js" />
+    <Content Include="Scripts\sweetalert2\sweetalert2.min.js" />
+    <Content Include="Scripts\Utilities\util.js" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutLogin.cshtml" />
+    <Content Include="Views\Shared\_LayoutUser.cshtml" />
+    <Content Include="Views\Login\Index.cshtml" />
+    <Content Include="Views\Maestra\Index.cshtml" />
+    <Content Include="Views\Maestra\Detalles.cshtml" />
+    <Content Include="Views\Maestra\Paises.cshtml" />
+    <Content Include="Views\Maestra\Idiomas.cshtml" />
+    <Content Include="Views\Usuario\Index.cshtml" />
+    <Content Include="Views\Usuario\_Detail.cshtml" />
+    <Content Include="Views\Usuario\BuscarUsuarios.cshtml" />
+    <Content Include="Views\Usuario\CreateOrEdit.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Encuestas\Index.cshtml" />
+    <Content Include="Views\Grupos\Index.cshtml" />
+    <Content Include="Views\Grupos\CreateOrEdit.cshtml" />
+    <Content Include="Views\Grupos\_Detail.cshtml" />
+    <Content Include="Views\Encuestas\_Details.cshtml" />
+    <Content Include="Views\Preguntas\Index.cshtml" />
+    <Content Include="Views\Preguntas\Create.cshtml" />
+    <Content Include="Views\Preguntas\EditOpen.cshtml" />
+    <Content Include="Views\Preguntas\EditBool.cshtml" />
+    <Content Include="Views\Preguntas\EditClosed.cshtml" />
+    <Content Include="Views\Preguntas\_Details.cshtml" />
+    <Content Include="Views\Preguntas\EditMatrix.cshtml" />
+    <Content Include="Views\ContenidoEncuesta\Index.cshtml" />
+    <Content Include="Views\ContenidoEncuesta\ItemGroup.cshtml" />
+    <Content Include="Views\ContenidoEncuesta\ItemContent.cshtml" />
+    <Content Include="Views\Contenido\Index.cshtml" />
+    <Content Include="Views\Contenido\CreateOrEdit.cshtml" />
+    <Content Include="Views\PreguntasPorGrupo\Index.cshtml" />
+    <Content Include="Views\PreguntasPorGrupo\AddItem.cshtml" />
+    <Content Include="Views\Respuestas\Index.cshtml" />
+    <Content Include="Views\Encuestas\MisEncuestas.cshtml" />
+    <Content Include="Views\Encuestas\_UpdateUser.cshtml" />
+    <Content Include="Views\Encuestas\ResponderEncuesta.cshtml" />
+    <Content Include="Views\Encuestas\_ControlAbierto.cshtml" />
+    <Content Include="Views\Encuestas\_ControlBooleano.cshtml" />
+    <Content Include="Views\Encuestas\_ControlCerrado.cshtml" />
+    <Content Include="Views\Encuestas\_ControlMatriz.cshtml" />
+    <Content Include="Views\Respuestas\PDF.cshtml" />
+    <Content Include="Views\Respuestas\Respuesta.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Recursos\Recurso.en-US.resx" />
+    <EmbeddedResource Include="Recursos\Recurso.pt-BR.resx" />
+    <EmbeddedResource Include="Recursos\Recurso.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Recurso.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>53969</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost:44376/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

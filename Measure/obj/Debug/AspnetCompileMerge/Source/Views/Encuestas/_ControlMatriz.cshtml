@@ -1,0 +1,110 @@
+﻿@using Measure.ViewModels.Respuesta
+
+@model ViewAnswerControlMatriz
+@{
+    string[] Titulos = Model.ControlMColunnas.Select(s => s.Texto).ToArray();
+    string[] Filas = Model.ControlMFilas.Select(s => s.Texto).ToArray();
+    string[] Columnas = new string[1];
+    if (Model.ControlM.TipoControl == (int)Measure.Enums.ControlMatriz.range)
+    {
+        Columnas = Model.ControlMColunnas.Select(s => s.PasosPorColumna.ToString()).ToArray();
+    }
+    string Control = ((Measure.Enums.ControlMatriz)Model.ControlM.TipoControl).ToString();
+}
+<div class="row">
+    <div class="col-12 table-responsive mt-2">
+        <table class="table table-borderless text-center matriz" id="@Model.ControlM.Id.ToString().Replace('-', '_')" data-maid="@Model.ControlM.Id" data-radio="@Control">
+            <thead style="text-transform: uppercase;">
+                <tr>
+                    <th style="width:30%"></th>
+                    @if (Control == "range")
+                    {
+                        decimal Percentaje = 70 / (((int)Model.ControlM.Maximo - (int)Model.ControlM.Minimo) + 1);
+                        for (int a = 0; a < Titulos.Count(); a++)
+                        {
+                            <th class="custom-backgroun-1 thRange" style="width:@((Percentaje * Convert.ToInt32(Columnas[a])).ToString() + "%")">@Titulos[a]</th>
+                        }
+                    }
+                    else
+                    {
+                        foreach (string Col in Titulos)
+                        {
+                            <th>@Col</th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Control == "range")
+                {
+                    for (int z = 0; z < Filas.Length; z++)
+                    {
+                        <tr>
+                            <td class="text-start text-range">
+                                @Filas[z]
+                            </td>
+                            <td colspan="@Titulos.Length">
+                                <div class="range-slider">
+                                    <input value="0" min="@Model.ControlM.Minimo" max="@Model.ControlM.Maximo" step="@Model.ControlM.Step" name="@(Model.ControlM.Id.ToString() + "_" + Titulos.Length.ToString() + "_" + z.ToString())" type="@Control" style="width:100%" />
+                                    <div class="range-slider-ticks" id="colSlider_@(Model.ControlM.Id.ToString().Replace('-', '_') + Titulos.Length.ToString() + "_" + z.ToString())">
+                                        @for (int a = (int)Model.ControlM.Minimo; a <= (int)Model.ControlM.Maximo; a++)
+                                        {
+                                            string _Class = a == (int)Model.ControlM.Minimo ? "range-slider-ticks__label is-selected" : "range-slider-ticks__label";
+                                            <div class="range-slider-ticks__tick">
+                                                <span class="@_Class">@a</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    for (int z = 0; z < Filas.Length; z++)
+                    {
+                        <tr>
+                            <td>
+                                @Filas[z]
+                            </td>
+                            @for (int a = 0; a < Titulos.Length; a++)
+                            {
+                                <td>
+                                    @if (Control == "radio")
+                                    {
+                                        <input class="form-check-input" name="@(Model.ControlM.Id.ToString() + "_" + a.ToString() + "_" + z.ToString())" type="@Control" value="@Titulos[a]" />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input" id="@(Model.ControlM.Id.ToString() + "_" + a.ToString() + "_" + z.ToString())" type="@Control" value="@Titulos[a]" />
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot style="text-transform: uppercase;">
+                <tr>
+                    <th style="width:30%"></th>
+                    @if (Control == "range")
+                    {
+                        decimal Percentaje = 70 / (((int)Model.ControlM.Maximo - (int)Model.ControlM.Minimo) + 1);
+                        for (int a = 0; a < Titulos.Count(); a++)
+                        {
+                            <th style="width:@((Percentaje * Convert.ToInt32(Columnas[a])).ToString() + "%")">@Titulos[a]</th>
+                        }
+                    }
+                    else
+                    {
+                        foreach (string Col in Titulos)
+                        {
+                            <th>@Col</th>
+                        }
+                    }
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

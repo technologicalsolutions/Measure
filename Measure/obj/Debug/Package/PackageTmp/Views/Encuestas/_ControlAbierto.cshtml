@@ -1,0 +1,70 @@
+﻿@using Measure.Models
+
+@model ControlAbierto
+
+@if (Model.MultiCampo)
+{
+    string[] Textos = Model.DescripcionPre.Split(',');
+    string[] Tipos = Model.DescripcionPos.Split(',');
+    for (int a = 0; a < Textos.Length; a++)
+    {
+        <div class="form-group">
+            <label class="form-label">@Textos[a]</label>
+            <input class="form-control abierto" data-caid="@Model.Id" type="@(((Measure.Enums.TipoDato)Convert.ToInt32(Tipos[a])).ToString())" />
+        </div>
+    }
+}
+else
+{
+    if ((int)Measure.Enums.ControlAbierto.Ca_Entrada == Model.TipoAbierta)
+    {
+        <div class="row">
+            <div class="col-12 mt-2">
+                @if (Model.Multilinea)
+                {
+                    <textarea class="form-control abierto" data-caid="@Model.Id"></textarea>
+                }
+                else
+                {
+                    <input class="form-control abierto" data-caid="@Model.Id" type="@(((Measure.Enums.TipoDato)Model.TipoDato).ToString())" />
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 mt-2">
+                <div class="form-group">
+                    @if (Model.DescripcionPos != null)
+                    {
+                        <label class="col-sm-2 col-form-label">@Model.DescripcionPre</label>
+                        <div class="col-sm-8">
+                            @if (Model.Multilinea)
+                            {
+                                <textarea class="form-control abierto" data-caid="@Model.Id"></textarea>
+                            }
+                            else
+                            {
+                                <input class="form-control abierto" data-caid="@Model.Id" type="@(((Measure.Enums.TipoDato)Model.TipoDato).ToString())" />
+                            }
+                        </div>
+                        <label class="col-sm-2 col-form-label">@Model.DescripcionPos</label>
+                    }
+                    else
+                    {
+                        <label class="form-label">@Model.DescripcionPre</label>
+                        if (Model.Multilinea)
+                        {
+                            <textarea class="form-control abierto" data-caid="@Model.Id"></textarea>
+                        }
+                        else
+                        {
+                            <input class="form-control abierto" data-caid="@Model.Id" type="@(((Measure.Enums.TipoDato)Model.TipoDato).ToString())" />
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,141 @@
+﻿@using Measure.ViewModels.ContenidoPorEncuesta
+
+@model ViewContenidosEncuesta
+@{
+    ViewBag.formShow = "show";
+    ViewBag.EncuestaActive = "active";
+    ViewBag.Title = "Contenido Encuestas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Contenido Encuesta: <strong>@Model.Padre.Nombre</strong></h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-md-3">
+            <button class="btn btn-primary rounded-pill py-0 mt-1" type="button" onclick="ShowModal('ContenModal')"><i class="bi-plus-circle"></i>Enlazar Contenido</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Tipo de Componente</th>
+                        <th>Nombre</th>
+                        <th>Orden</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ViewSurveyContent item in Model.Lista)
+                    {
+                        <tr>
+                            <td>@item.TipoDeComponente</td>
+                            <td>@item.NombreComponente</td>
+                            <td>@item.Orden</td>
+                            <td>
+                                @if (item.Estado)
+                                {
+                                    @Measure.Recursos.Recurso.EstadoActivo
+                                }
+                                else
+                                {
+                                    @Measure.Recursos.Recurso.EstadoInactivo
+                                }
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@item.NombreComponente')">Eliminar</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "ContenidoEncuesta", FormMethod.Post, new { id = "ContenidoDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="DeleteCont" value="" />
+
+}
+@section ModalSection{
+    <div class="modal fade" tabindex="-1" id="ContenModal">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModal">Seleccion el tipo de Contenido</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('ContenModal')"></button>
+                </div>
+                @using (Html.BeginForm("AddItem", "ContenidoEncuesta", FormMethod.Post))
+                {
+                    <input type="hidden" name="EncuestaId" value="@Model.Padre.id" />
+                    <input type="hidden" name="ClienteId" value="@Model.Padre.ClienteId" />                    
+                    <div class="modal-body">
+                        @Html.DropDownList("TipoComponente", Model.TiposComponente, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="CloseModal('ContenModal')">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Enlazar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+                "dropdownParent": $('#ContenModal')
+            });
+
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea desenlazar el componente: " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteCont").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#ContenidoDelete").submit();
+                }
+            });
+        }
+    </script>
+}

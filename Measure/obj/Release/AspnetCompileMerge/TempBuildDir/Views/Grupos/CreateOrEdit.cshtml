@@ -1,0 +1,339 @@
+﻿@using Measure.ViewModels.Grupo
+@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model ViewGrupoEncuestas
+@{
+    ViewBag.formShow = "show";
+    ViewBag.GruposActive = "active";
+    ViewBag.Title = "Categorias de Encuestas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string selected = string.Empty;
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    @Scripts.Render("~/bundles/jscolor")
+    <script type="text/javascript">
+        jscolor.presets.default = {
+            width: 141,               // make the picker a little narrower
+            position: 'right',        // position it to the right of the target
+            previewPosition: 'right', // display color preview on the right
+            previewSize: 40,          // make the color preview bigger
+            palette: [
+                '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
+                '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
+                '#ffffff', '#c3c3c3', '#b87957', '#feaec9', '#ffc80d',
+                '#eee3af', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7',
+            ],
+        };
+    </script>
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@ViewBag.Title</h1>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginRouteForm("CategoriasAcciones", FormMethod.Post, new { id = "FrmCat", onsubmit = "return ValidateForm()" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Accion)
+        @Html.HiddenFor(model => model.Modelo.Id)
+        <div class="row mt-2">
+            @if (Model.ClienteId == null || Model.ClienteId == Guid.Empty)
+            {
+                <div class="col-12 col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Clientes</label>
+                        <div class="col-md-12">
+                            @Html.DropDownList("Modelo.ClienteId", Model.Clientes, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", onchange = "LoadPoll(this.value)" })
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.Modelo.ClienteId)
+
+            }
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Color</label>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-2 text-center">
+                                <button class="mt-1" type="button" data-jscolor="{valueElement:'#Modelo_Color'}"></button>
+                            </div>
+                            <div class="col-10">
+                                @Html.TextBoxFor(model => model.Modelo.Color, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label>Cantidad de columnas</label>
+                    <div class="col-md-12">
+                        <select class="form-select" data-init-plugin="select2" name="Modelo.Columnas">
+                            <option value="12" @(Model.Modelo == null ? "selected" : Model.Modelo.Columnas == 12 ? "selected" : "")>1</option>
+                            <option value="6" @(Model.Modelo != null ? Model.Modelo.Columnas == 6 ? "selected" : "" : "")>2</option>
+                            <option value="4" @(Model.Modelo != null ? Model.Modelo.Columnas == 4 ? "selected" : "" : "")>3</option>
+                            <option value="3" @(Model.Modelo != null ? Model.Modelo.Columnas == 3 ? "selected" : "" : "")>4</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="form-group">
+                    <label>Tipo Reporte</label>
+                    <div class="col-md-12">
+                        <select class="form-select" data-init-plugin="select2" name="Modelo.TipoReporte" id="TipoReporte" onchange="ActiveExtra(this.value)" required>
+                            <option @(Model.Modelo == null ? "selected" : Model.Modelo.TipoReporte == null ? "selected" : "")>Ninguno</option>
+                            <option value="4" @(Model.Modelo != null ? Model.Modelo.TipoReporte == 4 ? "selected" : "" : "")>Presentación</option>
+                            <option value="0" @(Model.Modelo != null ? Model.Modelo.TipoReporte == 0 ? "selected" : "" : "")>Abierto</option>
+                            <option value="1" @(Model.Modelo != null ? Model.Modelo.TipoReporte == 1 ? "selected" : "" : "")>Booleano</option>
+                            <option value="2" @(Model.Modelo != null ? Model.Modelo.TipoReporte == 2 ? "selected" : "" : "")>Cerrado</option>
+                            <option value="3" @(Model.Modelo != null ? Model.Modelo.TipoReporte == 3 ? "selected" : "" : "")>Matriz</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" id="MatrizReportMaxMin" style="display:none">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label">Puntaje Maximo Bajo</label>
+                        <div class="form-group">
+                            @Html.EditorFor(model => model.Modelo.RespuestaBajaMax, new { htmlAttributes = new { @class = "form-control", @onkeypress = "NumberOnly(event)" } })
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Puntaje Minimo Alto</label>
+                        <div class="form-group">
+                            @Html.EditorFor(model => model.Modelo.RespuestaAltaMin, new { htmlAttributes = new { @class = "form-control", @onkeypress = "NumberOnly(event)" } })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Nombre Español</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.es_ES)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.es_Es, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.es_Es, new { @class = "form-control nombres"})
+                    }
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Descripcion Español</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.es_ES)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_es_Es, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_es_Es, new { @class = "form-control nombres" })
+                    }                    
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Nombre Ingles</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.en_US)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.en_US, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.en_US, new { @class = "form-control nombres" })
+                    }                    
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Descripcion Ingles</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.en_US)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_en_US, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_en_US, new { @class = "form-control nombres" })
+                    }                    
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Nombre Portugues</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.pt_BR)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.pt_BR, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.pt_BR, new { @class = "form-control nombres" })
+                    }                    
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Descripcion Portugues</label>
+                <div class="form-group">
+                    @if (login.Idioma == (int)Idiomas.pt_BR)
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_pt_BR, new { @class = "form-control nombres", required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Modelo.Desc_pt_BR, new { @class = "form-control nombres" })
+                    }                    
+                </div>
+            </div>
+            <div class="col-12 text-center">
+                <label class="form-label">Estado</label>
+                <div class="form-group">
+                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                    @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Activo / Inactivo
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-4 mt-4 text-center">
+                <button class="btn btn-success" type="submit"><i class="bi-save"></i> Guardar</button>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-12 col-sm-4 mt-4 text-center">
+            <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Limpiar</button>
+        </div>
+        <div class="col-12 col-sm-4 mt-4 text-center">
+            @using (Html.BeginRouteForm("Categorias", FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-primary" name="Cliente" value="@Model.ClienteId"><i class="bi-skip-backward"></i> a la lista</button>
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+            if ('@((int)Model.Accion)' == '2') {
+                if ('@(Model.Modelo.TipoReporte)' == '3') {
+                    activeDiv("MatrizReportMaxMin", 'show');
+                }
+            }
+        });
+
+        function ActiveExtra(Value) {
+            if (Value == 3) {
+                activeDiv("MatrizReportMaxMin", 'show');
+            }
+            else {
+                activeDiv("MatrizReportMaxMin", 'hide');
+            }
+        }
+
+        function activeDiv(name,option) {
+            if (option == 'hide') {
+                $("#" + name).hide();
+            } else {
+                $("#" + name).show();
+            }
+        }
+
+        function LoadPoll(ClienteId) {
+            var params = {
+                'ClienteId': ClienteId
+            };
+
+            var encuestaId = $("#EncuestaId").val();
+
+            $.ajax({
+                data: params,
+                url: '@Url.Action("ListaEncuestas", "Encuestas")',
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    $("#Encuestas").html("");
+
+                    var Html = '';
+                    $.each(data, function (pos, item){
+                        Html += '<option value="' + item.Value+'" ';
+                        if (encuestaId == item.Text) {
+                            Html += 'Selected';
+                        }
+                        Html += '>' + item.Text+'</option>';
+                    });
+                    $("#EncuestaId").html(Html);
+
+                    $("#EncuestaId").select2("destroy");
+                    $("#EncuestaId").select2({
+                        "width": 'resolve',
+                        "theme": "bootstrap-5",
+                        "language": SelectedTranslate
+                    });
+                },
+                error: function(data) {
+                    console.log(data);
+                },
+            });
+        }
+
+        function ValidateForm() {
+            var message = '';
+            if ($("#TipoReporte").val() == "3") {
+                if ($("#Modelo_RespuestaBajaMax").val() == "") {
+                    message += '<p>Debe seleccionar una Respuesta baja maxima</p>';
+                }
+                if ($("#Modelo_RespuestaAltaMin").val() == "") {
+                    message += '<p>Debe seleccionar una Respuesta alta minima</p>';
+                }
+            }
+
+            if (message == '') {
+                return true;
+            } else {
+                var type = 'danger';
+                var duration = '5000';
+                var ripple = true;
+                var dismissible = true;
+                var positionX = 'center';
+                var positionY = 'top';
+                window.notyf.open({
+                    type,
+                    message,
+                    duration,
+                    ripple,
+                    dismissible,
+                    position: {
+                        x: positionX,
+                        y: positionY
+                    }
+                });
+                return false;
+            }
+            
+        }
+    </script>
+}

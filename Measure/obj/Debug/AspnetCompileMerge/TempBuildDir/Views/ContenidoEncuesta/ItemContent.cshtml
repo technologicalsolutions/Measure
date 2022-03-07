@@ -1,0 +1,158 @@
+﻿@using Measure.ViewModels.ContenidoPorEncuesta
+@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model ViewContentList
+@{
+    ViewBag.formShow = "show";
+    ViewBag.EncuestaActive = "active";
+    ViewBag.Title = "Agrear Contenido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    string Nombre = string.Empty;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Contenido Encuesta: <strong>@Model.Padre.Nombre</strong></h1>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginForm("SaveItem", "ContenidoEncuesta", FormMethod.Post, new { onsubmit = "return validate()" }))
+    {
+        <div class="row mt-4">
+            <div class="col-12 col-md-2">
+                <label class="form-label">Orden</label>
+                <div class="form-group">
+                    @Html.EditorFor(model => model.Modelo.Orden, new { htmlAttributes = new { @class = "form-control", @type = "text", onkeypress = "NumberOnly(event)", required = "required" } })
+                </div>
+            </div>
+            <div class="col-12 col-md-5">
+                <label class="form-label">Nombre Complemento</label>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="NombreComplemento" readonly />
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Estado</label>
+                <div class="form-group mt-1">
+                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Activo / Inactivo
+                    </label>
+                </div>
+            </div>
+            <div class="col-12 col-md-2 mt-4">
+                @Html.HiddenFor(m => m.Modelo.TipoComponente)
+                @Html.HiddenFor(m => m.Modelo.EncuestaId)
+                <input type="hidden" name="Modelo.ComponenteId" id="ComponenteId" value="" />
+                <button class="btn btn-primary" type="submit">Enlazar</button>
+            </div>
+        </div>
+    }
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Seleccione</th>
+                        <th>Nombre</th>
+                        <th>Tipo Contenido</th>
+                        <th>Idioma</th>
+                        <th>Posición</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Contenidos)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" onchange="Selected(this)">
+                                <input type="hidden" value="@item.Id" />
+                            </td>
+                            <td>
+                                @{
+                                    Nombre = !string.IsNullOrEmpty(item.es_Es) ? item.es_Es : !string.IsNullOrEmpty(item.en_US) ? item.en_US : item.pt_BR;
+                                }
+                                @Nombre
+                            </td>
+                            <td>@(((TipoComponente)item.TipoContenido).ToString())</td>
+                            <td>@(((Measure.Enums.Idiomas)item.Idioma).ToString())</td>
+                            <td>@((item.Posicion) ? "Inicio" : "Fin")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
+        function Selected(Obj) {
+            var row = Obj.parentElement.parentElement;
+            var countRow = 0;
+            var Rows = $("#TblLista tbody tr");
+
+            $.each(Rows, function (pos, item) {
+                if (!item.cells[0].firstElementChild.checked) {
+                    countRow++;
+                }
+                if (item != row) {
+                    item.classList.remove("selected");
+                    item.cells[0].firstElementChild.checked = false;
+                } else {
+                    $('#ComponenteId').val(row.cells[0].lastElementChild.value);
+                    $("#NombreComplemento").val(row.cells[1].innerText);
+                }
+            });
+
+            if (countRow == Rows.length) {
+                $('#ComponenteId').val("");
+                $("#NombreComplemento").val("");
+            }
+        }
+
+        function validate() {
+            var Result = true;
+
+            if ($("#NombreComplemento").val() == "") {                
+                Result = false;
+                ToastError("Debe de seleccionar minimo un complemento")
+            }
+
+            return Result;
+        }
+
+        function ToastError(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,71 @@
+﻿@using Measure.ViewModels.Usuario
+<!DOCTYPE html>
+@{
+    ViewUser login = @HttpContext.Current.Session["login"] as ViewUser;
+    string Logo = string.IsNullOrEmpty(login.Imagen) ? Url.Content("~/Content/images/logo-user.png") : login.Imagen;
+    string lang = @HttpContext.Current.Session["BaseIdioma"].ToString().Replace("_", "-");
+}
+<html lang="@lang">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@ViewBag.Title</title>
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/base")
+    @Styles.Render("~/Content/sweet")
+    @RenderSection("style", required: false)
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/base")
+    @Scripts.Render("~/bundles/sweet")
+    @RenderSection("scriptsHead", required: false)
+</head>
+<body data-theme="default" data-layout="fluid" data-sidebar-position="left" data-sidebar-behavior="sticky">
+    <div class="main">
+        <nav class="navbar navbar-expand navbar-light navbar-bg">
+            <div class="navbar-collapse collapse">
+                <ul class="navbar-nav navbar-align">
+                    <li class="nav-item dropdown">
+                        <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
+                            <i class="align-middle" data-feather="settings"></i>
+                        </a>
+                        <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
+                            <img src="@Logo" class="avatar img-fluid rounded-circle me-1" /> <span class="text-dark">@login.Correo</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            @Html.ActionLink(Measure.Recursos.Recurso.Tablero, "MisEncuestas", "Encuestas", new { id = login.Id }, new { @class = "dropdown-item" })
+                            <div class="dropdown-divider"></div>
+                            @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
+                            {
+                                <button class="dropdown-item" id="BtnLogOut" value="@login.Id" type="submit">@Measure.Recursos.Recurso.LoginSalirUsuario</button>
+                            }
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main class="content" style="padding:1rem">
+            @RenderBody()
+        </main>
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row text-muted">
+                    <div class="col-6 text-end">
+                        <p class="mb-0">
+                            Copyright &copy; by <a href="https://consultree.com/">ConsulTree Analytics. LLC</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    @RenderSection("styleFoot", required: false)
+    <script src="@Url.Content("~/js/app.js")"></script>
+    <script type="text/javascript">
+        var SelectedTranslate = '@Measure.Recursos.Recurso.LenguajeSelect';
+        var DataTableTranslate = { url: '@Measure.Recursos.Recurso.LenguajeDatatables' };
+    </script>
+    @RenderSection("scripts", required: false)
+    @RenderSection("scriptsPost", required: false)
+</body>
+</html>

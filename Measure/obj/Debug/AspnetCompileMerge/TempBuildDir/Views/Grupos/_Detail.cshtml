@@ -1,0 +1,113 @@
+﻿@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model Measure.Models.Grupo
+@{
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+}
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            <strong>Nombre</strong>
+        </dt>
+
+        <dd>
+            @if (login.Idioma == (int)Idiomas.es_ES)
+            {
+                @Html.DisplayFor(model => model.es_Es)
+            }
+            else if (login.Idioma == (int)Idiomas.en_US)
+            {
+                @Html.DisplayFor(model => model.en_US)
+            }
+            else if (login.Idioma == (int)Idiomas.pt_BR)
+            {
+                @Html.DisplayFor(model => model.pt_BR)
+            }
+        </dd>
+
+        <dt>
+            <strong>Descripción</strong>
+        </dt>
+
+        <dd>
+            @if (login.Idioma == (int)Idiomas.es_ES)
+            {
+                @Html.DisplayFor(model => model.Desc_es_Es)
+            }
+            else if (login.Idioma == (int)Idiomas.en_US)
+            {
+                @Html.DisplayFor(model => model.Desc_en_US)
+            }
+            else if (login.Idioma == (int)Idiomas.pt_BR)
+            {
+                @Html.DisplayFor(model => model.Desc_pt_BR)
+            }
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Columnas)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Columnas)
+        </dd>
+
+        <dt>
+            <strong>Tiene reporte</strong>
+        </dt>
+
+        <dd>
+            @if (Model.TipoReporte == null)
+            {
+
+                @Measure.Recursos.Recurso.EstadoActivo
+            }
+            else
+            {
+                @Measure.Recursos.Recurso.EstadoInactivo
+            }
+        </dd>
+        @if (Model.TipoReporte == 3)
+        {
+            <dt>
+                <strong>@Html.DisplayNameFor(model => model.RespuestaBajaMax)</strong>
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.RespuestaBajaMax)
+            </dd>
+
+            <dt>
+                <strong>@Html.DisplayNameFor(model => model.RespuestaAltaMin)</strong>
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.RespuestaAltaMin)
+            </dd>
+        }
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Color)</strong>
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Color)
+        </dd>
+
+        <dt>
+            <strong>@Html.DisplayNameFor(model => model.Estado)</strong>
+        </dt>
+
+        <dd>
+            @if (Model.Estado)
+            {
+                @Measure.Recursos.Recurso.EstadoActivo
+            }
+            else
+            {
+                @Measure.Recursos.Recurso.EstadoInactivo
+            }
+        </dd>
+
+    </dl>
+</div>

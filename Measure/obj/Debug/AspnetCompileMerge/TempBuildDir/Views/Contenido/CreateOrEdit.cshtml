@@ -1,0 +1,165 @@
+﻿@using Measure.ViewModels.Contenidos
+@using Measure.Enums
+
+@model ViewContent
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";    
+}
+@section scriptsHead{
+    <script src="@Url.Content("~/Scripts/ckeditor5/ckeditor.js")"></script>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@ViewBag.Title</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            @using (Html.BeginForm("CreateOrEditSave", "Contenido", FormMethod.Post, new { @id = "FrmContenido" }))
+            {
+                <div class="row mt-2">
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.Accion)
+                    @Html.HiddenFor(model => model.ClienteId)
+                    @Html.HiddenFor(model => model.Idioma)
+                    @Html.HiddenFor(model => model.TipoContenido)
+                    <div class="col-12 col-md-8">
+                        <label class="form-label" for="flexCheckChecked">Nombre</label>
+                        <div class="col-md-12">
+                            @if (Model.Idioma == (int)Idiomas.es_ES)
+                            {
+                                @Html.EditorFor(model => model.es_Es, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            }
+                            else if (Model.Idioma == (int)Idiomas.en_US)
+                            {
+                                @Html.EditorFor(model => model.en_US, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            }
+                            else
+                            {
+                                @Html.EditorFor(model => model.pt_BR, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                            }
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="flexCheckChecked">Estado</label>
+                        <div class="mt-2">
+                            @Html.EditorFor(model => model.Estado, new { @class = "form-check-input form-control", required = "required" })
+                            <label for="flexCheckChecked">
+                                Activo/Inactivo
+                            </label>
+                        </div>
+                    </div>    
+                    <div class="col-12 col-md-1">
+                        @if (Model.TipoContenido == (int)TipoComponente.Inicio || Model.TipoContenido == (int)TipoComponente.Fin)
+                        {
+                            bool Posicion = Model.TipoContenido == (int)TipoComponente.Inicio ? true : false;
+                            <input type="hidden" name="Posicion" value="@((Posicion).ToString())" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="Posicion" value="@((false).ToString())" />
+                        }
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label>Contenido</label>
+                        <textarea id="Html" name="Html">
+                            @Model.Html
+                        </textarea>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mt-2">
+                                <button class="btn btn-success" type="submit"><i class="bi-save"></i> Guardar</button>
+                            </div>
+                            <div class="col-12 col-md-6 mt-2">
+                                <button class="btn btn-danger" type="reset" onclick="reseteForm()"><i class="bi-x-square"></i> Limpiar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var chkLanguaje = LenguajeBase.split('-')[0];
+            ClassicEditor
+                .create(document.querySelector('#Html'), {
+                    toolbar: {
+                        items: [
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            'link',
+                            'bulletedList',
+                            'numberedList',
+                            '|',
+                            'outdent',
+                            'indent',
+                            '|',
+                            'imageUpload',
+                            'blockQuote',
+                            'insertTable',
+                            'mediaEmbed',
+                            'undo',
+                            'redo',
+                            '|',
+                            'code',
+                            'codeBlock'
+                        ]
+                    },
+                    language: chkLanguaje,
+                    image: {
+                        toolbar: [
+                            'imageTextAlternative',
+                            'imageStyle:inline',
+                            'imageStyle:block',
+                            'imageStyle:side'
+                        ]
+                    },
+                    table: {
+                        contentToolbar: [
+                            'tableColumn',
+                            'tableRow',
+                            'mergeTableCells'
+                        ]
+                    },
+                    licenseKey: '',
+                })
+                .then(editor => {
+                    window.editor = editor;
+                })
+                .catch(error => {
+                    console.error('Oops, something went wrong!');
+                    console.error('Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:');
+                    console.warn('Build id: 251kf1pyjfhj-v2m6lmswftvg');
+                    console.error(error);
+                });
+        });
+
+        function reseteForm() {
+            document.getElementById('FrmContenido').reset();
+        }
+
+        function ValidForm() {
+            document.getElementById('FrmContenido').submit();
+        }
+
+        function IrLista() {
+            document.getElementById('frmListaContenido').submit();
+        }
+    </script>
+}

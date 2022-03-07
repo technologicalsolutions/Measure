@@ -1,0 +1,342 @@
+﻿@using Measure.Enums
+@model Measure.ViewModels.Usuario.ViewUsuario
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    UserRol RolBase = (UserRol)Model.Modelo.RolId;
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    @if (Model.Modelo.RolId == (int)UserRol.Cliente)
+    {
+        @Scripts.Render("~/bundles/jscolor")
+        <script type="text/javascript">
+            jscolor.presets.default = {
+                width: 141,               // make the picker a little narrower
+                position: 'right',        // position it to the right of the target
+                previewPosition: 'right', // display color preview on the right
+                previewSize: 40,          // make the color preview bigger
+                palette: [
+                    '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
+                    '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
+                    '#ffffff', '#c3c3c3', '#b87957', '#feaec9', '#ffc80d',
+                    '#eee3af', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7',
+                ],
+            };
+        </script>
+    }
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@ViewBag.Title @(RolBase.ToString())</h1>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginRouteForm("UserAcciones", FormMethod.Post, new { enctype = "multipart/form-data", id = "FrmUser" }))
+    {
+        <div class="row mt-2">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(modelo => modelo.Accion)
+            @Html.HiddenFor(modelo => modelo.Modelo.Id)
+            @Html.HiddenFor(modelo => modelo.Modelo.RolId)
+            @if (Model.FindRolId == (int)UserRol.Administrador)
+            {
+                if (Model.Modelo.RolId == (int)UserRol.Aliado)
+                {
+                    <div class="col-12 col-md-6 mt-2 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolCliente</label>
+                            <div class="col-md-10">
+                                <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Modelo_ClienteId" required>
+                                    @foreach (var item in Model.Clientes)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (Model.Modelo.RolId == (int)UserRol.Encuestado)
+                {
+                    <div class="col-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolCliente</label>
+                            <div class="col-md-10">
+                                <select class="form-select" data-init-plugin="select2" name="Clientes" id="Clientes" onchange="LoadAliado(this.value);">
+                                    @foreach (var item in Model.Clientes)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
+                            <div class="col-md-10">
+                                <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Modelo_ClienteId" required>
+                                    @foreach (var item in Model.Aliados)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                }
+                if (Model.Modelo.RolId == (int)UserRol.Cliente)
+                {
+                    <div class="col-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Color</label>
+                            <div class="col-md-10">
+                                <div class="row">
+                                    <div class="col-2 text-center">
+                                        <button class="mt-1" type="button" data-jscolor="{valueElement:'#Modelo_Color'}"></button>
+                                    </div>
+                                    <div class="col-10">
+                                        @Html.TextBoxFor(model => model.Modelo.Color, new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Imagen</label>
+                            <div class="col-md-10">
+                                <input class="form-control" type="file" name="Modelo.Image" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    if (!string.IsNullOrEmpty(Model.Modelo.Imagen))
+                    {
+                        <div class="col-12 col-md-6 mt-2">
+                            <div class="form-group">
+                                <label for="formFileSm" class="form-label">Imagen</label>
+                                <br />
+                                <img src="@Model.Modelo.Imagen" class="img-thumbnail" width="35" height="35" style="cursor:pointer" onclick="ViewImage(this)" />
+                            </div>
+                        </div>
+                    }
+                }
+            }
+            else if (Model.FindRolId == (int)UserRol.Cliente)
+            {
+                if (Model.Modelo.RolId == (int)UserRol.Encuestado)
+                {
+                    <div class="col-12 col-md-6 mt-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
+                            <div class="col-md-10">
+                                @Html.DropDownList("Modelo.ClienteId", Model.Aliados, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
+                }
+            }
+            else
+            {
+                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
+            }
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Modelo.Correo, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @if (Model.Accion != 0)
+                        {
+                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "mail", @readonly = "ReadOnly", required = "required" } })
+                        }
+                        else
+                        {
+                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "mail", required = "required" } })
+                        }
+
+                        @Html.ValidationMessageFor(model => model.Modelo.Clave, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Modelo.Clave, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Modelo.Clave, new { htmlAttributes = new { @class = "form-control", @type = "password", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.Modelo.Clave, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Modelo.Nombres, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Modelo.Nombres, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.Modelo.Nombres, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            @if (Model.Modelo.RolId == (int)UserRol.Encuestado)
+            {
+                <div class="col-12 col-md-6 mt-2">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Modelo.Apellidos, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Modelo.Apellidos, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Modelo.Apellidos, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Modelo.Idioma, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("Modelo.Idioma", Model.Idiomas, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                        @Html.ValidationMessageFor(model => model.Modelo.Idioma, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Pais</label>
+                    <div class="col-md-10">
+                        @Html.DropDownList("Modelo.PaisId", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                        @Html.ValidationMessageFor(model => model.Modelo.PaisId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 mt-2 mt-4">
+                <div class="form-group">
+                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                    @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Activo / Inactivo
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-4 mt-4 text-center">
+                <button class="btn btn-success" type="submit"><i class="bi-save"></i> Guardar</button>
+            </div>
+            <div class="col-12 col-sm-4 mt-4 text-center">
+                <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Cancelar</button>
+            </div>
+            <div class="col-12 col-sm-4 mt-4 text-center">
+                <button class="btn btn-primary" type="button" onclick="BackForm()"><i class="bi-skip-backward"></i> a la lista</button>
+            </div>
+        </div>
+    }
+</div>
+<div style="display:none">
+    @Html.ValidationSummary("", new { @id = "errores" })
+</div>
+@using (Html.BeginRouteForm("Usuarios", FormMethod.Post, new { id = "FrmBack" }))
+{
+    <input type="hidden" name="rol" value="@((int)RolBase)" />
+}
+@section ModalSection{
+    <div class="modal" tabindex="-1" id="Preview">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Previsualizar Imagen 300 x 300 px</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('Preview')"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" class="rounded mx-auto d-block" width="300" height="300" id="imageResize" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-absolute top-0 end-0 p-3" id="DivErrors"></div>
+    </div>
+}
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate
+            });
+
+            var errores = '';
+            $.each($("#errores ul li"), function (pos, item) {
+                if (item.style.display != "none") {
+                    errores +=
+                        '<div class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true"  id="ErrorToast_' + pos + '">' +
+                        '<div class="toast-header" ><strong class="me-auto">Error</strong>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                        '</div ><div class="toast-body">' + item.textContent + '</div></div >';
+                }
+            })
+
+            if (errores != '') {
+                $("#DivErrors").html(errores);
+                $.each($("#errores ul li"), function (pos, item) {
+                    if (item.style.display != "none") {
+                        $('#ErrorToast_' + pos).toast({
+                            autohide: false
+                        });
+                        $('#ErrorToast_' + pos).toast('show');
+                    }
+                })
+            }
+
+        });
+
+        function LoadAliado(ClienteId) {
+            $.ajax({
+                url: '@Url.Action("BuscarAliados", "Usuarios")',
+                method: 'Post',
+                data: { 'ClienteId': ClienteId },
+                success: function (result) {
+                    var Html = '';
+                    $.each(result, function (pos, item) {
+                        Html += '<option value="' + item.Value + '" >' + item.Text + '</option>';
+                    });
+                    $("#Modelo_ClienteId").html(Html);
+
+                    $("#Modelo_ClienteId").select2("destroy");
+                    $("#Modelo_ClienteId").select2({
+                        "width": 'resolve',
+                        "theme": "bootstrap-5",
+                        "language": SelectedTranslate
+                    });
+
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function AsignarValor(obj) {
+            document.getElementById(obj.name).value = obj.value;
+        }
+
+        function ViewImage(obj) {
+            document.getElementById("imageResize").src = obj.src;
+            ShowModal("Preview");
+        }
+
+        function BackForm() {
+            $("#FrmBack").submit();
+        }
+    </script>
+}

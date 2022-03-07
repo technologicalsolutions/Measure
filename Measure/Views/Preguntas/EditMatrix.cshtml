@@ -1,0 +1,418 @@
+﻿@using Measure.ViewModels.Pregunta
+@model ViewQuestion
+@{
+    ViewBag.formShow = "show";
+    ViewBag.PreguntasActive = "active";
+    ViewBag.Title = "Preguntas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    <script type="text/javascript">
+        var Columnas = ('@Html.Raw(string.Join("|", Model.ControlMColunnas.Select(s => s.Texto).ToArray()))').split('|');
+        var Filas = ('@Html.Raw(string.Join("|", Model.ControlMFilas.Select(s => s.Texto).ToArray()))').split('|');
+        var PasosPorColumna = ('@string.Join("|", Model.ControlMColunnas.Select(s => s.PasosPorColumna).ToArray())').split('|');
+    </script>
+}
+<div class="container">
+    <form>
+        <div class="row">
+            <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+                <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+                <div class="lh-1">
+                    <h1 class="h3 mb-0 text-white lh-1">Pregunta Matriz</h1>
+                    @Html.HiddenFor(m => m.ControlId)
+                    @Html.HiddenFor(m => m.Id)
+                    @Html.HiddenFor(m => m.ClienteId)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label">Texto Pregunta</label>
+                    <div class="col-md-12">
+                        @Html.TextAreaFor(m => m.Texto, new { @class = "form-control", id = "PreguntaControlM", rows = "3" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-sm-4">
+                <div class="form-group">
+                    <label class="form-label">Idioma Pregunta</label>
+                    <div class="col-md-12">
+                        <select class="form-select" data-init-plugin="select2" id="IdiomaControlM">
+                            <option value="1" @(Model.Idioma == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaEspanol</option>
+                            <option value="2" @(Model.Idioma == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaIngles</option>
+                            <option value="3" @(Model.Idioma == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaPortugues</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">Tipo de Matriz</label>
+                <br />
+                <div class="form-check form-check-inline mt-2">
+                    @Html.RadioButtonFor(m => m.ControlM.TipoControl, 0, new { @class = "form-check-input Radio" })
+                    <label class="form-check-label" for="exampleRadios1">
+                        Unica
+                    </label>
+                </div>
+                <div class="form-check form-check-inline mt-2">
+                    @Html.RadioButtonFor(m => m.ControlM.TipoControl, 1, new { @class = "form-check-input Radio" })
+                    <label class="form-check-label" for="exampleRadios2">
+                        Multiple
+                    </label>
+                </div>
+                <div class="form-check form-check-inline mt-2">
+                    @Html.RadioButtonFor(m => m.ControlM.TipoControl, 2, new { @class = "form-check-input Radio" })
+                    <label class="form-check-label" for="exampleRadios2">
+                        Rango
+                    </label>
+                </div>
+            </div>
+            <div class="col-12 col-sm-3">
+                <div class="form-group">
+                    <label class="form-check-label" for="EstadoControlC">
+                        Estado: Activo / Inactivo
+                    </label>
+                    <br />
+                    <div class="mt-3">
+                        @Html.CheckBoxFor(m => m.Estado, new { @class = "form-check-input", id = "EstadoControlM" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-2-5">
+                <div class="form-group">
+                    <label class="form-label">Cantidad de Columnas</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="NumberOnly(event)" value="1" id="ColumnasMatriz" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-2-5">
+                <div class="form-group">
+                    <label class="form-label">Cantidad de Filas</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="NumberOnly(event)" value="1" Id="FilasMatriz" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-2-5">
+                <div class="form-group">
+                    <label class="form-label">Comienza en:</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="NumberOnly(event)" value="0" id="MinimoMatriz" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-2-5">
+                <div class="form-group">
+                    <label class="form-label">Finaliza en:</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="NumberOnly(event)" value="1" Id="MaximoMatriz" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-2-5">
+                <div class="form-group">
+                    <label class="form-label">Pasos</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="DecimalOnly(event)" value="1" Id="PasoMatriz" disabled />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center mt-4">
+                <button class="btn btn-primary btn-sm rounded-pill py-0" type="button" onclick="VisualizarMatriz()"><i class="bi-binoculars"></i>Generar Matriz</button>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 col-sm-6" id="FilasM">
+
+            </div>
+            <div class="col-12 col-sm-6" id="ColumnasM">
+
+            </div>
+        </div>
+        <div class="col-12 text-center mt-4">
+            <div class="row">
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-success" type="button" id="BtnSaveAbierta" onclick="ActualizarMatriz()"><i class="bi-save"></i> Actualizar Matriz</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Limpiar</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <a href="@Url.RouteUrl("Home")" class="btn btn-primary"><i class="bi-skip-backward"></i> a la lista</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="row">
+    @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPrg" }))
+    {
+        <input type="hidden" name="Cliente" id="Cliente" />
+    }
+</div>
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate
+            });
+
+            $("input:radio").change(function () {
+                if (this.value == "2") {
+                    $("#MinimoMatriz").removeAttr("disabled");
+                    $("#MaximoMatriz").removeAttr("disabled");
+                    $("#PasoMatriz").removeAttr("disabled");
+                } else {
+                    $("#MinimoMatriz").attr("disabled", "disabled");
+                    $("#MaximoMatriz").attr("disabled", "disabled");
+                    $("#PasoMatriz").attr("disabled", "disabled");
+                }
+            })
+
+            $("#ColumnasMatriz").val(Columnas.length);
+            $("#FilasMatriz").val(Filas.length);
+
+            if (@Model.ControlM.TipoControl == 2) {
+                $("#MinimoMatriz").val('@Model.ControlM.Minimo');
+                $("#MaximoMatriz").val('@Model.ControlM.Maximo');
+                $("#PasoMatriz").val('@Model.ControlM.Step');
+                $("#MinimoMatriz").removeAttr("disabled");
+                $("#MaximoMatriz").removeAttr("disabled");
+                $("#PasoMatriz").removeAttr("disabled");
+            } else {
+                $("#MinimoMatriz").attr("disabled", "disabled");
+                $("#MaximoMatriz").attr("disabled", "disabled");
+                $("#PasoMatriz").attr("disabled", "disabled");
+            }
+
+            VisualizarMatriz(Filas, Columnas);
+        });
+
+        function VisualizarMatriz(filas, columnas) {
+            var tipo = '';
+            var flenght = 0;
+            var clenght = 0;
+            var newData = true;
+            $.each(document.getElementsByName("ControlM.TipoControl"), function (pos, item) {
+                if (item.checked) {
+                    tipo = item.value;
+                }
+            })
+
+            if (filas == undefined) {
+                flenght = parseInt($("#FilasMatriz").val());
+                clenght = parseInt($("#ColumnasMatriz").val());
+            } else {
+                flenght = filas.length;
+                clenght = columnas.length;
+                newData = false;
+            }
+
+            var Html = '';
+            Html += '<div class="row">';
+            for (var b = 0; b < clenght; b++) {
+                Html += '<div class="col-12">';
+                Html += '<div class="row">';
+                if (tipo == "2") {
+                    Html += '<div class="col-12 col-md-8">';
+                    Html += '<label>Texto Columna Nro. ' + (b + 1) + '</label>';
+                    if (newData) {
+                        Html += '<input class="form-control" name="TextoColumna"/></div>';
+                    } else {
+                        Html += '<input class="form-control" name="TextoColumna" value="' + columnas[b] + '" /></div>';
+                    }
+
+                    Html += '<div class="col-12 col-md-4">';
+                    Html += '<label>Pasos por Columna Nro. ' + (b + 1) + '</label>';
+                    if (newData) {
+                        Html += '<input class="form-control pasoPorColumna" onkeypress="NumberOnly(event)"/></div>';
+                    } else {
+                        Html += '<input class="form-control pasoPorColumna" onkeypress="NumberOnly(event)" value="' + PasosPorColumna[b] + '"/></div>';
+                    }
+
+                } else {
+                    Html += '<div class="col-12 col-md-12">';
+                    Html += '<label>Texto Columna Nro. ' + (b + 1) + '</label>';
+                    Html += '<input class="form-control" name="TextoColumna" /></div>';
+                }
+                Html += '</div>';
+            }
+            Html += '</div>';
+            $("#ColumnasM").html(Html);
+            Html = '<div class="row">';
+            for (var a = 0; a < flenght; a++) {
+                Html += '<div class="col-12">';
+                if (newData) {
+                    Html += '<label>Texto Fila Nro. ' + (a + 1) + '</label> <input class="form-control" name="TextoFila" />';
+                } else {
+                    Html += '<label>Texto Fila Nro. ' + (a + 1) + '</label> <input class="form-control" name="TextoFila" value="' + filas[a] + '" />';
+                }
+                Html += '</div>';
+            }
+            Html += '</div>';
+            $("#FilasM").html(Html);
+        }
+
+        function ActualizarMatriz() {
+            var message = Array();
+            var params = {
+                Data: {
+                    ControlId: $("#ControlId").val(),
+                    PreguntaId: $("#Id").val(),
+                    ClienteId: $("#ClienteId").val(),
+                    TextoPregunta: $("#PreguntaControlM").val(),
+                    Idioma: parseInt($("#IdiomaControlM").val()),
+                    EstadoPregunta: document.getElementById("EstadoControlM").checked,
+
+                    Orden: $("#OrdenControlM").val(),
+                }
+            };
+
+            if ($('input:radio[name=Radio]:checked').val() == 0) {
+                params.Data.Radio = "radio";
+            } else if ($('input:radio[name=Radio]:checked').val() == 1) {
+                params.Data.Radio = "checkbox";
+            } else {
+                params.Data.Radio ="range";
+            }
+
+            if (params.Data.TextoPregunta == "") {
+                message.push('<p>Debe de escribir el texto de la pregunta.</p>');
+            }
+
+            var _TextoFilas = '';
+            $.each(document.getElementsByName("TextoFila"), function (pos, item) {
+                if (item.value != '') {
+                    _TextoFilas += item.value + '|';
+                }
+            })
+            _TextoFilas = _TextoFilas.substring(0, (_TextoFilas.length - 1));
+
+            var _TextoColumnas = '';
+            $.each(document.getElementsByName("TextoColumna"), function (pos, item) {
+                if (item.value != '') {
+                    _TextoColumnas += item.value + '|';
+                }
+            })
+            _TextoColumnas = _TextoColumnas.substring(0, (_TextoColumnas.length - 1));
+
+            params.Data.TextoFilas = _TextoFilas;
+            params.Data.TextoColumnas = _TextoColumnas;
+
+            if (_TextoFilas == "") {
+                message.push('<p>Debe de escribir todas las descripciones de las filas</p>');
+            } else {
+                if (_TextoFilas.split('|').length != document.getElementsByName("TextoFila").length) {
+                    message.push('<p>Debe de escribir todas las descripciones de las filas</p>');
+                }
+            }
+
+            if (_TextoColumnas == "") {
+                message.push('<p>Debe de escribir todas las descripciones de las columnas</p>');
+            } else {
+                if (_TextoColumnas.split('|').length != document.getElementsByName("TextoColumna").length) {
+                    message.push('<p>Debe de escribir todas las descripciones de las columnas</p>');
+                }
+            }
+
+
+            if (params.Data.Radio == "range") {
+                if ($("#MinimoMatriz").val() == "") {
+                    message.push('<p>Debe de escribir en que valor empieza el rango</p>');
+                } else {
+                    params.Data.Min = parseInt($("#MinimoMatriz").val());
+                }
+                if ($("#MaximoMatriz").val() == "") {
+                    message.push('<p>Debe de escribir en que valor termina el rango</p>');
+                } else {
+                    params.Data.Max = parseInt($("#MaximoMatriz").val());
+                }
+                if ($("#PasoMatriz").val() == "") {
+                    message.push('<p>Debe de escribir en que valor termina el rango</p>');
+                } else {
+                    params.Data.Step = parseInt($("#PasoMatriz").val());
+                }
+
+                var pasosColumnas = '';
+                var countEmpty = 0;
+                var countTotal = 0;
+                $.each($(".pasoPorColumna"), function (pos, item) {
+                    if (item.value == '') {
+                        countEmpty++;
+                    } else {
+                        countTotal += parseInt(item.value);
+                        pasosColumnas += item.value + '|';
+                    }
+                })
+
+                if (countEmpty > 0) {
+                    message.push('<p>Debe de digitar todos los pasos por columna</p>');
+                } else {
+                    var totalPasos = (params.Data.Max - params.Data.Min) + 1;
+                    if (totalPasos < countTotal) {
+                        message.push('<p>Los pasos por columna no pueden ser mas que el rango seleccionado: ' + totalPasos + ' </p>');
+                    } else if (totalPasos > countTotal) {
+                        message.push('<p>Los pasos por columna no pueden ser menos que el rango seleccionado: ' + totalPasos + ' </p>');
+                    } else {
+                        pasosColumnas = pasosColumnas.substring(0, (pasosColumnas.length - 1));
+                        params.Data.PasosPorColumna = pasosColumnas;
+                    }
+                }
+            }
+
+            if (message.length == 0) {
+                $.ajax({
+                    url: '@Url.Action("ActualizarControlMatriz", "Preguntas")',
+                    method: 'Post',
+                    data: params,
+                    success: function (result) {
+                        $("#Cliente").val(result);
+                        $("#FrmPrg").submit();
+                    },
+                    error: function (Error) {
+                        console.log(Error);
+                    }
+                });
+            } else {
+                $.each(message, function (pos, item) {
+                    ErrorCreate(item);
+                })
+            }
+        }
+
+        function ErrorCreate(message) {
+            var type = 'danger';
+            var duration = '';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

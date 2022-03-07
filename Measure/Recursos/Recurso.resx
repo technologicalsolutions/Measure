@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Accion" xml:space="preserve">
+    <value>Acción</value>
+  </data>
+  <data name="Antes" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="Apellidos" xml:space="preserve">
+    <value>Apellidos</value>
+  </data>
+  <data name="Ca_Entrada" xml:space="preserve">
+    <value>Campo entrada una linea</value>
+  </data>
+  <data name="Ca_Entrada_Descripcion" xml:space="preserve">
+    <value>Campo entrada una linea con texto antes y/o despues</value>
+  </data>
+  <data name="Ca_Entrada_Multiple" xml:space="preserve">
+    <value>Campo entrada multilinea</value>
+  </data>
+  <data name="Ca_Rango" xml:space="preserve">
+    <value>Rango</value>
+  </data>
+  <data name="Ca_Texto_Multiple" xml:space="preserve">
+    <value>Campo de texto multiple</value>
+  </data>
+  <data name="Cc_Desplegable" xml:space="preserve">
+    <value>Seleccion</value>
+  </data>
+  <data name="Cc_Enlistada" xml:space="preserve">
+    <value>Unica respuesta</value>
+  </data>
+  <data name="Cc_Enlistada_Anidada" xml:space="preserve">
+    <value>Unica respuesta anidada</value>
+  </data>
+  <data name="Cc_Enlistada_Otro" xml:space="preserve">
+    <value>Unica respuesta mas otro</value>
+  </data>
+  <data name="Cc_Opcion_Multiple" xml:space="preserve">
+    <value>Respuesta multiple</value>
+  </data>
+  <data name="Cc_Opcion_Multiple_Otro" xml:space="preserve">
+    <value>Respuesta multiple mas otro</value>
+  </data>
+  <data name="Cliente" xml:space="preserve">
+    <value>Cliente</value>
+  </data>
+  <data name="Confirmar" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="Continuar" xml:space="preserve">
+    <value>Continuar</value>
+  </data>
+  <data name="ControlAbierto" xml:space="preserve">
+    <value>Preguntas abiertas</value>
+  </data>
+  <data name="ControlBooleano" xml:space="preserve">
+    <value>Pregunta SI / NO</value>
+  </data>
+  <data name="ControlCerrado" xml:space="preserve">
+    <value>Preguntas Cerradas</value>
+  </data>
+  <data name="ControlMatriz" xml:space="preserve">
+    <value>Matriz de Seleccion</value>
+  </data>
+  <data name="ControlTodo" xml:space="preserve">
+    <value>Todas los controles</value>
+  </data>
+  <data name="CuerpoCorreo" xml:space="preserve">
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Correo&lt;/title&gt;
+&lt;/head&gt;
+&lt;body style="font-family: Arial, Helvetica, sans-serif;margin: 20px;"&gt;
+    &lt;div&gt;Estimado usuario de CONSULTREE&lt;/div&gt;
+    &lt;div style="padding-top: 10px;"&gt;Se adjunta el informe de la evaluación DTI para :&lt;/div&gt;
+    &lt;div style="padding-top: 20px;"&gt;        
+        &lt;strong&gt;Nombre: &lt;/strong&gt;{0}&lt;/br&gt;
+        &lt;strong&gt;Apellido:&lt;/strong&gt;{1}&lt;/br&gt;
+        &lt;strong&gt;Nombre de la Empresa: &lt;/strong&gt;{2}&lt;/br&gt;
+        &lt;strong&gt;# de Empleados: &lt;/strong&gt;{3}&lt;/br&gt;
+        &lt;strong&gt;Titulo/Posición: &lt;/strong&gt;{4}&lt;/br&gt;
+        &lt;strong&gt;Industrias: &lt;/strong&gt;{5}&lt;/br&gt;
+        &lt;strong&gt;Correo electrónico de trabajo: &lt;/strong&gt;{6}&lt;/br&gt;
+        &lt;strong&gt;Teléfono: &lt;/strong&gt;{7}&lt;/br&gt;
+        &lt;strong&gt;País: &lt;/strong&gt;{8}&lt;/br&gt;
+    &lt;/div&gt;
+    &lt;div style="text-align: justify; padding-top: 40px;"&gt;
+        Por favor revise el informe adjunto. Este informe contiene información que puede considerarse confidencial y solo debe compartirse con personas autorizadas según la política de la organización y de acuerdo con las normas y regulaciones locales relacionadas la privacidad de la data..
+    &lt;/div&gt;
+    &lt;div style="padding-top: 20px;"&gt;
+        Si experimenta alguna dificultad técnica o desea más ayuda, por favor contáctenos a infoDTI@consultree.com
+    &lt;/div&gt;
+    &lt;div style="padding-top: 20px;"&gt;
+        Gracias por elegir ConsulTree.
+    &lt;/div&gt;    
+&lt;/body&gt;
+&lt;/html&gt;</value>
+  </data>
+  <data name="Descargar" xml:space="preserve">
+    <value>Descargar</value>
+  </data>
+  <data name="Estado" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="EstadoActivo" xml:space="preserve">
+    <value>Activo</value>
+  </data>
+  <data name="EstadoInactivo" xml:space="preserve">
+    <value>Inactivo</value>
+  </data>
+  <data name="Fecha" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="IdiomaEspanol" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="IdiomaIngles" xml:space="preserve">
+    <value>Ingles</value>
+  </data>
+  <data name="IdiomaPortugues" xml:space="preserve">
+    <value>Portugues</value>
+  </data>
+  <data name="LenguajeDatatables" xml:space="preserve">
+    <value>//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json</value>
+  </data>
+  <data name="LenguajeSelect" xml:space="preserve">
+    <value>es-ES</value>
+  </data>
+  <data name="LenguajeSelectScript" xml:space="preserve">
+    <value>/Scripts/select2/i18n/es.js</value>
+  </data>
+  <data name="LoginBoton" xml:space="preserve">
+    <value>¡VAMOS A HACERLO!</value>
+  </data>
+  <data name="LoginCerrarSesion" xml:space="preserve">
+    <value>La sesión ha sido cerrada</value>
+  </data>
+  <data name="LoginClave" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="LoginDobleUsuario" xml:space="preserve">
+    <value>El usuario ya esta en el sistema, desea cerrar la sesión existente?</value>
+  </data>
+  <data name="LoginError4" xml:space="preserve">
+    <value>Contraseña Erronea.</value>
+  </data>
+  <data name="LoginEslogan" xml:space="preserve">
+    <value>TIEMPO DE TRANSFORMACIÓN</value>
+  </data>
+  <data name="LoginEslogan2" xml:space="preserve">
+    <value>¿ESTÁ SU EMPRESA LISTA PARA UNA TRANSFORMACIÓN DIGITAL?</value>
+  </data>
+  <data name="LoginInfo" xml:space="preserve">
+    <value>Información</value>
+  </data>
+  <data name="LoginSalirUsuario" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="LoginSinClave" xml:space="preserve">
+    <value>La contraseña no puede ir en blanco.</value>
+  </data>
+  <data name="LoginSinUsuario" xml:space="preserve">
+    <value>El usuario no existe.</value>
+  </data>
+  <data name="LoginUsuario" xml:space="preserve">
+    <value>Correo</value>
+  </data>
+  <data name="MsgIdiomaBase" xml:space="preserve">
+    <value>Idiomas del sistema</value>
+  </data>
+  <data name="Nombres" xml:space="preserve">
+    <value>Nombres</value>
+  </data>
+  <data name="Nombre_Encuesta" xml:space="preserve">
+    <value>Nombre Encuesta</value>
+  </data>
+  <data name="Pais" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="ProgresBar" xml:space="preserve">
+    <value>Se está procesando el contenido de la encuesta</value>
+  </data>
+  <data name="Reporte" xml:space="preserve">
+    <value>Ver Reporte</value>
+  </data>
+  <data name="Responder" xml:space="preserve">
+    <value>Responder</value>
+  </data>
+  <data name="Resultado" xml:space="preserve">
+    <value>Resultado</value>
+  </data>
+  <data name="RolAdministrador" xml:space="preserve">
+    <value>Administrador</value>
+  </data>
+  <data name="RolAliado" xml:space="preserve">
+    <value>Aliado</value>
+  </data>
+  <data name="RolCliente" xml:space="preserve">
+    <value>Cliente</value>
+  </data>
+  <data name="RolEncuestado" xml:space="preserve">
+    <value>Encuestado</value>
+  </data>
+  <data name="Seleccione" xml:space="preserve">
+    <value>Seleccione...</value>
+  </data>
+  <data name="SeleccioneIdioma" xml:space="preserve">
+    <value>Seleccione Idioma</value>
+  </data>
+  <data name="Siguiente" xml:space="preserve">
+    <value>Siguiente</value>
+  </data>
+  <data name="Sin_responder" xml:space="preserve">
+    <value>Sin responder</value>
+  </data>
+  <data name="SujetoCorreo" xml:space="preserve">
+    <value>Indice de Transformación Digital</value>
+  </data>
+  <data name="Tablero" xml:space="preserve">
+    <value>Tablero</value>
+  </data>
+  <data name="Td_datetime" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="Td_email" xml:space="preserve">
+    <value>Correo</value>
+  </data>
+  <data name="Td_number" xml:space="preserve">
+    <value>Numero</value>
+  </data>
+  <data name="Td_range" xml:space="preserve">
+    <value>Rango</value>
+  </data>
+  <data name="Td_tel" xml:space="preserve">
+    <value>Telefono</value>
+  </data>
+  <data name="Td_text" xml:space="preserve">
+    <value>Texto</value>
+  </data>
+  <data name="UpdateU_CEmple" xml:space="preserve">
+    <value># de Empleados</value>
+  </data>
+  <data name="UpdateU_CorreoT" xml:space="preserve">
+    <value>Correo Trabajo</value>
+  </data>
+  <data name="UpdateU_CorreoTC" xml:space="preserve">
+    <value>Confirmar Correo Trabajo</value>
+  </data>
+  <data name="UpdateU_DirT" xml:space="preserve">
+    <value>Dirección Oficina</value>
+  </data>
+  <data name="UpdateU_Empresa" xml:space="preserve">
+    <value>Empresa</value>
+  </data>
+  <data name="UpdateU_Industria" xml:space="preserve">
+    <value>Industria</value>
+  </data>
+  <data name="UpdateU_Provincia" xml:space="preserve">
+    <value>Provincia</value>
+  </data>
+  <data name="UpdateU_Subsi" xml:space="preserve">
+    <value>Subsidiario</value>
+  </data>
+  <data name="UpdateU_Telefono" xml:space="preserve">
+    <value>Teléfono</value>
+  </data>
+  <data name="UpdateU_Titulo" xml:space="preserve">
+    <value>Título / Posición</value>
+  </data>
+</root>

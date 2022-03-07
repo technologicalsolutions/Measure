@@ -1,0 +1,49 @@
+﻿@model Measure.ViewModels.Usuario.ViewUsuario
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Modelo.Pais)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Pais)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Modelo.Nombres)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Nombres)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Modelo.Apellidos)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Apellidos)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Modelo.Telefono)
+        </dt>
+
+        @if (!string.IsNullOrEmpty(Model.Modelo.Imagen))
+        {
+            <dd>
+                <img src="@Model.Modelo.Imagen" class="img-thumbnail" width="50" height="50" />
+            </dd>
+        }
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Modelo.Estado)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Modelo.Estado)
+        </dd>
+
+    </dl>
+</div>

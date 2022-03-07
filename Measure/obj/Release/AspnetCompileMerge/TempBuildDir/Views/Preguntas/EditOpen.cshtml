@@ -1,0 +1,368 @@
+﻿@using Measure.ViewModels.Pregunta
+@model ViewQuestion
+@{
+    ViewBag.formShow = "show";
+    ViewBag.PreguntasActive = "active";
+    ViewBag.Title = "Preguntas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Measure.Enums.ControlAbierto Tipo = (Measure.Enums.ControlAbierto)Model.ControlA.TipoAbierta;
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    @if ((int)Tipo == 4)
+    {
+        <script type="text/javascript">
+            var Textos = ('@Model.ControlA.DescripcionPre').split('|');
+            var Tipos = ('@Model.ControlA.DescripcionPos').split('|');
+            var visible = true;
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            var visible = false;
+        </script>
+    }
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Pregunta Abierta</h1>
+                @Html.HiddenFor(m => m.ControlId)
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.ClienteId)
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label class="form-label">Texto Pregunta</label>
+                <div class="col-md-12">
+                    @Html.TextAreaFor(m => m.Texto, new { @class = "form-control", id = "PreguntaControlA", rows = "3" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-4">
+            <div class="form-group">
+                <label class="form-label">Idioma Pregunta</label>
+                <div class="col-md-12">
+                    <select class="form-select" name="TipoControl" data-init-plugin="select2" id="IdiomaControlA">
+                        <option value="1" @(Model.Idioma == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaEspanol</option>
+                        <option value="2" @(Model.Idioma == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaIngles</option>
+                        <option value="3" @(Model.Idioma == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaPortugues</option>
+                    </select>
+                </div>
+            </div>
+        </div>  
+        <div class="col-4">
+            <div class="form-group">
+                <label class="form-check-label" for="EstadoControlA">
+                    Estado: Activo / Inactivo
+                </label>
+                <br />
+                <div class="mt-3">
+                    @Html.CheckBoxFor(m => m.Estado, new { @class = "form-check-input", id = "EstadoControlA" })
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label class="form-check-label" for="ConfControlA">
+                    Confirmación: Activo / Inactivo
+                </label>
+                <br />
+                <div class="mt-3">            
+                    @Html.CheckBoxFor(m => m.Confirmacion, new { @class = "form-check-input", id = "ConfControlA" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-2">
+            <div class="form-group">
+                <label>Tipo de Pregunta</label>
+                <div class="col-md-12 mt-2">
+                    <select class="form-select" data-init-plugin="select2" id="TipoPreguntaAbierta" disabled style="width:100%">
+                        <option value="0" @((int)Tipo == 0 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Ca_Entrada</option>
+                        <option value="1" @((int)Tipo == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Ca_Entrada_Descripcion</option>
+                        <option value="2" @((int)Tipo == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Ca_Rango</option>
+                        <option value="3" @((int)Tipo == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Ca_Entrada_Multiple</option>
+                        <option value="4" @((int)Tipo == 4 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Ca_Texto_Multiple</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="Ca_Entrada" style="display:@((int)Tipo == 0 ? "initial" : "none")">
+        <div class="mt-2">
+            <div class="form-group">
+                <label class="control-label">Tipo Campo</label>
+                <div class="col-md-12 mt-2">
+                    <select name="TipoDatoIdAbierta" id="TipoDatoIdAbierta" class="form-select" data-init-plugin="select2" style="width:100%">
+                        <option value="0" @(Model.ControlA.TipoDato == 0 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_datetime</option>
+                        <option value="1" @(Model.ControlA.TipoDato == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_email</option>
+                        <option value="2" @(Model.ControlA.TipoDato == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_number</option>
+                        <option value="3" @(Model.ControlA.TipoDato == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_range</option>
+                        <option value="4" @(Model.ControlA.TipoDato == 4 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_tel</option>
+                        <option value="5" @(Model.ControlA.TipoDato == 5 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_text</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="Ca_Entrada_Descripcion" style="display: @((int)Tipo == 1 ? "initial" : "none")">
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="form-group  mt-2">
+                    <label class="form-label">Texto Antes</label>
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.ControlA.DescripcionPre, new { @class = "form-control", id = "Ca_TxtAntes" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group  mt-2">
+                    <label class="control-label">Tipo Campo</label>
+                    <div class="col-md-12 mt-2">
+                        <select name="TipoDatoIdAbiertaC" id="TipoDatoIdAbiertaC" class="form-select" data-init-plugin="select2" style="width:100%">
+                            <option value="0" @(Model.ControlA.TipoDato == 0 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_datetime</option>
+                            <option value="1" @(Model.ControlA.TipoDato == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_email</option>
+                            <option value="2" @(Model.ControlA.TipoDato == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_number</option>
+                            <option value="3" @(Model.ControlA.TipoDato == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_range</option>
+                            <option value="4" @(Model.ControlA.TipoDato == 4 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_tel</option>
+                            <option value="5" @(Model.ControlA.TipoDato == 5 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.Td_text</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group mt-2">
+                    <label class="form-label">Texto Despues</label>
+                    <div class="col-md-12">
+                        @Html.TextBoxFor(m => m.ControlA.DescripcionPos, new { @class = "form-control", id = "Ca_TxtDespues" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row tipos" style="display: @((int)Tipo == 4 ? "initial" : "none")">
+        <div class="row">
+            <div class="col-12 col-sm-4  mt-2">
+                <div class="form-group">
+                    <label class="form-label">Cantidad de Descripciones</label>
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" onkeypress="NumberOnly(event)" value="1" id="ColumnasEntradaMultiple" />
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-sm rounded-pill py-0 mt-4" type="button" onclick="GenerarEntradaMultiple()"><i class="bi-binoculars"></i> Generar Campos</button>
+            </div>
+            <div class="col-12 col-sm-4 mt-2" id="DescripcionesMultiple">
+
+            </div>
+            <div class="col-12 col-sm-4 mt-2" id="CamposMultiple">
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-2 text-center">
+            <div class="row">
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-success" type="button" id="BtnSaveAbierta" onclick="ActualizarPreguntaAbierta()"><i class="bi-save"></i> Actualizar Pregunta</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Cancelar</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <a href="@Url.RouteUrl("Home")" class="btn btn-primary"><i class="bi-skip-backward"></i> a la lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPrg" }))
+    {
+        <input type="hidden" name="Cliente" id="Cliente" />
+    }
+</div>
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate
+            });
+            if (visible) {
+                $("#ColumnasEntradaMultiple").val(Textos.length);
+                GenerarEntradaMultiple(Textos, Tipos);
+            }
+        });
+
+        function GenerarEntradaMultiple(Textos, Tipos) {
+            var Html = '';
+            Html += '<div class="row">';
+            if (Textos != undefined) {
+                for (var a = 0; a < Textos.length; a++) {
+                    Html += '<div class="col-12 mt-2">';
+                    Html += '<label>Texto Descripción Nro. ' + (a + 1) + '</label> <input class="form-control" name="Columna" value="' + Textos[a] + '"/>';
+                    Html += '</div>';
+                }
+                Html += '</div>';
+                $("#DescripcionesMultiple").html("").html(Html);
+                Html = '<div class="row">';
+                for (var b = 0; b < Tipos.length; b++) {
+                    Html += '<div class="col-12  mt-2">';
+                    Html += '<label>Control Descripción Nro. ' + (b + 1) + '</label>' + TipoDatosHtml(Tipos[b]);
+                    Html += '</div>';
+                }
+
+            } else {
+                var columnas = parseInt($("#ColumnasEntradaMultiple").val());
+                for (var a = 0; a < columnas; a++) {
+                    Html += '<div class="col-12 mt-2">';
+                    Html += '<label>Texto Descripción Nro. ' + (a + 1) + '</label> <input class="form-control" name="Columna" />';
+                    Html += '</div>';
+                }
+                Html += '</div>';
+                $("#DescripcionesMultiple").html("").html(Html);
+                Html = '<div class="row">';
+                for (var b = 0; b < columnas; b++) {
+                    Html += '<div class="col-12  mt-2">';
+                    Html += '<label>Control Descripción Nro. ' + (b + 1) + '</label>' + TipoDatosHtml();
+                    Html += '</div>';
+                }
+            }
+            Html += '</div>';
+            $("#CamposMultiple").html("").html(Html);
+        }
+
+        function TipoDatosHtml(select) {
+            var Html = '<select class="form-select" name="TipoDatoMultiple" data-init-plugin="select2" style="width:100%">';
+
+            if (select != undefined) {
+                Html += '<option value="0" ' + (select == "0" ? 'selected' : '') + '>@Measure.Recursos.Recurso.Td_datetime</option>';
+                Html += '<option value="1" ' + (select == "1" ? 'selected' : '') + '>@Measure.Recursos.Recurso.Td_email</option>';
+                Html += '<option value="2" ' + (select == "2" ? 'selected' : '') + '>@Measure.Recursos.Recurso.Td_number</option>';
+                Html += '<option value="4" ' + (select == "4" ? 'selected' : '') + '>@Measure.Recursos.Recurso.Td_tel</option>';
+                Html += '<option value="5" ' + (select == "5" ? 'selected' : '') + '>@Measure.Recursos.Recurso.Td_text</option>';
+            } else {
+                Html += '<option value="0">@Measure.Recursos.Recurso.Td_datetime</option>';
+                Html += '<option value="1">@Measure.Recursos.Recurso.Td_email</option>';
+                Html += '<option value="2">@Measure.Recursos.Recurso.Td_number</option>';
+                Html += '<option value="4">@Measure.Recursos.Recurso.Td_tel</option>';
+                Html += '<option value="5">@Measure.Recursos.Recurso.Td_text</option>';
+            }
+            Html += '</select>';
+
+            return Html;
+        }
+
+        function ActualizarPreguntaAbierta() {
+            var message = '';
+
+            var params = {
+                Data: {
+                    ClienteId: $("#ClienteId").val(),
+                    PreguntaId: $("#Id").val(),
+                    GrupoId: $("#GrupoId").val(),
+                    TextoPregunta: $("#PreguntaControlA").val(),
+                    Idioma: parseInt($("#IdiomaControlA").val()),
+                    EstadoPregunta: document.getElementById("EstadoControlA").checked,
+                    Confirmacion: document.getElementById("ConfControlA").checked,
+                    Orden: $("#OrdenControlA").val(),
+                    TipoAbierta: $("#TipoPreguntaAbierta").val()
+                }
+            };
+
+            if (params.Data.TextoPregunta == "") {
+                message += '<p>Debe de escribir el texto de la pregunta.</p>';
+            }
+
+            if (params.Data.TipoAbierta == '0') {
+                params.Data.TipoDato = $("#TipoDatoIdAbierta").val();
+            } else if (params.Data.TipoAbierta == '1' || params.Data.TipoAbierta == '2') {
+                params.Data.DescripcionPre = $("#Ca_TxtAntes").val();
+                if (params.Data.DescripcionPre == "") {
+                    message += '<p>Debe de escribir Descripcion previa.</p>';
+                }
+                params.Data.TipoDato = $("#TipoDatoIdAbiertaC").val();
+                params.Data.DescripcionPos = $("#Ca_TxtDespues").val();
+            }
+            else if (params.Data.TipoAbierta == '3') {
+                params.Data.Multilinea = true;
+            } else {
+                params.Data.MultiCampo = true;
+                var _DescripcionPre = '';
+                $.each(document.getElementsByName("Columna"), function (pos, item) {
+                    if (item.value != '') {
+                        _DescripcionPre += item.value + '|';
+                    }
+                })
+                _DescripcionPre = _DescripcionPre.substring(0, (_DescripcionPre.length - 1));
+
+                var _DescripcionPos = '';
+                $.each(document.getElementsByName("TipoDatoMultiple"), function (pos, item) {
+                    _DescripcionPos += item.value + '|';
+                })
+                _DescripcionPos = _DescripcionPos.substring(0, (_DescripcionPos.length - 1));
+
+                params.Data.DescripcionPre = _DescripcionPre;
+                params.Data.DescripcionPos = _DescripcionPos;
+
+                if (_DescripcionPre == "") {
+                    message += '<p>Debe de escribir todas las descripciones</p>';
+                }
+                if (_DescripcionPre.split(',').length != document.getElementsByName("Columna").length) {
+                    message += '<p>Debe de escribir todas las descripciones</p>';
+                }
+            }
+
+            if (message == '') {
+                $.ajax({
+                    url: '@Url.Action("ActualizarControlAbierto", "Preguntas")',
+                    method: 'Post',
+                    data: params,
+                    success: function (result) {
+                        $("#Cliente").val(result);
+                        $("#FrmPrg").submit();
+                    },
+                    error: function (Error) {
+                        console.log(Error);
+                    }
+                });
+            } else {
+                ErrorCreate(message);
+            }
+        }
+
+        function ErrorCreate(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

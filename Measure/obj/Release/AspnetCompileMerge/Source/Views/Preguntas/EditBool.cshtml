@@ -1,0 +1,188 @@
+﻿@using Measure.ViewModels.Pregunta
+@model ViewQuestion
+@{
+    ViewBag.formShow = "show";
+    ViewBag.PreguntasActive = "active";
+    ViewBag.Title = "Preguntas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Pregunta Booleana</h1>
+                @Html.HiddenFor(m => m.ControlId)
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.ClienteId)
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label class="form-label">Texto Pregunta</label>
+                <div class="col-md-12">
+                    @Html.TextAreaFor(m => m.Texto, new { @class = "form-control", id = "PreguntaControlB", rows = "3" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-4">
+            <div class="form-group">
+                <label class="form-label">Idioma Pregunta</label>
+                <div class="col-md-12">
+                    <select class="form-select" data-init-plugin="select2" id="IdiomaControlB">
+                        <option value="1" @(Model.Idioma == 1 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaEspanol</option>
+                        <option value="2" @(Model.Idioma == 2 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaIngles</option>
+                        <option value="3" @(Model.Idioma == 3 ? "selected" : string.Empty)>@Measure.Recursos.Recurso.IdiomaPortugues</option>
+                    </select>
+                </div>
+            </div>
+        </div>        
+        <div class="col-4">
+            <div class="form-group">
+                <label class="form-check-label" for="EstadoControlB">
+                    Estado: Activo / Inactivo
+                </label>
+                <br />
+                <div class="mt-3">
+                    @Html.CheckBoxFor(m => m.Estado, new { @class = "form-check-input", id = "EstadoControlB" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label class="form-label mt-2">Tipo de pregunta</label>
+            <br />
+            <div class="form-check form-check-inline mt-2">
+                @Html.RadioButtonFor(m => m.ControlB.TipoValor, false, new { @class = "form-check-input TipoValor" })
+                <label class="form-check-label" for="exampleRadios1">
+                    Si / No
+                </label>
+            </div>
+            <div class="form-check form-check-inline mt-2">
+                @Html.RadioButtonFor(m => m.ControlB.TipoValor, true, new { @class = "form-check-input TipoValor" })
+                <label class="form-check-label" for="exampleRadios2">
+                    Falso / Verdadero
+                </label>
+            </div>
+        </div>
+        <div class="col-6">
+            <label class="form-label mt-2">Respuesta Correcta</label>
+            <br />
+            <div class="form-check form-check-inline mt-2">
+                @Html.RadioButtonFor(m => m.ControlB.RespuestaCorrecta, false, new { @class = "form-check-input RespuestaCorrecta" })
+                <label class="form-check-label">
+                    Si / Verdadero
+                </label>
+            </div>
+            <div class="form-check form-check-inline mt-2">
+                @Html.RadioButtonFor(m => m.ControlB.RespuestaCorrecta, true, new { @class = "form-check-input RespuestaCorrecta" })
+                <label class="form-check-label">
+                    No / Falso
+                </label>
+            </div>
+            <br />
+        </div>
+        <div class="col-12 text-center mt-4">
+            <div class="row">
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-success" type="button" id="BtnSaveAbierta" onclick="ActualizarPreguntaBool()"><i class="bi-save"></i> Actualizar Pregunta</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <button class="btn btn-danger" type="reset"><i class="bi-x-square"></i> Cancelar</button>
+                </div>
+                <div class="col-12 col-sm-4">
+                    <a href="@Url.RouteUrl("Home")" class="btn btn-primary"><i class="bi-skip-backward"></i> a la lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPrg" }))
+    {
+        <input type="hidden" name="Cliente" id="Cliente" />
+    }
+</div>
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate
+            });
+        });
+
+        function ActualizarPreguntaBool() {
+            var message = '';
+            var _RespuestaCorrecta = $('.RespuestaCorrecta:checked').val() == undefined ? null : $('.RespuestaCorrecta:checked').val() == "False" ? false : true;
+            var _TipoValor = $('.TipoValor:checked').val() == undefined ? null : $('.TipoValor:checked').val() == "False" ? false : true;
+
+            var params = {
+                Data: {
+                    ControlId: $("#ControlId").val(),
+                    PreguntaId: $("#Id").val(),
+                    ClienteId: $("#ClienteId").val(),
+                    TextoPregunta: $("#PreguntaControlB").val(),
+                    Idioma: parseInt($("#IdiomaControlB").val()),
+                    EstadoPregunta: document.getElementById("EstadoControlB").checked,
+                    Orden: $("#OrdenControlB").val(),
+                    TipoValor: _TipoValor,
+                    RespuestaCorrecta: _RespuestaCorrecta
+                }
+            };
+
+            if (params.Data.TextoPregunta == "") {
+                message += '<p>Debe de escribir el texto de la pregunta.</p>';
+            }
+
+            if (message == '') {
+                $.ajax({
+                    url: '@Url.Action("ActualizarControlBoolean", "Preguntas")',
+                    method: 'Post',
+                    data: params,
+                    success: function (result) {
+                        $("#Cliente").val(result);
+                        $("#FrmPrg").submit();
+                    },
+                    error: function (Error) {
+                        console.log(Error);
+                    }
+                });
+            } else {
+                ErrorCreate(message);
+            }
+        }
+
+        function ErrorCreate(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

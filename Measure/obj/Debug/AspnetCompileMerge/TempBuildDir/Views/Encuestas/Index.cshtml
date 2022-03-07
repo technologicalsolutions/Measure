@@ -1,0 +1,410 @@
+﻿@using Measure.ViewModels.Encuesta
+@model ViewEncuesta
+@{
+    ViewBag.formShow = "show";
+    ViewBag.EncuestaActive = "active";
+    ViewBag.Title = "Encuestas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Encuestas</h1>
+            </div>
+        </div>
+    </div>
+    @if (Model.RolId == (int)Measure.Enums.UserRol.Administrador || Model.RolId == (int)Measure.Enums.UserRol.Cliente)
+    {
+        <div class="row mt-4">
+            <div class="col-lg-12 d-flex justify-content-between align-items-center">
+                <button class="btn btn-primary btn-sm rounded-pill py-0" type="button" onclick="Crear()"><i class="bi-plus-circle"></i> Crear Encuesta</button>
+            </div>
+        </div>
+    }
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div>
+                <table class="table table-striped" style="width:100%" id="TblLista">
+                    <thead>
+                        <tr>
+                            <th>
+                                Nombre
+                            </th>
+                            <th>
+                                Proposito
+                            </th>
+                            <th>
+                                Fecha de Creacion
+                            </th>
+                            <th>
+                                Estado
+                            </th>
+                            <th class="text-center">
+                                Informacion
+                            </th>
+                            <th class="text-center">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Lista)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Nombre)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Proposito)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FechaCreacion)
+                                </td>
+                                <td>
+                                    @if (item.Estado)
+                                    {
+                                        @Measure.Recursos.Recurso.EstadoActivo
+                                    }
+                                    else
+                                    {
+                                        @Measure.Recursos.Recurso.EstadoInactivo
+                                    }
+                                </td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-lg-4 text-center">
+                                            @using (Html.BeginRouteForm("BuscarUsuarios", FormMethod.Post))
+                                            {
+                                                <button name="id" value="@item.id" type="submit" class="btn btn-secondary btn-sm rounded-pill py-0 editLink">Asignar</button>
+                                            }
+                                        </div>
+                                        <div class="col-sm-12 col-lg-4 text-center">
+                                            @using (Html.BeginRouteForm("ContenidoEncuesta", FormMethod.Get))
+                                            {                                                
+                                                <button name="EncuestaId" value="@item.id" type="submit" class="btn btn-info btn-sm rounded-pill py-0 editLink">Contenido</button>
+                                            }
+                                        </div>
+                                        <div class="col-sm-12 col-lg-4 text-center">
+                                            <button name="id" type="button" onclick="Asignada('@item.id')" class="btn btn-danger btn-sm rounded-pill py-0 editLink">Asignada</button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="row">
+                                        @if (Model.RolId == (int)Measure.Enums.UserRol.Administrador || Model.RolId == (int)Measure.Enums.UserRol.Cliente)
+                                        {
+                                            <div class="col-12 col-lg-4 text-center">
+                                                <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
+                                            </div>
+                                            <div class="col-12 col-lg-4 text-center">
+                                                <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.id')">Detalles</a>
+                                            </div>
+                                            <div class="col-12 col-lg-4  text-center">
+                                                <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.id','@item.Nombre')">Eliminar</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-12 text-center">
+                                                <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.id')">Detalles</a>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "Encuestas", FormMethod.Post, new { id = "EncuestaDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="DeleteEnc" value="" />
+}
+@section ModalSection{
+    <div class="modal fade" id="EncModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TitleModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModal"></h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('EncModal')"></button>
+                </div>
+                <div class="modal-body" id="CrearOEditar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="EncModalAsignado" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TitleModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModal">Usuarios Asignados</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('EncModalAsignado')"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <table class="table table-striped" style="width:100%" id="TblAsignados">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Correo
+                                    </th>
+                                    <th>
+                                        Nombres
+                                    </th>
+                                    <th>
+                                        Estado
+                                    </th>
+                                    <th>
+                                        Acciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="EncuestaModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModalAccion"></h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('EncuestaModal')"></button>
+                </div>
+                @using (Html.BeginRouteForm("EncuestaAcciones", FormMethod.Post, new { id = "FrmEncuesta" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" name="Modelo.ClienteId" id="Modelo_ClienteId" value="@Model.ClienteId" />
+                        <input type="hidden" name="Modelo.id" id="Modelo_id" />
+                        @Html.HiddenFor(model => model.Accion)
+                    <div class="row mt-2">
+                        @if (Model.Cliente == null)
+                        {
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Clientes</label>
+                                    <select class="form-select" name="Modelo_ClienteId" id="ClienteId" data-init-plugin="select2" onchange="AsignarValor(this)">
+                                        @foreach (var item in Model.Clientes)
+                                        {
+                                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Modelo.Nombre, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-12">
+                                    @Html.EditorFor(model => model.Modelo.Nombre, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                                    @Html.ValidationMessageFor(model => model.Modelo.Nombre, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Modelo.Proposito, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-12">
+                                    @Html.EditorFor(model => model.Modelo.Proposito, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                                    @Html.ValidationMessageFor(model => model.Modelo.Proposito, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mt-2">
+                                <label>Actualizar Usuario</label>
+                                <br />
+                                @Html.EditorFor(model => model.Modelo.ActualizaUsuario, new { @class = "form-check-input" })
+                                @Html.ValidationMessageFor(model => model.Modelo.ActualizaUsuario, "", new { @class = "text-danger" })
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group mt-2">
+                                <label>Estado</label>
+                                <br />
+                                @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                                @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger">Limpiar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    @if (Model.Cliente == null)
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('select').select2({
+                    "width": 'resolve',
+                    "theme": "bootstrap-5",
+                    "language": SelectedTranslate,
+                    "dropdownParent": $('#EncuestaModal')
+                });
+
+                if ($("#ClienteId option").length > 0) {
+                    var id = $("#ClienteId").val();
+                    $("#Modelo_ClienteId").val(id);
+                }
+            })
+        </script>
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadDataTable("TblLista", false, true, null, 10);
+        });
+
+        function Crear() {
+            $("#TitleModalAccion").text("Crear Encuesta");
+            $("#Acciones").val(0);
+            $("#Modelo_es_ES").val('');
+            $("#Modelo_en_US").val('');
+            $("#Modelo_pt_BR").val('');
+            $("#Modelo_Activo").prop("checked", false);
+            ShowModal("EncuestaModal");
+        }
+
+        function Editar(Model) {
+            var Data = JSON.parse(Model);
+            $("#TitleModalAccion").text("Editar Encuesta");
+            $("#Accion").val(2);
+            $("#Modelo_id").val(Data.id);
+            $("#Modelo_ClienteId").val(Data.ClienteId);
+            $("#ClienteId").val(Data.ClienteId).trigger('change');
+            $("#Modelo_Nombre").val(Data.Nombre)
+            $("#Modelo_Proposito").val(Data.Proposito);
+            $("#Modelo_Estado").prop("checked", Data.Estado);
+            $("#Modelo_ActualizaUsuario").prop("checked", Data.ActualizaUsuario);
+            ShowModal("EncuestaModal");
+        }
+
+        function Detalles(Id) {
+            $.ajax({
+                url: '@Url.Action("Detail", "Encuestas")',
+                dataType: 'html',
+                method: 'Post',
+                data: { Data: { Modelo: { 'id': Id } } },
+                success: function (result) {
+                    $("#CrearOEditar").html('').html(result);
+                    ShowModal("EncModal");
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar la Encuesta " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteEnc").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#EncuestaDelete").submit();
+                }
+            });
+        }
+
+        function Asignada(idEncuesta) {
+             var params = {
+                 'idEncuesta': idEncuesta
+            };
+
+            $.ajax({
+                data: params,
+                url: '@Url.RouteUrl("ListaUsuarios")',
+                type: "POST",
+                async: false,
+                success: function (result) {
+                   var Html = '';
+                    $.each(result, function (pos, item) {
+                        Html += '<tr><td>' + item.Correo + '</td>';
+                        Html += '<td>' + item.Nombres + '</td>';
+                        Html += '<td>';
+                        if (item.Estado) {
+                            Html += '@Measure.Recursos.Recurso.EstadoActivo';
+                        } else {
+                            Html +='@Measure.Recursos.Recurso.EstadoInactivo';
+                        }
+                        Html += '</td><td><button class="btn btn-danger" onclick="Deseleccionar(\'' + item.IdAsignacion + '\')">Remover Asignación</button></td></tr>';
+                    });
+                    var table = $("#TblAsignados").DataTable();
+                    table.destroy();
+                    $("#TblAsignados tbody").html('').html(Html);
+                    LoadDataTable("TblAsignados", false, true, null, 25);
+                    ShowModal("EncModalAsignado");
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            });
+        }
+
+        function Deseleccionar(IdAsignacion) {
+            var params = {
+                'Id': IdAsignacion,
+            };
+
+            $.ajax({
+                data: params,
+                url: '@Url.RouteUrl("DesAsignarUsuarios")',
+                type: "POST",
+                async: false,
+                success: function (result) {
+                    location.reload();
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+            });
+        }
+
+        function AsignarValor(obj) {
+            document.getElementById(obj.name).value = obj.value;
+        }
+
+    </script>
+}

@@ -16,5 +16,11 @@ namespace Measure.Controllers
             }
         }
 
+        [Route("Error")]
+        public ActionResult Error()
+        {
+            return RedirectToAction("index", "Login");
+        }
+
     }
 }

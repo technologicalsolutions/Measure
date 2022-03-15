@@ -14,6 +14,7 @@ namespace Measure.Models
 
         public virtual DbSet<Contenido> Contenido { get; set; }
         public virtual DbSet<ContenidoPorEncuesta> ContenidoPorEncuesta { get; set; }
+        public virtual DbSet<ContenidoReporte> ContenidoReporte { get; set; }
         public virtual DbSet<ControlAbierto> ControlAbierto { get; set; }
         public virtual DbSet<ControlBooleano> ControlBooleano { get; set; }
         public virtual DbSet<ControlCerrado> ControlCerrado { get; set; }
@@ -26,9 +27,11 @@ namespace Measure.Models
         public virtual DbSet<MaestrasDetalle> MaestrasDetalle { get; set; }
         public virtual DbSet<Pregunta> Pregunta { get; set; }
         public virtual DbSet<PreguntasPorGrupo> PreguntasPorGrupo { get; set; }
+        public virtual DbSet<Reporte> Reporte { get; set; }
         public virtual DbSet<Respuesta> Respuesta { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Usuario> Usuario { get; set; }
+        public virtual DbSet<UsuarioLabel> UsuarioLabel { get; set; }
         public virtual DbSet<UsuariosPorEncuenta> UsuariosPorEncuenta { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -50,6 +53,12 @@ namespace Measure.Models
                 .WithRequired(e => e.Maestras)
                 .HasForeignKey(e => e.MaestraId)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Reporte>()
+               .HasMany(e => e.ContenidosReporte)
+               .WithRequired(e => e.Reporte)
+               .HasForeignKey(e => e.ReporteId)
+               .WillCascadeOnDelete(false);
         }
     }
 }

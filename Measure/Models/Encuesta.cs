@@ -1,10 +1,8 @@
 namespace Measure.Models
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
 
     [Table("Encuesta")]
     public partial class Encuesta
@@ -25,5 +23,7 @@ namespace Measure.Models
         public bool ActualizaUsuario { get; set; }
 
         public bool Estado { get; set; }
+
+        public Guid TipoReporteGeneral { get; set; }
     }
 }

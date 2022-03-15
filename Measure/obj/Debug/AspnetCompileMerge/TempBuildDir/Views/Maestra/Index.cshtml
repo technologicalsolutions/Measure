@@ -34,46 +34,44 @@
     </div>
     <div class="row mt-4">
         <div class="col-lg-12">
-            <div>
-                <table class="table table-striped" style="width:100%" id="TblLista">
-                    <thead>
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>
+                            Nombre
+                        </th>
+                        <th class="text-center">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lista)
+                    {
                         <tr>
-                            <th>
-                                Nombre
-                            </th>
-                            <th class="text-center">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Lista)
-                        {
-                            <tr>
-                                <td>
-                                    @{
-                                        Nombre = login.Idioma == 1 ? item.es_ES : login.Idioma == 2 ? item.en_US : item.pt_BR;
-                                    }
-                                    @Nombre
-                                </td>
-                                <td width="30%">
-                                    <div class="row text-center">
-                                        <div class="col-12 col-md-4 text-center">
-                                            <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
-                                        </div>
-                                        <div class="col-12 col-md-4 text-center">
-                                            <button class="btn btn-info btn-sm rounded-pill py-0 editLink" type="button" onclick="Detalles(@item.Id) ">Detalle</button>
-                                        </div>
-                                        <div class="col-12 col-md-4 text-center">
-                                            <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@item.es_ES')">Eliminar</button>
-                                        </div>
+                            <td>
+                                @{
+                                    Nombre = login.Idioma == 1 ? item.es_ES : login.Idioma == 2 ? item.en_US : item.pt_BR;
+                                }
+                                @Nombre
+                            </td>
+                            <td width="30%">
+                                <div class="row text-center">
+                                    <div class="col-12 col-md-4 text-center">
+                                        <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                    <div class="col-12 col-md-4 text-center">
+                                        <button class="btn btn-info btn-sm rounded-pill py-0 editLink" type="button" onclick="Detalles(@item.Id) ">Detalle</button>
+                                    </div>
+                                    <div class="col-12 col-md-4 text-center">
+                                        <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@item.es_ES')">Eliminar</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

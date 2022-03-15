@@ -304,8 +304,8 @@
     {
         <script type="text/javascript">
             $(document).ready(function () {
-                var textCategories = '@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Cliente).ToList()))';
-                var dataGraph = '@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Encuestas).ToList()))';
+                var textCategories = "@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Cliente).ToList()))";
+                var dataGraph = "@Html.Raw(string.Join("|", Model.GraphGeneral.Select(s => s.Encuestas).ToList()))";
                 DetailColumn(textCategories, dataGraph, "#Char-General");
             });
         </script>

@@ -9,6 +9,16 @@
 }
 
 @font-face {
+    font-family: Barlow Condensed;
+    src: url(../fonts/BarlowCondensed-Regular.ttf);
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(../fonts/Ubuntu-Bold.ttf);
+}
+
+@font-face {
     font-family: PageFont;
     font-style: normal;
     src: url(../fonts/BarlowCondensed-Regular.ttf);
@@ -362,7 +372,7 @@ strong {
     padding-right: 12px;
 }
 
-.parent-rectangle {
+.parent-rectangle {   
     background-color: gray;
     border-radius: 15px;
     max-width: 50px;
@@ -374,8 +384,14 @@ strong {
     border-radius: 15px;
     font-size: medium;
     font-weight: 500;
-    padding-top: 10px;
+    padding-top: 3px;
     width: 50px;
+    flex: 1 0 0%;
+    margin-top: 0;
+    max-width: 100%;
+    padding-left: calc( 24px*.5);
+    padding-right: calc( 24px*.5);
+    color: #fff;
 }
 
     .rectangle p {

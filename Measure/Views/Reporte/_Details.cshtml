@@ -1,0 +1,29 @@
+﻿@model Measure.Models.Reporte
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            <strong>Nombre Español</strong>
+        </dt>
+        <dt>
+            @Html.DisplayFor(model => model.es_ES)
+        </dt>
+        <dt>
+            <strong>Nombre Ingles</strong>
+        </dt>
+        <dt>
+            @Html.DisplayFor(model => model.en_US)
+        </dt>
+        <dt>
+            <strong>Nombre Portugues</strong>
+        </dt>
+        <dt>
+            @Html.DisplayFor(model => model.pt_BR)
+        </dt>
+        <dt>
+            <strong>Estado</strong>
+        </dt>
+        <dt>
+            @Html.DisplayFor(model => model.Estado)
+        </dt>
+    </dl>
+</div>

@@ -27,5 +27,7 @@ namespace Measure.ViewModels.Grupo
         public bool Finalizada { get; set; }
 
         public Guid IdAsignacion { get; set; }
+
+        public Guid TipoReporteGeneral { get; set; }
     }
 }

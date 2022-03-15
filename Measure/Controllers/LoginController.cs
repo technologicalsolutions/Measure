@@ -57,6 +57,16 @@ namespace Measure.Controllers
             return View(data);
         }
 
+        [HttpGet]
+        public JsonResult Unloock(string Old)
+        {
+            string Result = string.Empty;
+            using (ClsUtilities clsUtilities = new ClsUtilities())
+            {
+                Result = clsUtilities.Cifrado(Old, false);
+            }
+            return new JsonResult { Data = Result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LanguajeLogin(ViewLogin Usuario)
@@ -167,7 +177,7 @@ namespace Measure.Controllers
             ViewLogin Result = new ViewLogin
             {
                 Apellidos = User.Apellidos,
-                Clave = User.Clave,                
+                Clave = User.Clave,
                 Correo = User.Correo,
                 Estado = User.Estado,
                 Id = User.Id,
@@ -179,12 +189,24 @@ namespace Measure.Controllers
             if (User.ClienteId != null)
             {
                 Result.ClienteId = User.ClienteId;
-                using (ModeloEncuesta db = new ModeloEncuesta())
+                if (Result.RolId == (int)UserRol.Encuestado)
                 {
-                    Usuario aliado = db.Usuario.Where(u => u.Id == (Guid)User.AliadoId).FirstOrDefault();
-                    Usuario Cliente = db.Usuario.Where(u => u.Id == (Guid)aliado.ClienteId).FirstOrDefault();
-                    Result.Cliente = Cliente.Nombres;
-                }                
+                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    {
+                        Usuario aliado = db.Usuario.Where(u => u.Id == (Guid)User.AliadoId).FirstOrDefault();
+                        Usuario Cliente = db.Usuario.Where(u => u.Id == (Guid)aliado.ClienteId).FirstOrDefault();
+                        Result.Cliente = Cliente.Nombres;
+                    }
+                }
+                else if (Result.RolId == (int)UserRol.Aliado)
+                {
+                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    {
+                        Usuario Cliente = db.Usuario.Where(u => u.Id == (Guid)User.ClienteId).FirstOrDefault();
+                        Result.Cliente = Cliente.Nombres;
+                    }
+                }
+
             }
 
             if (User.PaisId != null)
@@ -204,11 +226,11 @@ namespace Measure.Controllers
                             break;
                         case Idiomas.pt_BR:
                             Result.Pais = Pais.pt_BR;
-                            break;                        
+                            break;
                     }
-                }                
+                }
             }
-            
+
             if (User.Imagen != null)
             {
                 Result.Imagen = string.Format("data:image/gif;base64,{0}", Convert.ToBase64String(User.Imagen));

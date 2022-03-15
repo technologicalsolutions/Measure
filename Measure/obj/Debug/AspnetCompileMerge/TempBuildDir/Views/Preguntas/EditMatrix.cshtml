@@ -12,9 +12,9 @@
 @section scriptsHead{
     @Scripts.Render("~/bundles/select2")
     <script type="text/javascript">
-        var Columnas = ('@Html.Raw(string.Join("|", Model.ControlMColunnas.Select(s => s.Texto).ToArray()))').split('|');
-        var Filas = ('@Html.Raw(string.Join("|", Model.ControlMFilas.Select(s => s.Texto).ToArray()))').split('|');
-        var PasosPorColumna = ('@string.Join("|", Model.ControlMColunnas.Select(s => s.PasosPorColumna).ToArray())').split('|');
+        var Columnas = ("@Html.Raw(string.Join("|", Model.ControlMColunnas.Select(s => s.Texto).ToArray()))").split('|');
+        var Filas = ("@Html.Raw(string.Join("|", Model.ControlMFilas.Select(s => s.Texto).ToArray()))").split('|');
+        var PasosPorColumna = ("@string.Join("|", Model.ControlMColunnas.Select(s => s.PasosPorColumna).ToArray())").split('|');
     </script>
 }
 <div class="container">

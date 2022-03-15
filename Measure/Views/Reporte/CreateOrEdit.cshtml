@@ -1,0 +1,99 @@
+﻿@using Measure.ViewModels.Reportes
+
+@model ViewContentReport
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/ckeditor")
+}
+
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@ViewBag.Title</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            @using (Html.BeginRouteForm("AccionesContenido", FormMethod.Post, new { @id = "FrmContenido" }))
+            {
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label>Contenido</label>
+                        <textarea id="Html" name="Html" required>
+                            @Model.Html
+                        </textarea>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Acciones)
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.ReporteId)
+                    <div class="col-12 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Idiomas</label>
+                            <div class="col-md-10">
+                                <select class="form-select" name="Idioma" id="Idioma" data-init-plugin="select2">
+                                    @foreach (var item in Model.Idiomas)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label class="form-label mt-2">Tipo TipoContenido</label>
+                        <br />
+                        <div class="form-check form-check-inline mt-2">
+                            <input class="form-check-input" type="radio" name="TipoContenido" value="0" @(Model.TipoContenido == 0 ? "checked" : "")>
+                            <label class="form-check-label" for="exampleRadios1">
+                                Inicio
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline mt-2">
+                            <input class="form-check-input" type="radio" name="TipoContenido" value="1" @(Model.TipoContenido == 1 ? "checked" : "")>
+                            <label class="form-check-label" for="exampleRadios2">
+                                Fin
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label class="form-label" for="flexCheckChecked">Orden</label>
+                        <div class="form-group">
+                            @Html.EditorFor(model => model.Orden, new { htmlAttributes = new { @class = "form-control", @type = "text", onkeypress = "NumberOnly(event)", required = "required" } })
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label class="form-label" for="flexCheckChecked">Estado</label>
+                        <div class="mt-3">
+                            @Html.EditorFor(model => model.Estado, new { @class = "form-check-input form-control", required = "required" })
+                            <label for="flexCheckChecked">
+                                Activo/Inactivo
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2 text-center">
+                        <button class="btn btn-success mt-4" type="submit"><i class="bi-save"></i> Guardar</button>
+                    </div>
+                    <div class="col-12 col-md-2 text-center">
+                        <button class="btn btn-danger mt-4" type="reset"><i class="bi-x-square"></i> Limpiar</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            CKEDITOR.replace('Html');
+        });
+    </script>
+}
+

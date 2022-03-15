@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Measure
@@ -32,6 +28,12 @@ namespace Measure
                 name: "UserHome",
                 url: "UserHome",
                 defaults: new { controller = "Home", action = "UserIndex" }
+            );
+
+            routes.MapRoute(
+                name: "Error",
+                url: "Error",
+                defaults: new { controller = "Home", action = "Error" }
             );
 
             #endregion
@@ -83,6 +85,12 @@ namespace Measure
                name: "ListaUsuarios",
                url: "ListaUsuarios",
                defaults: new { controller = "Usuarios", action = "ListaUsuarios" }
+            );
+
+            routes.MapRoute(
+               name: "ActualizarUsuario",
+               url: "ActualizarUsuario",
+               defaults: new { controller = "Usuarios", action = "UpdateUser" }
             );
             #endregion
 
@@ -163,6 +171,52 @@ namespace Measure
             );
             #endregion
 
+            #region Reporte
+
+            routes.MapRoute(
+               name: "Reportes",
+               url: "Reportes",
+               defaults: new { controller = "Resporte", action = "Index" }
+            );
+
+            routes.MapRoute(
+               name: "ReporteAcciones",
+               url: "ReporteAcciones",
+               defaults: new { controller = "Resporte", action = "Acciones" }
+            );
+
+            routes.MapRoute(
+               name: "EliminarReporte",
+               url: "EliminarReporte",
+               defaults: new { controller = "Resporte", action = "Delete" }
+            );
+
+            routes.MapRoute(
+               name: "ContenidosReporte",
+               url: "ContenidosReporte",
+               defaults: new { controller = "Resporte", action = "Contenido" }
+            );
+
+            routes.MapRoute(
+               name: "ContenidoReporte",
+               url: "ContenidoReporte",
+               defaults: new { controller = "Resporte", action = "CreateOrEdit" }
+            );
+
+            routes.MapRoute(
+               name: "AccionesContenido",
+               url: "AccionesContenido",
+               defaults: new { controller = "Resporte", action = "ActionContent" }
+            );
+
+            routes.MapRoute(
+               name: "EliminarContenido",
+               url: "EliminarContenido",
+               defaults: new { controller = "Resporte", action = "DeleteContent" }
+            );
+
+            #endregion
+
             #region Dashboard
 
             routes.MapRoute(
@@ -229,6 +283,12 @@ namespace Measure
                name: "SendEMail",
                url: "SendEMail",
                defaults: new { controller = "Respuestas", action = "SendEMail" }
+            );
+
+            routes.MapRoute(
+               name: "PruebaEmail",
+               url: "PruebaEmail",
+               defaults: new { controller = "Respuestas", action = "PruebaEmail" }
             );
             #endregion
 

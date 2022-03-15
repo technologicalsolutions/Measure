@@ -44,7 +44,7 @@ namespace Measure.Controllers
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 List<ViewGroupPoll> Lista = (from C in db.Grupo
-                                             where (Cliente == null  || C.ClienteId == Cliente) && C.ClienteId != Guid.Empty
+                                             where (Cliente == null  || C.ClienteId == Cliente)
                                              select new ViewGroupPoll
                                              {
                                                  Columnas = C.Columnas,

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 
@@ -34,10 +35,12 @@ namespace Measure.Controllers
                 ViewEncuesta Modelo = new ViewEncuesta
                 {
                     ClienteId = Cliente,
-                    RolId = Login.RolId
+                    RolId = Login.RolId,
+                    TipoReporteGeneral = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } },
                 };
-                List<ViewPoll> Lista = new List<ViewPoll>();
 
+                List<ViewPoll> Lista = new List<ViewPoll>();
+                List<Reporte> Reportes = new List<Reporte>();
                 if (Cliente == Guid.Empty || Cliente == null)
                 {
                     Lista = db.Encuesta.Select(s => new ViewPoll
@@ -50,6 +53,8 @@ namespace Measure.Controllers
                         Nombre = s.Nombre,
                         Proposito = s.Proposito
                     }).ToList();
+
+                    Reportes = db.Reporte.Where(r => r.Estado).ToList();
 
                     Modelo.Modelo = new ViewPoll();
                     Modelo.Clientes = db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
@@ -89,7 +94,15 @@ namespace Measure.Controllers
                                     Proposito = s.Proposito
                                 }).ToList();
                     }
+
+                    Reportes = db.Reporte.Where(r => r.ClienteId == Cliente && r.Estado).ToList();
                 }
+
+                Modelo.TipoReporteGeneral = Reportes.Select(r => new SelectListItem
+                {
+                    Text = Login.Idioma == (int)Enums.Idiomas.es_ES ? r.es_ES : Login.Idioma == (int)Enums.Idiomas.en_US ? r.en_US : r.pt_BR,
+                    Value = r.Id.ToString(),
+                }).ToList();
 
                 Modelo.Lista = Lista;
                 return View(Modelo);
@@ -235,19 +248,15 @@ namespace Measure.Controllers
                 switch ((Enums.TipoComponente)item.TipoComponente)
                 {
                     case Enums.TipoComponente.ActualizarUsuario:
+                        Item.ActulizarUsuario = new ViewUpdateUser
+                        {
+                            DataPage = ActualizarUsuario(Login)
+                        };
                         using (ModeloEncuesta db = new ModeloEncuesta())
                         {
-                            Item.ActulizarUsuario = new ViewUpdateUser
-                            {
-                                Apellidos = Login.Apellidos,
-                                Group = db.Grupo.Find(item.ComponenteId),
-                                Id = Login.Id,
-                                Idioma = Login.Idioma,
-                                Nombres = Login.Nombres,
-                                PaisId = Login.PaisId,
-                            };
-                            Modelo.Lista.Add(Item);
+                            Item.ActulizarUsuario.Group = db.Grupo.Find(item.ComponenteId);
                         }
+                        Modelo.Lista.Add(Item);
                         break;
                     case Enums.TipoComponente.Inicio:
                         using (ModeloEncuesta db = new ModeloEncuesta())
@@ -266,8 +275,8 @@ namespace Measure.Controllers
                         using (ModeloEncuesta db = new ModeloEncuesta())
                         {
                             AddGroup.Group = db.Grupo.Find(item.ComponenteId);
-                            List<Guid> IdPreguntas = db.PreguntasPorGrupo.Where(p => p.GrupoId == item.ComponenteId).Select(s => s.PreguntaId).ToList();
-                            Preguntas = db.Pregunta.Where(p => IdPreguntas.Contains(p.Id) && p.Idioma == Login.Idioma && p.Estado).ToList();
+                            List<Guid> IdPreguntas = db.PreguntasPorGrupo.Where(p => p.GrupoId == item.ComponenteId).OrderBy(o => o.Orden).Select(s => s.PreguntaId).ToList();
+                            Preguntas = db.Pregunta.Where(p => IdPreguntas.Contains(p.Id) && p.Idioma == Login.Idioma && p.Estado).OrderBy(o => o.Texto).ToList();
                         }
                         AddGroup.Preguntas = new List<ViewLoadQuestion>();
                         foreach (Pregunta ItemPr in Preguntas)
@@ -402,11 +411,17 @@ namespace Measure.Controllers
                                     FechaRespuesta = DateTime.Now
                                 };
                                 db.Respuesta.Add(subitem);
-                            }                            
+                            }
                         }
                     }
                 }
+                db.SaveChanges();
 
+                UsuariosPorEncuenta usuariosPor = db.UsuariosPorEncuenta.Find(new Guid(respuestas.IdAsignacion));
+                usuariosPor.Resuelta = true;
+                usuariosPor.FechaResuelta = DateTime.Now;
+
+                db.Entry(usuariosPor).State = EntityState.Modified;
                 db.SaveChanges();
             }
 
@@ -474,6 +489,48 @@ namespace Measure.Controllers
             OldEncuesta.ClienteId = OldEncuesta.ClienteId != NewEncuesta.ClienteId ? NewEncuesta.ClienteId : OldEncuesta.ClienteId;
 
             return OldEncuesta;
+        }
+
+        private List<ViewUserProperties> ActualizarUsuario(ViewLogin Login)
+        {
+            List<ViewUserProperties> Result = new List<ViewUserProperties>();
+
+            List<UsuarioLabel> Data = DatosPagina();
+            foreach (UsuarioLabel item in Data)
+            {
+                PropertyInfo Property = Login.GetType().GetProperties().FirstOrDefault(p => p.Name.Equals(item.Campo));
+
+                Result.Add(new ViewUserProperties
+                {
+                    Confirm = item.Confirmacion,
+                    Compare = item.Comparar,
+                    Label = Login.Idioma == (int)Enums.Idiomas.es_ES ? item.es_ES : Login.Idioma == (int)Enums.Idiomas.en_US ? item.en_US : item.pt_BR,
+                    Name = item.Campo,
+                    Value = Property.GetValue(Login) != null ? Property.GetValue(Login, null).ToString() : string.Empty,
+                });
+
+                if (item.Comparar)
+                {
+                    Result.Add(new ViewUserProperties
+                    {
+                        Confirm = item.Confirmacion,
+                        Compare = item.Comparar,
+                        Label = string.Format("{0} {1}", Recursos.Recurso.Confirmar, (Login.Idioma == (int)Enums.Idiomas.es_ES ? item.es_ES : Login.Idioma == (int)Enums.Idiomas.en_US ? item.en_US : item.pt_BR)),
+                        Name = string.Concat("Comparar", item.Campo),
+                        Value = Property.GetValue(Login) != null ? Property.GetValue(Login, null).ToString() : string.Empty,
+                    });
+                }
+            }
+
+            return Result;
+        }
+
+        private List<UsuarioLabel> DatosPagina()
+        {
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                return db.UsuarioLabel.OrderBy(o => o.Orden).ToList();
+            }
         }
     }
 }

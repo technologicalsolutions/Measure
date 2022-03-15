@@ -75,8 +75,7 @@
 @using (Html.BeginForm("Delete", "ContenidoEncuesta", FormMethod.Post, new { id = "ContenidoDelete" }))
 {
     @Html.AntiForgeryToken()
-    <input type="hidden" name="Id" id="DeleteCont" value="" />
-
+    <input type="hidden" name="Id" id="DeleteCont" value="" />    
 }
 @section ModalSection{
     <div class="modal fade" tabindex="-1" id="ContenModal">
@@ -89,7 +88,7 @@
                 @using (Html.BeginForm("AddItem", "ContenidoEncuesta", FormMethod.Post))
                 {
                     <input type="hidden" name="EncuestaId" value="@Model.Padre.id" />
-                    <input type="hidden" name="ClienteId" value="@Model.Padre.ClienteId" />                    
+                    <input type="hidden" name="ClienteId" value="@Model.Padre.ClienteId" />
                     <div class="modal-body">
                         @Html.DropDownList("TipoComponente", Model.TiposComponente, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
                     </div>

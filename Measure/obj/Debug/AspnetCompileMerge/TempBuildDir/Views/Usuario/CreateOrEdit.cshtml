@@ -69,7 +69,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolCliente</label>
                             <div class="col-md-10">
-                                <select class="form-select" data-init-plugin="select2" name="Clientes" id="Clientes" onchange="LoadAliado(this.value);">
+                                <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Clientes" onchange="LoadAliado(this.value);">
                                     @foreach (var item in Model.Clientes)
                                     {
                                         <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
@@ -82,7 +82,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
                             <div class="col-md-10">
-                                <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Modelo_ClienteId" required>
+                                <select class="form-select" data-init-plugin="select2" name="Modelo.AliadoId" id="Modelo_ClienteId" required>
                                     @foreach (var item in Model.Aliados)
                                     {
                                         <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>

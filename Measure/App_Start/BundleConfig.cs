@@ -72,6 +72,10 @@ namespace Measure
                         "~/Scripts/base/jquery.validate.min.js",
                         "~/Scripts/base/jquery.validate.unobtrusive.js",
                         "~/Scripts/base/jquery.validate.unobtrusive.min.js"));
+            
+            bundles.Add(new ScriptBundle("~/bundles/ckeditor").Include(
+                        "~/Scripts/ckeditor4/ckeditor.js",
+                        "~/Scripts/ckeditor4/build-config.js"));            
         }
     }
 }

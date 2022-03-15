@@ -270,8 +270,8 @@ namespace Measure.Recursos {
         ///&lt;body style=&quot;font-family: Arial, Helvetica, sans-serif;margin: 20px;&quot;&gt;
         ///    &lt;div&gt;Estimado usuario de CONSULTREE&lt;/div&gt;
         ///    &lt;div style=&quot;padding-top: 10px;&quot;&gt;Se adjunta el informe de la evaluación DTI para :&lt;/div&gt;
-        ///    &lt;div style=&quot;padding-top: 20px;&quot;&gt;        
-        ///        &lt;str [rest of string was truncated]&quot;;.
+        ///    &lt;div style=&quot;padding-top: 30px;&quot;&gt;        
+        ///        Nomb [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CuerpoCorreo {
             get {
@@ -379,7 +379,7 @@ namespace Measure.Recursos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ¡VAMOS A HACERLO!.
+        ///   Looks up a localized string similar to ¡Vamos a Completarlo!.
         /// </summary>
         public static string LoginBoton {
             get {

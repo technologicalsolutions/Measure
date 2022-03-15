@@ -3,10 +3,10 @@
 
 @model ViewContent
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";    
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section scriptsHead{
-    <script src="@Url.Content("~/Scripts/ckeditor5/ckeditor.js")"></script>
+    @Scripts.Render("~/bundles/ckeditor")
 }
 
 <div class="container">
@@ -54,7 +54,7 @@
                                 Activo/Inactivo
                             </label>
                         </div>
-                    </div>    
+                    </div>
                     <div class="col-12 col-md-1">
                         @if (Model.TipoContenido == (int)TipoComponente.Inicio || Model.TipoContenido == (int)TipoComponente.Fin)
                         {
@@ -94,60 +94,9 @@
 @section scripts{
     <script type="text/javascript">
         $(document).ready(function () {
-            var chkLanguaje = LenguajeBase.split('-')[0];
-            ClassicEditor
-                .create(document.querySelector('#Html'), {
-                    toolbar: {
-                        items: [
-                            'heading',
-                            '|',
-                            'bold',
-                            'italic',
-                            'link',
-                            'bulletedList',
-                            'numberedList',
-                            '|',
-                            'outdent',
-                            'indent',
-                            '|',
-                            'imageUpload',
-                            'blockQuote',
-                            'insertTable',
-                            'mediaEmbed',
-                            'undo',
-                            'redo',
-                            '|',
-                            'code',
-                            'codeBlock'
-                        ]
-                    },
-                    language: chkLanguaje,
-                    image: {
-                        toolbar: [
-                            'imageTextAlternative',
-                            'imageStyle:inline',
-                            'imageStyle:block',
-                            'imageStyle:side'
-                        ]
-                    },
-                    table: {
-                        contentToolbar: [
-                            'tableColumn',
-                            'tableRow',
-                            'mergeTableCells'
-                        ]
-                    },
-                    licenseKey: '',
-                })
-                .then(editor => {
-                    window.editor = editor;
-                })
-                .catch(error => {
-                    console.error('Oops, something went wrong!');
-                    console.error('Please, report the following error on https://github.com/ckeditor/ckeditor5/issues with the build id and the error stack trace:');
-                    console.warn('Build id: 251kf1pyjfhj-v2m6lmswftvg');
-                    console.error(error);
-                });
+            $(document).ready(function () {
+                CKEDITOR.replace('Html');
+            });
         });
 
         function reseteForm() {

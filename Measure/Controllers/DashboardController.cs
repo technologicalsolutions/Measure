@@ -143,9 +143,9 @@ namespace Measure.Controllers
                 }
                 using (ModeloEncuesta db = new ModeloEncuesta())
                 {
-                    Result.DatosBasicos.Value = (from A in db.UsuariosPorEncuenta
-                                                 join B in db.Respuesta on A.UsuarioId equals B.UsuarioId
+                    Result.DatosBasicos.Value = (from A in db.UsuariosPorEncuenta                                                
                                                  where A.EncuestaId == EncuestaId
+                                                 && A.Resuelta
                                                  select A.UsuarioId.ToString()).Distinct().Count();
                 }
 
@@ -155,7 +155,8 @@ namespace Measure.Controllers
                 {                    
                     Result.DistPais = (from A in db.UsuariosPorEncuenta
                                        join B in db.Usuario on A.UsuarioId equals B.Id
-                                       join C in db.MaestrasDetalle on B.PaisId equals C.Id
+                                       join C in db.MaestrasDetalle on B.PaisId.ToString() equals C.Valor
+                                       where A.EncuestaId == EncuestaId && B.PaisId != null
                                        group C by new
                                        {
                                            C.Valor,
@@ -176,7 +177,7 @@ namespace Measure.Controllers
                 List<ContenidoPorEncuesta> Grupos = new List<ContenidoPorEncuesta>();
                 using (ModeloEncuesta db = new ModeloEncuesta())
                 {
-                    Grupos = db.ContenidoPorEncuesta.Where(e => e.TipoComponente == (int)Enums.TipoComponente.CategoriaEncuesta && e.ComponenteId == EncuestaId).ToList();
+                    Grupos = db.ContenidoPorEncuesta.Where(e => e.TipoComponente == (int)Enums.TipoComponente.CategoriaEncuesta && e.EncuestaId == EncuestaId).ToList();
                 }
 
                 foreach (ContenidoPorEncuesta item in Grupos)
@@ -215,7 +216,7 @@ namespace Measure.Controllers
                                 List<string> TempRespuestas = (from A in db.Pregunta
                                                                join B in db.Respuesta on A.Id equals B.PreguntaId
                                                                join C in db.PreguntasPorGrupo on A.Id equals C.PreguntaId
-                                                               where C.GrupoId == item.Id
+                                                               where C.GrupoId == _Grupo.Id
                                                                && A.Idioma == Usuario.Idioma
                                                                && A.Estado
                                                                && !string.IsNullOrEmpty(B.Resultado)
@@ -235,7 +236,7 @@ namespace Measure.Controllers
                                 int TempRespuestas = (from A in db.Pregunta
                                                       join B in db.Respuesta on A.Id equals B.PreguntaId
                                                       join C in db.PreguntasPorGrupo on A.Id equals C.PreguntaId
-                                                      where C.GrupoId == item.Id
+                                                      where C.GrupoId == _Grupo.Id
                                                       && A.Idioma == Usuario.Idioma
                                                       && A.Estado
                                                       select B.Resultado).Count();

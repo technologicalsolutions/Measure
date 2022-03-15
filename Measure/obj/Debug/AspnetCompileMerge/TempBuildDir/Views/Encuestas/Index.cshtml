@@ -90,7 +90,7 @@
                                         </div>
                                         <div class="col-sm-12 col-lg-4 text-center">
                                             @using (Html.BeginRouteForm("ContenidoEncuesta", FormMethod.Get))
-                                            {                                                
+                                            {
                                                 <button name="EncuestaId" value="@item.id" type="submit" class="btn btn-info btn-sm rounded-pill py-0 editLink">Contenido</button>
                                             }
                                         </div>
@@ -194,62 +194,62 @@
                         <input type="hidden" name="Modelo.ClienteId" id="Modelo_ClienteId" value="@Model.ClienteId" />
                         <input type="hidden" name="Modelo.id" id="Modelo_id" />
                         @Html.HiddenFor(model => model.Accion)
-                    <div class="row mt-2">
-                        @if (Model.Cliente == null)
-                        {
+                        <div class="row mt-2">
+                            @if (Model.Cliente == null)
+                            {
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Clientes</label>
+                                        <select class="form-select" name="Modelo_ClienteId" id="ClienteId" data-init-plugin="select2" onchange="AsignarValor(this)">
+                                            @foreach (var item in Model.Clientes)
+                                            {
+                                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            }
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label>Clientes</label>
-                                    <select class="form-select" name="Modelo_ClienteId" id="ClienteId" data-init-plugin="select2" onchange="AsignarValor(this)">
-                                        @foreach (var item in Model.Clientes)
-                                        {
-                                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                        }
-                                    </select>
+                                    @Html.LabelFor(model => model.Modelo.Nombre, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.Modelo.Nombre, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                                        @Html.ValidationMessageFor(model => model.Modelo.Nombre, "", new { @class = "text-danger" })
+                                    </div>
                                 </div>
                             </div>
-                        }
-                        <div class="col-12">
-                            <div class="form-group">
-                                @Html.LabelFor(model => model.Modelo.Nombre, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-12">
-                                    @Html.EditorFor(model => model.Modelo.Nombre, new { htmlAttributes = new { @class = "form-control", required = "required" } })
-                                    @Html.ValidationMessageFor(model => model.Modelo.Nombre, "", new { @class = "text-danger" })
+                            <div class="col-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Modelo.Proposito, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-12">
+                                        @Html.EditorFor(model => model.Modelo.Proposito, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                                        @Html.ValidationMessageFor(model => model.Modelo.Proposito, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group mt-2">
+                                    <label>Actualizar Usuario</label>
+                                    <br />
+                                    @Html.EditorFor(model => model.Modelo.ActualizaUsuario, new { @class = "form-check-input" })
+                                    @Html.ValidationMessageFor(model => model.Modelo.ActualizaUsuario, "", new { @class = "text-danger" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Activo
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group mt-2">
+                                    <label>Estado</label>
+                                    <br />
+                                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                                    @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        Activo / Inactivo
+                                    </label>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                @Html.LabelFor(model => model.Modelo.Proposito, htmlAttributes: new { @class = "control-label col-md-2" })
-                                <div class="col-md-12">
-                                    @Html.EditorFor(model => model.Modelo.Proposito, new { htmlAttributes = new { @class = "form-control", required = "required" } })
-                                    @Html.ValidationMessageFor(model => model.Modelo.Proposito, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-group mt-2">
-                                <label>Actualizar Usuario</label>
-                                <br />
-                                @Html.EditorFor(model => model.Modelo.ActualizaUsuario, new { @class = "form-check-input" })
-                                @Html.ValidationMessageFor(model => model.Modelo.ActualizaUsuario, "", new { @class = "text-danger" })
-                                <label class="form-check-label" for="flexCheckChecked">
-                                    Activo
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-group mt-2">
-                                <label>Estado</label>
-                                <br />
-                                @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
-                                @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
-                                <label class="form-check-label" for="flexCheckChecked">
-                                    Activo
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     </div>
                     <div class="modal-footer">
                         <button type="reset" class="btn btn-danger">Limpiar</button>

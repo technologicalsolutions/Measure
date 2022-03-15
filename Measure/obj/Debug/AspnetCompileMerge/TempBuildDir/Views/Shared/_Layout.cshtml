@@ -93,6 +93,15 @@
                                     </a>
                                 }
                             </li>
+                            <li class="sidebar-item @ViewBag.ReporteActive">
+                                @using (Html.BeginRouteForm("Reportes", FormMethod.Post, new { id = "FrmRpt" }))
+                                {
+                                    <input type="hidden" name="Cliente" value="@ClienteID" />
+                                    <a class="sidebar-link" onclick="document.getElementById('FrmRpt').submit();">
+                                        <i class="align-middle me-2 fas fa-fw fa-list-ul"></i>Reportes
+                                    </a>
+                                }
+                            </li>
                             <li class="sidebar-item @ViewBag.MaestrasActive">
                                 @using (Html.BeginRouteForm("Maestras", FormMethod.Post, new { id = "FrmMaestra" }))
                                 {

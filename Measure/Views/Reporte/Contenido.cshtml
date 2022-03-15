@@ -1,0 +1,148 @@
+﻿@using Measure.ViewModels.Reportes
+@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model ViewContentReportIndex
+@{
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    ViewBag.formShow = "show";
+    ViewBag.ReporteActive = "active";
+    ViewBag.Title = "Contenido Reporte";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string Nombre = string.Empty;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">
+                    Contenido reporte:
+                    <strong>
+                        @{
+                            Nombre = login.Idioma == (int)Idiomas.es_ES ? Model.Padre.es_ES : login.Idioma == (int)Idiomas.en_US ? Model.Padre.en_US : Model.Padre.pt_BR;
+                        }
+                        @Nombre
+                    </strong>
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-sm-3">
+            @using (Html.BeginRouteForm("ContenidoReporte", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Acciones)
+                @Html.HiddenFor(m => m.ReporteId)
+                <button type="submit" class="btn btn-primary rounded-pill py-0 mt-1">Crear Contenido</button>
+            }
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped" style="width:100%" id="TblLista">
+                <thead>
+                    <tr>
+                        <th>Tipo de Contenido</th>
+                        <th>Idioma</th>
+                        <th>Orden</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Lista)
+                    {
+                    <tr>
+                        <td>@(((TipoContenido)item.TipoContenido).ToString())</td>
+                        <td>@(((Measure.Enums.Idiomas)item.Idioma).ToString())</td>
+                        <td>@item.Orden</td>
+                        <td>
+                            @if (item.Estado)
+                            {
+                                @Measure.Recursos.Recurso.EstadoActivo
+                            }
+                            else
+                            {
+                                @Measure.Recursos.Recurso.EstadoInactivo
+                            }
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-12 col-sm-6 text-center">
+                                    <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@item.Id')">Editar</button>
+                                </div>
+                                <div class="col-12 col-sm-6 text-center">
+                                    <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id')">Eliminar</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@using (Html.BeginRouteForm("EliminarContenido", FormMethod.Post, new { id = "ContenidoDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="DeleteCont" value="" />
+}
+@using (Html.BeginRouteForm("ContenidoReporte", FormMethod.Post, new { id = "EditFrm" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Acciones" value="2" />
+    @Html.HiddenFor(m => m.ReporteId)
+    <input type="hidden" name="Id" id="EditId" value="" />    
+}
+@section scripts{
+    <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+            LoadDataTable("TblLista", false, true, null, 25);
+        })
+
+        function Editar(Id) {
+            $("#EditId").val(Id);
+            $("#EditFrm").submit();
+        }
+
+        function Eliminar(Id) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar el contenido del reporte.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteCont").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#ContenidoDelete").submit();
+                }
+            });
+        }
+    </script>
+}

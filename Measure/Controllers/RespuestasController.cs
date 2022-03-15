@@ -79,80 +79,93 @@ namespace Measure.Controllers
             ViewPoll _Encuesta = new ViewPoll();
 
             using (ClsProcedures clsProcedures = new ClsProcedures())
-            {                
+            {
                 _Encuesta = clsProcedures.DetalleEncuestaUsuario(Data.Id, Usuario.Id);
             }
 
             ViewAnswerResult Modelo = new ViewAnswerResult();
+            Usuario Cliente = new Usuario();
+            List<Grupo> Grupos = new List<Grupo>();
+            List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                Usuario Cliente = db.Usuario.Where(u => u.Id == _Encuesta.ClienteId).FirstOrDefault();
+                Cliente = db.Usuario.Where(u => u.Id == _Encuesta.ClienteId).FirstOrDefault();
 
-                List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
-
-                List<Guid> IdGrupos = db.ContenidoPorEncuesta.
+                List<ContenidoPorEncuesta> TempGroups = db.ContenidoPorEncuesta.
                     Where(c => c.EncuestaId == _Encuesta.id && c.ComponenteId != Guid.Empty).
-                    OrderBy(o => o.Orden).Select(s => s.ComponenteId).ToList();
+                    OrderBy(o => o.Orden).ToList();
 
-                List<Grupo> Grupos = new List<Grupo>();
-
-                if (Data.Report)
+                foreach (ContenidoPorEncuesta item in TempGroups)
                 {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id)).ToList();
-                }
-                else
-                {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id) && g.TipoReporte != 0 && g.TipoReporte != null).ToList();
-
-                }
-
-                List<Tuple<int, string>> ConsolidadoMatriz = new List<Tuple<int, string>>();
-
-                foreach (Grupo item in Grupos)
-                {
-                    ViewAnswerGroupPoll Addtem = new ViewAnswerGroupPoll
+                    Grupo AddItem = new Grupo();
+                    if (Data.Report)
                     {
-                        Group = item,
-                    };
-
-                    switch (item.TipoReporte)
-                    {
-                        case 0:
-                            Addtem.RespuestasAbierta = GraphicControlAbiero(Usuario, item, Data.Id);
-                            Lista.Add(Addtem);
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            Addtem.RespuestasMatriz = GraphicControlMatrizRange(Usuario, item, Data.Id);
-                            ConsolidadoMatriz.AddRange(Addtem.RespuestasMatriz.Select(l => new Tuple<int, string>(l.ResultQuestionMatrizRange.Radial.Serie, l.ResultQuestionMatrizRange.Radial.Label)).ToList());
-                            Lista.Add(Addtem);
-                            break;
-                        case 4:
-                            Modelo.Wellcome = GraphicPresentation(Usuario);
-                            break;
+                        AddItem = db.Grupo.FirstOrDefault(g => g.Id == item.ComponenteId);
                     }
-                }
-
-                Modelo.Cliente = Cliente;
-                Modelo.ConsolidadoMatriz = ConsolidadoMatriz;
-                Modelo.DataEncuesta = _Encuesta;
-                Modelo.Grupos = Lista;
+                    else
+                    {
+                        AddItem = db.Grupo.FirstOrDefault(g => g.Id == item.ComponenteId && g.TipoReporte != 0 && g.TipoReporte != null);
+                    }
+                    if (AddItem != null)
+                    {
+                        Grupos.Add(AddItem);
+                    }                    
+                }                
             }
 
-            if (Data.Report)
+            List<Tuple<int, string>> ConsolidadoMatriz = new List<Tuple<int, string>>();
+
+            foreach (Grupo item in Grupos)
             {
-                string path = Server.MapPath("/Content/images/");
-                List<string> Imagenes = new List<string>
+                ViewAnswerGroupPoll Addtem = new ViewAnswerGroupPoll
+                {
+                    Group = item,
+                };
+
+                switch (item.TipoReporte)
+                {
+                    case 0:
+                        Addtem.RespuestasAbierta = GraphicControlAbiero(Usuario, item, Data.Id);
+                        Lista.Add(Addtem);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Addtem.RespuestasMatriz = GraphicControlMatrizRange(Usuario, item, Data.Id);
+                        ConsolidadoMatriz.AddRange(Addtem.RespuestasMatriz.Select(l => new Tuple<int, string>(l.ResultQuestionMatrizRange.Radial.Serie, l.ResultQuestionMatrizRange.Radial.Label)).ToList());
+                        Lista.Add(Addtem);
+                        break;
+                    case 4:
+                        Modelo.Wellcome = GraphicPresentation(Usuario);
+                        break;
+                }
+            }
+
+            Modelo.Cliente = Cliente;
+            Modelo.ConsolidadoMatriz = ConsolidadoMatriz;
+            Modelo.DataEncuesta = _Encuesta;
+            Modelo.Grupos = Lista;
+
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                Modelo.ContenidoReporte = db.Reporte.Find(_Encuesta.TipoReporteGeneral)
+                                          .ContenidosReporte.Where(c => c.Idioma == Usuario.Idioma && c.Estado).ToList();
+            }
+
+            string path = Server.MapPath("/Content/images/");
+            List<string> Imagenes = new List<string>
                 {
                     ConvertImagenPathFromBase64(path+"FondoBienvenida.png"),
                     ConvertImagenPathFromBase64(path+"foother_pdf.png"),
                     ConvertImagenPathFromBase64(path+(Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
                 };
-                ViewBag.Imagenes = Imagenes;
+            ViewBag.Imagenes = Imagenes;
+
+            if (Data.Report)
+            {
                 return View("PDF", Modelo);
             }
             return View(Modelo);
@@ -172,77 +185,81 @@ namespace Measure.Controllers
             ViewPoll _Encuesta = new ViewPoll();
 
             using (ClsProcedures clsProcedures = new ClsProcedures())
-            {                
+            {
                 _Encuesta = clsProcedures.DetalleEncuestaUsuario(Data.Id, Usuario.Id);
             }
 
             ViewAnswerResult Modelo = new ViewAnswerResult();
+            Usuario Cliente = new Usuario();
+            List<Grupo> Grupos = new List<Grupo>();
+            List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                Usuario Cliente = db.Usuario.Where(u => u.Id == _Encuesta.ClienteId).FirstOrDefault();
-
-                List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
+                Cliente = db.Usuario.Where(u => u.Id == _Encuesta.ClienteId).FirstOrDefault();
 
                 List<Guid> IdGrupos = db.ContenidoPorEncuesta.
-                    Where(c => c.EncuestaId == _Encuesta.id && c.TipoComponente == (int)Enums.TipoComponente.CategoriaEncuesta).
+                    Where(c => c.EncuestaId == _Encuesta.id && c.ComponenteId != Guid.Empty).
                     OrderBy(o => o.Orden).Select(s => s.ComponenteId).ToList();
-
-                List<Grupo> Grupos = new List<Grupo>();
 
                 if (Data.Report)
                 {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id) && g.ClienteId != Guid.Empty).ToList();
+                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id)).ToList();
                 }
                 else
                 {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id) && g.ClienteId != Guid.Empty && g.TipoReporte != 0 && g.TipoReporte != null).ToList();
-
+                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id) && g.TipoReporte != 0 && g.TipoReporte != null).ToList();
                 }
+            }
 
-                List<Tuple<int, string>> ConsolidadoMatriz = new List<Tuple<int, string>>();
+            List<Tuple<int, string>> ConsolidadoMatriz = new List<Tuple<int, string>>();
 
-                foreach (Grupo item in Grupos)
+            foreach (Grupo item in Grupos)
+            {
+                ViewAnswerGroupPoll Addtem = new ViewAnswerGroupPoll
                 {
-                    ViewAnswerGroupPoll Addtem = new ViewAnswerGroupPoll
-                    {
-                        Group = item,
-                    };
+                    Group = item,
+                };
 
-                    switch (item.TipoReporte)
-                    {
-                        case 0:
-                            Addtem.RespuestasAbierta = GraphicControlAbiero(Usuario, item, Data.Id);
-                            Lista.Add(Addtem);
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            Addtem.RespuestasMatriz = GraphicControlMatrizRange(Usuario, item, Data.Id);
-                            ConsolidadoMatriz.AddRange(Addtem.RespuestasMatriz.Select(l => new Tuple<int, string>(l.ResultQuestionMatrizRange.Radial.Serie, l.ResultQuestionMatrizRange.Radial.Label)).ToList());
-                            Lista.Add(Addtem);
-                            break;
-                        case 4:
-                            Modelo.Wellcome = GraphicPresentation(Usuario);
-                            break;
-                    }
+                switch (item.TipoReporte)
+                {
+                    case 0:
+                        Addtem.RespuestasAbierta = GraphicControlAbiero(Usuario, item, Data.Id);
+                        Lista.Add(Addtem);
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Addtem.RespuestasMatriz = GraphicControlMatrizRange(Usuario, item, Data.Id);
+                        ConsolidadoMatriz.AddRange(Addtem.RespuestasMatriz.Select(l => new Tuple<int, string>(l.ResultQuestionMatrizRange.Radial.Serie, l.ResultQuestionMatrizRange.Radial.Label)).ToList());
+                        Lista.Add(Addtem);
+                        break;
+                    case 4:
+                        Modelo.Wellcome = GraphicPresentation(Usuario);
+                        break;
                 }
+            }
 
-                Modelo.Cliente = Cliente;
-                Modelo.ConsolidadoMatriz = ConsolidadoMatriz;
-                Modelo.DataEncuesta = _Encuesta;
-                Modelo.Grupos = Lista;
+            Modelo.Cliente = Cliente;
+            Modelo.ConsolidadoMatriz = ConsolidadoMatriz;
+            Modelo.DataEncuesta = _Encuesta;
+            Modelo.Grupos = Lista;
+
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                Modelo.ContenidoReporte = db.Reporte.Find(_Encuesta.TipoReporteGeneral)
+                                          .ContenidosReporte.Where(c => c.Idioma == Usuario.Idioma && c.Estado).ToList();
             }
 
             string path = Server.MapPath("/Content/images/");
             List<string> Imagenes = new List<string>
-                {
-                    ConvertImagenPathFromBase64(path+"FondoBienvenida.png"),
-                    ConvertImagenPathFromBase64(path+"foother_pdf.png"),
-                    ConvertImagenPathFromBase64(path+(Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
-                };
+            {
+                ConvertImagenPathFromBase64(path+"FondoBienvenida.png"),
+                ConvertImagenPathFromBase64(path+"foother_pdf.png"),
+                ConvertImagenPathFromBase64(path+(Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
+            };
             ViewBag.Imagenes = Imagenes;
             Modelo.Email = true;
             Modelo.Report = Data.Report;
@@ -265,53 +282,86 @@ namespace Measure.Controllers
         public ActionResult SendEmail(ViewDownload Data)
         {
             ViewLogin Usuario = HttpContext.Session["login"] as ViewLogin;
-
-            SmtpSection smtpSection = (SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
-            ViewPoll DataEncuesta = JsonConvert.DeserializeObject<ViewPoll>(Data.DataEncuesta);
-
             string mailbody = MailBody((Enums.Idiomas)Usuario.Idioma, Usuario);
+            byte[] DataHtml = ConvertHtmlToPdf(Data.Contenido);
 
-            using (MailMessage message = new MailMessage())
+            bool send = EmailSending(Usuario.Correo, DataHtml, mailbody);
+            send = EmailSending(ConfigurationManager.AppSettings["SecundaryEmail"].ToString(), DataHtml, mailbody);
+
+            if (Data.Report)
             {
-                message.From = new MailAddress(smtpSection.Network.UserName.ToString());
-                message.To.Add(Usuario.Correo);
-                message.To.Add(ConfigurationManager.AppSettings["SecundaryEmail"].ToString());
-                message.Subject = Recursos.Recurso.SujetoCorreo;
-                message.Body = mailbody;
-                message.BodyEncoding = Encoding.UTF8;
-                message.IsBodyHtml = true;
+                return RedirectToAction("ResponderEncuesta", "Encuestas");
+            }
+            else
+            {
+                return RedirectToAction("MisEncuestas", "Encuestas", new { Id = Usuario.Id });
+            }
+        }
 
-                Byte[] DataHtml = ConvertHtmlToPdf(Data.Contenido);
-                Stream DataStrem = new MemoryStream(DataHtml);
-                message.Attachments.Add(new Attachment(DataStrem, ConfigurationManager.AppSettings["FileName"].ToString()));
+        [HttpGet]
+        [Route("PruebaEmail")]
+        public ActionResult PruebaEmail(string Email)
+        {
+            ViewLogin Usuario = new ViewLogin
+            {
+                Idioma = 1,
+                Correo = Email,
+                Nombres = "Rene Alejandro",
+                Apellidos = "Paramo Porras",
+                Empresa = "Prueba",
+                Titulo = "Desarrollador",
+                Industria = "Desarrollo",
+                Pais = "Colombia"
+            };
+            string Contenido = "<!DOCTYPE html> <html lang='es'> <head> <meta charset='UTF-8'>" +
+                " <meta http-equiv='X-UA-Compatible' content='IE=edge'> <meta name='viewport' " +
+                "content='width=device-width, initial-scale=1.0'> <title>Correo</title> </head> " +
+                "<body style='font-family: Arial, Helvetica, sans-serif;margin: 20px;'>" +
+                " <div>Estimado usuario de CONSULTREE</div> " +
+                "<div style='padding-top: 10px;'>Se adjunta el informe de la evaluación DTI para :</div></body> </html>";
+            string mailbody = MailBody((Enums.Idiomas)Usuario.Idioma, Usuario);
+            byte[] DataHtml = ConvertHtmlToPdf(Contenido);
 
-                using (SmtpClient client = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
+            bool send = EmailSending(Usuario.Correo, DataHtml, mailbody);
+            return RedirectToAction("index", "Login");
+        }
+
+        private bool EmailSending(string Email, byte[] DataHtml, string mailbody)
+        {
+            bool Result = true;
+            try
+            {
+                SmtpSection smtpSection = (SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
+
+                using (MailMessage message = new MailMessage())
                 {
-                    client.EnableSsl = true;
-                    client.UseDefaultCredentials = false;
-                    client.Credentials = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
-                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    message.From = new MailAddress(smtpSection.Network.UserName.ToString());
+                    message.To.Add(Email);
+                    message.Subject = Recursos.Recurso.SujetoCorreo;
+                    message.Body = mailbody;
+                    message.BodyEncoding = Encoding.UTF8;
+                    message.IsBodyHtml = true;
 
-                    try
+                    Stream DataStrem = new MemoryStream(DataHtml);
+                    message.Attachments.Add(new Attachment(DataStrem, ConfigurationManager.AppSettings["FileName"].ToString()));
+
+                    using (SmtpClient client = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
                     {
+                        client.EnableSsl = true;
+                        client.UseDefaultCredentials = false;
+                        client.Credentials = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
+                        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+
                         client.Send(message);
-
-                        if (Data.Report)
-                        {
-                            return RedirectToAction("ResponderEncuesta", "Encuestas");
-                        }
-                        else
-                        {
-                            return RedirectToAction("MisEncuestas", "Encuestas", new { Id = Usuario.Id });
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        string error = ex.ToString();
-                        throw;
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                string error = ex.ToString();
+                Result = false;
+            }
+            return Result;
         }
 
         private string ConvertImagenPathFromBase64(string Path)
@@ -330,27 +380,29 @@ namespace Measure.Controllers
 
         private Byte[] ConvertHtmlToPdf(string Html)
         {
-            HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+            HtmlToPdf converter = new HtmlToPdf();
             converter.Options.PdfPageSize = PdfPageSize.Letter;
             converter.Options.PdfPageOrientation = PdfPageOrientation.Landscape;
+            converter.Options.MarginLeft = 0;
+            converter.Options.MarginRight = 0;
+            converter.Options.MarginTop = 0;
+            converter.Options.MarginBottom = 0;
+
             PdfDocument document = converter.ConvertHtmlString(Html);
             document.Margins.Top = 2;
             document.Margins.Right = 2;
             document.Margins.Bottom = 2;
             document.Margins.Left = 2;
 
-            string path = Server.MapPath("/Content/fonts/");
+            string pathFnt = Server.MapPath("/Content/fonts/");
             PrivateFontCollection collection = new PrivateFontCollection();
-            collection.AddFontFile(path + "Avenir-Roman.ttf");
-            collection.AddFontFile(path + "BarlowCondensed-Regular.ttf");
-            collection.AddFontFile(path + "Ubuntu-Bold.ttf");
+            collection.AddFontFile(pathFnt + "BarlowCondensed-Regular.ttf");
+            collection.AddFontFile(pathFnt + "Ubuntu-Bold.ttf");
 
-            Font TitleFont = new Font(collection.Families[0], 14);
-            document.AddFont(TitleFont);
-            Font PageFont = new Font(collection.Families[1], 14);
-            document.AddFont(PageFont);
-            Font TextFont = new Font(collection.Families[2], 14);
-            document.AddFont(TextFont);
+            Font PageFont = new Font(collection.Families[0], 14);
+            document.AddFont(PageFont, true);
+            Font TextFont = new Font(collection.Families[1], 14);
+            document.AddFont(TextFont, true);
 
             MemoryStream stream = new MemoryStream();
             document.Save(stream);
@@ -437,7 +489,7 @@ namespace Measure.Controllers
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 List<Guid> IdPreguntas = db.PreguntasPorGrupo.Where(p => p.GrupoId == grupo.Id).OrderBy(o => o.Orden).Select(s => s.PreguntaId).ToList();
-                _Preguntas = db.Pregunta.Where(p => IdPreguntas.Contains(p.Id) && p.Idioma == Usuario.Idioma).ToList();
+                _Preguntas = db.Pregunta.Where(p => IdPreguntas.Contains(p.Id) && p.Idioma == Usuario.Idioma && p.Estado).OrderBy(o => o.Texto).ToList();
             }
 
             foreach (Pregunta item in _Preguntas)
@@ -468,7 +520,7 @@ namespace Measure.Controllers
                             List<string> SubPreguntas = new List<string>();
                             using (ModeloEncuesta db = new ModeloEncuesta())
                             {
-                                SubPreguntas = db.ControlMatrizFila.Where(c => c.MatrizId == control.Id).Select(s => s.Texto).ToList();
+                                SubPreguntas = db.ControlMatrizFila.Where(c => c.MatrizId == control.Id).OrderBy(o => o.Orden).Select(s => s.Texto).ToList();
                             }
 
                             int Calificacion = 0;

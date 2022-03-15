@@ -10,6 +10,7 @@ namespace Measure.ViewModels.Encuesta
     {
         public List<SelectListItem> Idiomas { get; set; }
         public List<SelectListItem> Clientes { get; set; }
+        public List<SelectListItem> TipoReporteGeneral { get; set; }
         public List<ViewPoll> Lista { get; set; }
         public ViewPoll Modelo { get; set; }
         public Models.Usuario Cliente { get; set; }

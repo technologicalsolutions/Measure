@@ -32,7 +32,7 @@
     <div class="row">
         @using (Html.BeginRouteForm("Busqueda", FormMethod.Post))
         {
-            @Html.HiddenFor(m => m.DataEncuesta.id)
+            <input type="hidden" name="EncuestaId" value="@Model.DataEncuesta.id" />            
             <div class="row">
                 @if (Model.Clientes.Count() > 0)
                 {
@@ -40,7 +40,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2">Cliente</label>
                             <div class="col-md-10">
-                                @Html.DropDownList("Modelo.ClienteId", Model.Clientes, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
+                                @Html.DropDownList("ClienteId", Model.Clientes, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2">Pais</label>
                         <div class="col-md-10">
-                            @Html.DropDownList("Modelo.CodigoPais", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
+                            @Html.DropDownList("PaisId", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
                         </div>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2">Idioma</label>
                         <div class="col-md-10">
-                            @Html.DropDownList("Modelo.Idioma", Model.Idiomas, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
+                            @Html.DropDownList("Idioma", Model.Idiomas, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2" })
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2">Correo</label>
                         <div class="col-md-10">
-                            @Html.TextBoxFor(m => m.Modelo.email, new { @class = "form-control" })
+                            <input type="email" name="Correo" class="form-control" />
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-2">Nombre</label>
                         <div class="col-md-10">
-                            @Html.TextBoxFor(m => m.Modelo.email, new { @class = "form-control" })
+                            <input type="text" name="Nombre" class="form-control" />
                         </div>
                     </div>
                 </div>

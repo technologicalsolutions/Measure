@@ -10,8 +10,10 @@ namespace Measure.ViewModels.Usuario
 {
     public class ViewUpdateUser
     {
-        public Models.Grupo Group { get; set; }
+        public List<ViewUserProperties> DataPage { get; set; }
 
+        public Models.Grupo Group { get; set; }
+                
         public Guid Id { get; set; }
 
         public int Idioma { get; set; }

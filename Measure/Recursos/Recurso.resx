@@ -195,16 +195,16 @@
 &lt;body style="font-family: Arial, Helvetica, sans-serif;margin: 20px;"&gt;
     &lt;div&gt;Estimado usuario de CONSULTREE&lt;/div&gt;
     &lt;div style="padding-top: 10px;"&gt;Se adjunta el informe de la evaluación DTI para :&lt;/div&gt;
-    &lt;div style="padding-top: 20px;"&gt;        
-        &lt;strong&gt;Nombre: &lt;/strong&gt;{0}&lt;/br&gt;
-        &lt;strong&gt;Apellido:&lt;/strong&gt;{1}&lt;/br&gt;
-        &lt;strong&gt;Nombre de la Empresa: &lt;/strong&gt;{2}&lt;/br&gt;
-        &lt;strong&gt;# de Empleados: &lt;/strong&gt;{3}&lt;/br&gt;
-        &lt;strong&gt;Titulo/Posición: &lt;/strong&gt;{4}&lt;/br&gt;
-        &lt;strong&gt;Industrias: &lt;/strong&gt;{5}&lt;/br&gt;
-        &lt;strong&gt;Correo electrónico de trabajo: &lt;/strong&gt;{6}&lt;/br&gt;
-        &lt;strong&gt;Teléfono: &lt;/strong&gt;{7}&lt;/br&gt;
-        &lt;strong&gt;País: &lt;/strong&gt;{8}&lt;/br&gt;
+    &lt;div style="padding-top: 30px;"&gt;        
+        Nombre: {0}&lt;/br&gt;
+        Apellido:{1}&lt;/br&gt;
+        Nombre de la Empresa: {2}&lt;/br&gt;
+        # de Empleados: {3}&lt;/br&gt;
+        Titulo/Posición: {4}&lt;/br&gt;
+        Industrias: {5}&lt;/br&gt;
+        Correo electrónico de trabajo: {6}&lt;/br&gt;
+        Teléfono: {7}&lt;/br&gt;
+        País: {8}&lt;/br&gt;
     &lt;/div&gt;
     &lt;div style="text-align: justify; padding-top: 40px;"&gt;
         Por favor revise el informe adjunto. Este informe contiene información que puede considerarse confidencial y solo debe compartirse con personas autorizadas según la política de la organización y de acuerdo con las normas y regulaciones locales relacionadas la privacidad de la data..
@@ -214,6 +214,22 @@
     &lt;/div&gt;
     &lt;div style="padding-top: 20px;"&gt;
         Gracias por elegir ConsulTree.
+    &lt;/div&gt;
+	&lt;div style="padding-top: 30px;text-align: left;"&gt;
+        &lt;img src="data:image/png;base64,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"&gt;
+    &lt;/div&gt;
+    &lt;div style="font-size: small;text-align: justify;"&gt;
+        &lt;p&gt;
+            This message and its enclosures contains information which may be confidential and privileged. For exclusive
+            use of the addressee. If you have received this message by error, please delete the original message and
+            notify the sender by reply e-mail. Unless you are the addressee, you may not use, copy or disclose to anyone
+            this message or any information contained in this message. CONSULTREE, LLC is not liable for opinions
+            expressed in this message which may not coincide with its responsibilities and purpose and which may not
+            express official matters. The information contemplated herein are solely for use by the addressees hereof in
+            connection with herein and may not be relied upon by any other person (other than the successors and
+            permitted assigns of the addresses) or for any other purpose without our prior written consent, and shall
+            not be considered a binding opinion of CONSULTREE, LLC.
+        &lt;/p&gt;
     &lt;/div&gt;    
 &lt;/body&gt;
 &lt;/html&gt;</value>
@@ -252,7 +268,7 @@
     <value>/Scripts/select2/i18n/es.js</value>
   </data>
   <data name="LoginBoton" xml:space="preserve">
-    <value>¡VAMOS A HACERLO!</value>
+    <value>¡Vamos a Completarlo!</value>
   </data>
   <data name="LoginCerrarSesion" xml:space="preserve">
     <value>La sesión ha sido cerrada</value>

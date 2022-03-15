@@ -18,6 +18,8 @@ namespace Measure.ViewModels.Respuesta
 
         public bool Report { get; set; }
 
+        public List<Models.ContenidoReporte> ContenidoReporte { get; set; }
+
         public bool Email { get; set; }
     }
 }

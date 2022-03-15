@@ -94,10 +94,10 @@
                                                 }
                                             </div>
                                             <div class="col-12 col-lg-4">
-                                                <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.Correo')">Detalles</a>
+                                                <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.Id')">Detalles</a>
                                             </div>
                                             <div class="col-12 col-lg-4">
-                                                <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Correo')">Eliminar</a>
+                                                <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@item.Correo')">Eliminar</a>
                                             </div>
                                         </div>
                                     </td>
@@ -110,10 +110,10 @@
         </div>
     </div>
 </div>
-@using (Html.BeginForm("Delete", "Usuarios", FormMethod.Post, new { id = "UserDelete" }))
+@using (Html.BeginForm("Delete", "Usuario", FormMethod.Post, new { id = "UserDelete" }))
 {
     @Html.AntiForgeryToken()
-    <input type="hidden" name="Correo" id="DeleteUser" value="" />
+    <input type="hidden" name="Id" id="DeleteUser" value="" />
 }
 @section ModalSection{
     <div class="modal fade" tabindex="-1" id="UserModal">
@@ -134,12 +134,12 @@
             LoadDataTable("TblLista", false, true, null, 10);
         })
 
-        function Detalles(Correo) {
+        function Detalles(Id) {
             $.ajax({
-                url: '@Url.Action("Detail", "Usuarios")',
+                url: '@Url.Action("Detail", "Usuario")',
                 dataType: 'html',
                 method: 'Post',
-                data: { Data: { Modelo: { 'Correo': Correo } } },
+                data: { Data: { Modelo: { 'Id': Id } } },
                 success: function (result) {
                     $("#CrearOEditar").html('').html(result);
                     ShowModal("UserModal");
@@ -150,7 +150,7 @@
             });
         }
 
-        function Eliminar(Correo) {
+        function Eliminar(Id,Correo) {
             Swal.fire({
                 title: '¿Estas seguro?',
                 text: "Desea eliminar el usuario de correo " + Correo,
@@ -162,7 +162,7 @@
                 confirmButtonText: 'Sí, bórralo'
             }).then((result) => {
                 if (result.value) {
-                    $("#DeleteUser").val(Correo);
+                    $("#DeleteUser").val(Id);
                     Swal.fire(
                         'Exito!',
                         'Tu registro ha sido eliminado.',

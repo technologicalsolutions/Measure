@@ -1,0 +1,264 @@
+﻿@using Measure.ViewModels.Reportes
+@using Measure.ViewModels.Usuario
+@using Measure.Enums
+
+@model ViewReportIndex
+@{
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+    ViewBag.formShow = "show";
+    ViewBag.ReporteActive = "active";
+    ViewBag.Title = "Reportes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string Nombre = string.Empty;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+}
+
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Reporte</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-12 col-md-2 d-flex justify-content-between align-items-center">
+            <button class="btn btn-primary btn-sm rounded-pill py-0" type="button" onclick="Crear()"><i class="bi-plus-circle"></i>Crear Reporte</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <table class="table table-striped" style="width:100%" id="TblLista">
+                    <thead>
+                        <tr>
+                            <th>
+                                Nombre
+                            </th>
+                            <th class="text-center">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Lista)
+                        {
+                            <tr>
+                                <td>
+                                    @{
+                                        Nombre = login.Idioma == 1 ? item.es_ES : login.Idioma == 2 ? item.en_US : item.pt_BR;
+                                    }
+                                    @Nombre
+                                </td>
+                                <td width="30%">
+                                    <div class="row text-center">
+                                        <div class="col-12 col-md-3 text-center">
+                                            <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Contenido('@item.Id')">Contenido</button>
+                                        </div>
+                                        <div class="col-12 col-md-3 text-center">
+                                            <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
+                                        </div>
+                                        <div class="col-12 col-md-3 text-center">
+                                            <button class="btn btn-info btn-sm rounded-pill py-0 editLink" type="button" onclick="Detalles('@item.Id')">Detalle</button>
+                                        </div>
+                                        <div class="col-12 col-md-3 text-center">
+                                            <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar('@item.Id','@item.es_ES')">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginRouteForm("EliminarReporte", FormMethod.Post, new { id = "ContenidoDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="DeleteEnc" value="" />
+}
+@using (Html.BeginRouteForm("ContenidosReporte", FormMethod.Get, new { id = "ContentReport" }))
+{    
+    <input type="hidden" name="Id" id="ContentId" value="" />
+}
+@section ModalSection{
+    <div class="modal fade" id="EncModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TitleModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModal"></h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('EncModal')"></button>
+                </div>
+                <div class="modal-body" id="Detail"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="ReporteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TitleModalAccion"></h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('ReporteModal')"></button>
+                </div>
+                @using (Html.BeginRouteForm("ReporteAcciones", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Modelo.Id)
+                    @Html.HiddenFor(model => model.Acciones)
+                    <div class="modal-body">
+                        @if (Model.ClienteId == null || Model.ClienteId == Guid.Empty)
+                        {
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Clientes</label>
+                                        <select class="form-select" name="Modelo.ClienteId" data-init-plugin="select2">
+                                            @foreach (var item in Model.Clientes)
+                                            {
+                                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="Modelo.ClienteId" value="@Model.ClienteId" />
+                        }
+                        <div class="row mt-2">
+                            <label class="form-label col-3">Nombre Español</label>
+                            <div class="form-group col-9">
+                                @Html.TextBoxFor(m => m.Modelo.es_ES, new { @class = "form-control", required = "required" })
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <label class="form-label col-3">Nombre Ingles</label>
+                            <div class="form-group col-9">
+                                @Html.TextBoxFor(m => m.Modelo.en_US, new { @class = "form-control", required = "required" })
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <label class="form-label col-3">Nombre Portuges</label>
+                            <div class="form-group col-9">
+                                @Html.TextBoxFor(m => m.Modelo.pt_BR, new { @class = "form-control", required = "required" })
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <label class="form-check-label col-2" for="Modelo_Estado">
+                                Estado
+                            </label>
+                            <div class="form-check col-10">
+                                @Html.CheckBoxFor(m => m.Modelo.Estado, new { @class = "form-check-input" })
+                                <label class="form-check-label ms-2" for="Modelo_Estado">
+                                    Activo / Inactivo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger">Limpiar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+                "dropdownParent": $('#ReporteModal')
+            });
+
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
+        function Contenido(Id) {
+            $("#ContentId").val(Id);
+            $("#ContentReport").submit();
+        }
+
+        function Crear() {
+            $("#TitleModalAccion").text("Crear Maestra");
+            $("#TitleModal").val(0);
+            $("#Modelo_es_ES").val('');
+            $("#Modelo_en_US").val('');
+            $("#Modelo_pt_BR").val('');
+            $("#Modelo_Activo").prop("checked", false);
+            ShowModal("ReporteModal");
+        }
+
+        function Editar(Model) {
+            var Data = JSON.parse(Model);
+            $("#TitleModal").html("Editar Maestra");
+            $("#Acciones").val(2);
+            $("#Modelo_Id").val(Data.Id);
+            $("#Modelo_es_ES").val(Data.en_US);
+            $("#Modelo_en_US").val(Data.es_ES);
+            $("#Modelo_pt_BR").val(Data.pt_BR);
+            $("#Modelo_ClienteId").val(Data.ClienteId);
+
+            if ($("#ClienteId option").length > 0) {
+                $("#ClienteId").val(Data.ClienteId);
+            }
+
+            $("#Modelo_Estado").prop("checked", Data.Estado);
+            ShowModal("ReporteModal");
+        }
+
+        function Eliminar(Id, Nombre) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar la maestra " + Nombre,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteEnc").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#ContenidoDelete").submit();
+                }
+            });
+        }
+
+        function Detalles(Id) {
+            $.ajax({
+                url: '@Url.Action("Detail", "Reporte")',
+                dataType: 'html',
+                method: 'Post',
+                data: { Data: { Modelo: { 'Id': Id } } },
+                success: function (result) {
+                    $("#Detail").html('').html(result);
+                    ShowModal("EncModal");
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+    </script>
+}

@@ -42,11 +42,24 @@ namespace Measure.Controllers
             }
             else
             {
-                using (ModeloEncuesta db = new ModeloEncuesta())
+                if (login.RolId == (int)UserRol.Administrador)
                 {
-                    Lista = db.Maestras.Where(m=> m.ClienteId != Guid.Empty).ToList();
-                    Modelo.Clientes = db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
+                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    {
+                        List<string> Excludes = new List<string> { "Pais", "Idioma" };
+                        Lista = db.Maestras.Where(m => !Excludes.Contains(m.es_ES)).ToList();
+                        Modelo.Clientes = db.Usuario.Where(u => u.RolId == (int)UserRol.Cliente).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
+                    }
                 }
+                else
+                {
+                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    {
+                        Lista = db.Maestras.Where(m => m.ClienteId != Guid.Empty).ToList();
+                        Modelo.Clientes = db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
+                    }
+                }
+                
             }
 
             foreach (Maestras item in Lista)
@@ -230,6 +243,7 @@ namespace Measure.Controllers
                 {
                     en_US = item.en_US,
                     es_ES = item.es_ES,
+                    Estado = item.Estado,
                     pt_BR = item.pt_BR,
                     Id = item.Id,
                     MaestraId = item.MaestraId,
@@ -303,6 +317,21 @@ namespace Measure.Controllers
                 MaestrasDetalle _Maestra = db.MaestrasDetalle.Find(Id);
                 MaestraId = _Maestra.MaestraId;
                 db.MaestrasDetalle.Remove(_Maestra);
+                db.SaveChanges();
+            }
+            return RedirectToRoute("Detalle", new { Id = MaestraId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult InactiveDetail(int Id)
+        {
+            int MaestraId = 0;
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                MaestrasDetalle _Maestra = db.MaestrasDetalle.Find(Id);
+                _Maestra.Estado = false;
+                db.Entry(_Maestra).State = EntityState.Modified;
                 db.SaveChanges();
             }
             return RedirectToRoute("Detalle", new { Id = MaestraId });

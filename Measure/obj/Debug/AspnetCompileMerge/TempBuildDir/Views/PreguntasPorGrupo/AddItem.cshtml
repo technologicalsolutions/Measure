@@ -44,11 +44,16 @@
                 </div>
             </div>
             <div class="col-12 col-md-2">
-                <label class="form-label">Estado</label>
-                <div class="form-group mt-1">
-                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Modelo.Estado, true, new { @class = "form-check-input" })
                     <label class="form-check-label" for="flexCheckChecked">
-                        Activo / Inactivo
+                        @Measure.Recursos.Recurso.EstadoActivo
+                    </label>
+                </div>
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Modelo.Estado, false, new { @class = "form-check-input" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        @Measure.Recursos.Recurso.EstadoInactivo
                     </label>
                 </div>
             </div>

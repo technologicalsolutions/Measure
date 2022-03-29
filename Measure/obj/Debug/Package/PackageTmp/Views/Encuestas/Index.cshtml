@@ -239,15 +239,18 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-6">
-                                <div class="form-group mt-2">
-                                    <label>Estado</label>
-                                    <br />
-                                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
-                                    @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Estado, true, new { @class = "form-check-input" })
                                     <label class="form-check-label" for="flexCheckChecked">
-                                        Activo / Inactivo
+                                        @Measure.Recursos.Recurso.EstadoActivo
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Estado, false, new { @class = "form-check-input" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        @Measure.Recursos.Recurso.EstadoInactivo
+                                    </label>
+                                </div>                                
                             </div>
                         </div>
                     </div>

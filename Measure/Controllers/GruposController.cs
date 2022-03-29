@@ -178,7 +178,7 @@ namespace Measure.Controllers
             OldGrupo.Desc_pt_BR = OldGrupo.Desc_pt_BR != NewGrupo.Desc_pt_BR ? NewGrupo.Desc_pt_BR : OldGrupo.Desc_pt_BR;
             OldGrupo.Estado = OldGrupo.Estado != NewGrupo.Estado ? NewGrupo.Estado : OldGrupo.Estado;
             OldGrupo.en_US = OldGrupo.en_US != NewGrupo.en_US ? NewGrupo.en_US : OldGrupo.en_US;
-            OldGrupo.es_Es = OldGrupo.es_Es != NewGrupo.es_Es ? NewGrupo.en_US : OldGrupo.es_Es;
+            OldGrupo.es_Es = OldGrupo.es_Es != NewGrupo.es_Es ? NewGrupo.es_Es : OldGrupo.es_Es;
             OldGrupo.pt_BR = OldGrupo.pt_BR != NewGrupo.pt_BR ? NewGrupo.pt_BR : OldGrupo.pt_BR;
             OldGrupo.RespuestaAltaMin = OldGrupo.RespuestaAltaMin != NewGrupo.RespuestaAltaMin ? NewGrupo.RespuestaAltaMin == null ? 0 : NewGrupo.RespuestaAltaMin : OldGrupo.RespuestaAltaMin;
             OldGrupo.RespuestaBajaMax = OldGrupo.RespuestaBajaMax != NewGrupo.RespuestaBajaMax ? NewGrupo.RespuestaBajaMax == null ? 0 : NewGrupo.RespuestaBajaMax : OldGrupo.RespuestaBajaMax;

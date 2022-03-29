@@ -47,13 +47,18 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
-                        <label class="form-label" for="flexCheckChecked">Estado</label>
-                        <div class="mt-2">
-                            @Html.EditorFor(model => model.Estado, new { @class = "form-check-input form-control", required = "required" })
-                            <label for="flexCheckChecked">
-                                Activo/Inactivo
+                        <div class="form-check">
+                            @Html.RadioButtonFor(m => m.Estado, true, new { @class = "form-check-input" })
+                            <label class="form-check-label" for="flexCheckChecked">
+                                @Measure.Recursos.Recurso.EstadoActivo
                             </label>
                         </div>
+                        <div class="form-check">
+                            @Html.RadioButtonFor(m => m.Estado, false, new { @class = "form-check-input" })
+                            <label class="form-check-label" for="flexCheckChecked">
+                                @Measure.Recursos.Recurso.EstadoInactivo
+                            </label>
+                        </div>                        
                     </div>
                     <div class="col-12 col-md-1">
                         @if (Model.TipoContenido == (int)TipoComponente.Inicio || Model.TipoContenido == (int)TipoComponente.Fin)

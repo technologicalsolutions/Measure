@@ -269,6 +269,9 @@
     <Content Include="Content\images\Icono.png" />
     <Content Include="Content\images\Icono.svg" />
     <Content Include="Content\images\loader.gif" />
+    <Content Include="Content\images\Loader_en_US.gif" />
+    <Content Include="Content\images\Loader_es_ES.gif" />
+    <Content Include="Content\images\Loader_pt_BR.gif" />
     <Content Include="Content\images\logo-user.png" />
     <Content Include="Content\images\logo_login.png" />
     <Content Include="Content\images\logo_login_2.png" />
@@ -312,6 +315,7 @@
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.min.js" />
     <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
+    <None Include="Properties\PublishProfiles\IISProfile1.pubxml" />
     <None Include="Scripts\base\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\base\jquery.validate.js" />
     <Content Include="Scripts\base\jquery.validate.min.js" />

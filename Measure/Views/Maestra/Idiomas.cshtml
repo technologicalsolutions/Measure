@@ -114,10 +114,18 @@
                                 Estado
                             </label>
                             <div class="form-check col-10">
-                                @Html.CheckBoxFor(m => m.Modelo.Estado, new { @class = "form-check-input" })
-                                <label class="form-check-label ms-2" for="Modelo_Activo">
-                                    Activo / Inactivo
-                                </label>
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Estado, true, new { @class = "form-check-input" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        @Measure.Recursos.Recurso.EstadoActivo
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Estado, false, new { @class = "form-check-input" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        @Measure.Recursos.Recurso.EstadoInactivo
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

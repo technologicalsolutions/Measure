@@ -122,14 +122,15 @@
                                 <div class="form-group mt-2">
                                     <label>Comparar Campo</label>
                                     <br />
-                                    <input type="checkbox" class="form-check-input" name="Comparar" id="Comparar" />
+                                    <input type="checkbox" class="form-check-input"  id="Comparar"  onchange="Selected(this)"/>
+                                    <input type="hidden" name="Comparar" />
                                 </div>
                             </div>
                             <div class="col-12 col-md-4">
                                 <div class="form-group">
                                     <label class="control-label col-md-2">Orden</label>
                                     <div class="col-md-10">
-                                        <input type="text" name="Orden" id="Orden" onkeypress="NumberOnly(event)" class = "form-control"/>
+                                        <input type="text" name="Orden" id="Orden" onkeypress="NumberOnly(event)" class = "form-control"/>                                        
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +138,8 @@
                                 <div class="form-group mt-2">
                                     <label>Confirmar Campo</label>
                                     <br />
-                                    <input type="checkbox" class="form-check-input" name="Confirmacion" id="Confirmacion" />
+                                    <input type="checkbox" class="form-check-input" id="Confirmacion" onchange="Selected(this)" />
+                                    <input type="hidden" name="Confirmacion" />
                                 </div>
                             </div>
                         </div>
@@ -163,10 +165,16 @@
             $("#es_ES").val(Data.es_ES);
             $("#en_US").val(Data.en_US);
             $("#pt_BR").val(Data.pt_BR)
-            $("#Orden").val(Data.Orden); 
+            $("#Orden").val(Data.Orden);
+            document.getElementsByName("Confirmacion")[0].value = Data.Confirmacion;
             $("#Confirmacion").prop("checked", Data.Confirmacion);
+            document.getElementsByName("Comparar")[0].value = Data.Comparar;
             $("#Comparar").prop("checked", Data.Comparar);
             ShowModal("UpdateModal");
+        }
+
+        function Selected(Obj) {
+            document.getElementsByName(Obj.id)[0].value = Obj.checked;
         }
     </script>
 }

@@ -428,11 +428,11 @@ namespace Measure.Controllers
         public PartialViewResult Detail(ViewUsuario Data)
         {
             using (ModeloEncuesta db = new ModeloEncuesta())
-            {
-                string Correo = Data.Modelo.Correo;
-                Data.Modelo = ResultViewUser(db.Usuario.Where(u => u.Correo == Correo).FirstOrDefault());
+            {                
+                Usuario FindUser = db.Usuario.Find(Data.Modelo.Id);
+                Data.Modelo = ResultViewUser(FindUser);
             }
-            return PartialView("_Details", Data);
+            return PartialView("_Detail", Data);
         }
 
         [HttpPost, ActionName("Delete")]
@@ -479,6 +479,10 @@ namespace Measure.Controllers
                 {
                     Result.ClienteId = Modelo.ClienteId;
                     Result.Cliente = db.Usuario.Where(u => u.Id == Modelo.ClienteId).FirstOrDefault().Nombres;
+                }
+                if (Modelo.AliadoId != null)
+                {
+                    Result.AliadoId = Modelo.AliadoId;
                 }
                 if (Modelo.Imagen != null)
                 {

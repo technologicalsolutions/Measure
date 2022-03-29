@@ -57,8 +57,7 @@
                                     {
                                         <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
                                     }
-                                </select>
-                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                                </select>                                
                             </div>
                         </div>
                     </div>
@@ -87,8 +86,7 @@
                                     {
                                         <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
                                     }
-                                </select>
-                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                                </select>                                
                             </div>
                         </div>
                     </div>
@@ -138,8 +136,7 @@
                         <div class="form-group">
                             <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
                             <div class="col-md-10">
-                                @Html.DropDownList("Modelo.ClienteId", Model.Aliados, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
-                                @Html.ValidationMessageFor(model => model.Modelo.ClienteId, "", new { @class = "text-danger" })
+                                @Html.DropDownList("Modelo.ClienteId", Model.Aliados, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })                                
                             </div>
                         </div>
                     </div>
@@ -156,17 +153,15 @@
             <div class="col-12 col-md-6 mt-2">
                 <div class="form-group">
                     @Html.LabelFor(model => model.Modelo.Correo, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
+                    <div class="col-md-10">                        
                         @if (Model.Accion != 0)
                         {
-                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "mail", @readonly = "ReadOnly", required = "required" } })
+                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "email", @readonly = "ReadOnly", required = "required" } })
                         }
                         else
                         {
-                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "mail", required = "required" } })
-                        }
-
-                        @Html.ValidationMessageFor(model => model.Modelo.Clave, "", new { @class = "text-danger" })
+                            @Html.EditorFor(model => model.Modelo.Correo, new { htmlAttributes = new { @class = "form-control", @type = "email", required = "required" } })
+                        }                        
                     </div>
                 </div>
             </div>
@@ -174,8 +169,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Modelo.Clave, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Modelo.Clave, new { htmlAttributes = new { @class = "form-control", @type = "password", required = "required" } })
-                        @Html.ValidationMessageFor(model => model.Modelo.Clave, "", new { @class = "text-danger" })
+                        @Html.EditorFor(model => model.Modelo.Clave, new { htmlAttributes = new { @class = "form-control", @type = "password", required = "required" } })                        
                     </div>
                 </div>
             </div>
@@ -183,8 +177,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Modelo.Nombres, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor(model => model.Modelo.Nombres, new { htmlAttributes = new { @class = "form-control", required = "required" } })
-                        @Html.ValidationMessageFor(model => model.Modelo.Nombres, "", new { @class = "text-danger" })
+                        @Html.EditorFor(model => model.Modelo.Nombres, new { htmlAttributes = new { @class = "form-control", required = "required", @onkeypress= "TextAndWhiteOnly(event);" } })                        
                     </div>
                 </div>
             </div>
@@ -194,8 +187,7 @@
                     <div class="form-group">
                         @Html.LabelFor(model => model.Modelo.Apellidos, htmlAttributes: new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            @Html.EditorFor(model => model.Modelo.Apellidos, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Modelo.Apellidos, "", new { @class = "text-danger" })
+                            @Html.EditorFor(model => model.Modelo.Apellidos, new { htmlAttributes = new { @type="text", @class = "form-control" } })                            
                         </div>
                     </div>
                 </div>
@@ -204,8 +196,7 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.Modelo.Idioma, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.DropDownList("Modelo.Idioma", Model.Idiomas, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
-                        @Html.ValidationMessageFor(model => model.Modelo.Idioma, "", new { @class = "text-danger" })
+                        @Html.DropDownList("Modelo.Idioma", Model.Idiomas, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })                        
                     </div>
                 </div>
             </div>
@@ -213,17 +204,21 @@
                 <div class="form-group">
                     <label class="control-label col-md-2">Pais</label>
                     <div class="col-md-10">
-                        @Html.DropDownList("Modelo.PaisId", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
-                        @Html.ValidationMessageFor(model => model.Modelo.PaisId, "", new { @class = "text-danger" })
+                        @Html.DropDownList("Modelo.PaisId", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })                        
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6 mt-2 mt-4">
-                <div class="form-group">
-                    @Html.EditorFor(model => model.Modelo.Estado, new { @class = "form-check-input" })
-                    @Html.ValidationMessageFor(model => model.Modelo.Estado, "", new { @class = "text-danger" })
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Modelo.Estado, true, new { @class = "form-check-input" })
                     <label class="form-check-label" for="flexCheckChecked">
-                        Activo / Inactivo
+                        @Measure.Recursos.Recurso.EstadoActivo
+                    </label>
+                </div>
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Modelo.Estado, false, new { @class = "form-check-input" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        @Measure.Recursos.Recurso.EstadoInactivo
                     </label>
                 </div>
             </div>
@@ -262,9 +257,6 @@
             </div>
         </div>
     </div>
-    <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div class="toast-container position-absolute top-0 end-0 p-3" id="DivErrors"></div>
-    </div>
 }
 @section scripts{
     <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
@@ -278,24 +270,12 @@
             var errores = '';
             $.each($("#errores ul li"), function (pos, item) {
                 if (item.style.display != "none") {
-                    errores +=
-                        '<div class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true"  id="ErrorToast_' + pos + '">' +
-                        '<div class="toast-header" ><strong class="me-auto">Error</strong>' +
-                        '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>' +
-                        '</div ><div class="toast-body">' + item.textContent + '</div></div >';
+                    errores += errores.length > 0 ? '\n' + item.textContent : item.textContent;
                 }
             })
 
             if (errores != '') {
-                $("#DivErrors").html(errores);
-                $.each($("#errores ul li"), function (pos, item) {
-                    if (item.style.display != "none") {
-                        $('#ErrorToast_' + pos).toast({
-                            autohide: false
-                        });
-                        $('#ErrorToast_' + pos).toast('show');
-                    }
-                })
+                ToastError(errores);
             }
 
         });
@@ -337,6 +317,26 @@
 
         function BackForm() {
             $("#FrmBack").submit();
+        }
+
+        function ToastError(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
         }
     </script>
 }

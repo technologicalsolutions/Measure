@@ -57,15 +57,38 @@
                             </td>
                             <td width="30%">
                                 <div class="row text-center">
-                                    <div class="col-12 col-md-4 text-center">
-                                        <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
-                                    </div>
-                                    <div class="col-12 col-md-4 text-center">
+                                    @{
+                                        string col = "3";
+                                        if (item.ClienteId == Guid.Empty)
+                                        {
+                                            if (item.Base)
+                                            {
+                                                col = "6";
+                                            }
+                                            else
+                                            {
+                                                col = "4";
+                                            }
+                                        }
+                                    }
+                                    @if (!item.Base)
+                                    {
+                                        <div class="col-12 col-md-@col text-center">
+                                            <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
+                                        </div>
+                                    }
+                                    <div class="col-12 col-md-@col text-center">
                                         <button class="btn btn-info btn-sm rounded-pill py-0 editLink" type="button" onclick="Detalles(@item.Id) ">Detalle</button>
                                     </div>
-                                    <div class="col-12 col-md-4 text-center">
-                                        <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@item.es_ES')">Eliminar</button>
+                                    <div class="col-12 col-md-@col text-center">
+                                        <a class="btn btn-secondary btn-sm rounded-pill py-0 editLink" href="@Url.RouteUrl("Detalle", new {Id = item.Id })">Contenido</a>                                        
                                     </div>
+                                    @if (item.ClienteId != Guid.Empty)
+                                    {
+                                        <div class="col-12 col-md-@col text-center">
+                                            <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@item.es_ES')">Eliminar</button>
+                                        </div>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -145,10 +168,18 @@
                                 Estado
                             </label>
                             <div class="form-check col-10">
-                                @Html.CheckBoxFor(m => m.Modelo.Activo, new { @class = "form-check-input" })
-                                <label class="form-check-label ms-2" for="Modelo_Activo">
-                                    Activo / Inactivo
-                                </label>
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Activo, true, new { @class = "form-check-input" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        @Measure.Recursos.Recurso.EstadoActivo
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    @Html.RadioButtonFor(m => m.Modelo.Activo, false, new { @class = "form-check-input" })
+                                    <label class="form-check-label" for="flexCheckChecked">
+                                        @Measure.Recursos.Recurso.EstadoInactivo
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

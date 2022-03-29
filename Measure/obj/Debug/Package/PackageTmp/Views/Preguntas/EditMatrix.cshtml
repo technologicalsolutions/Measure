@@ -12,8 +12,8 @@
 @section scriptsHead{
     @Scripts.Render("~/bundles/select2")
     <script type="text/javascript">
-        var Columnas = ("@Html.Raw(string.Join("|", Model.ControlMColunnas.Select(s => s.Texto).ToArray()))").split('|');
-        var Filas = ("@Html.Raw(string.Join("|", Model.ControlMFilas.Select(s => s.Texto).ToArray()))").split('|');
+        var Columnas = ("@Html.Raw(string.Join("|", Model.ControlMColunnas.Select(s => s.Texto.Replace('"','\'')).ToArray()))").split('|');
+        var Filas = ("@Html.Raw(string.Join("|", Model.ControlMFilas.Select(s => s.Texto.Replace('"', '\'')).ToArray()))").split('|');
         var PasosPorColumna = ("@string.Join("|", Model.ControlMColunnas.Select(s => s.PasosPorColumna).ToArray())").split('|');
     </script>
 }
@@ -76,14 +76,17 @@
                 </div>
             </div>
             <div class="col-12 col-sm-3">
-                <div class="form-group">
-                    <label class="form-check-label" for="EstadoControlC">
-                        Estado: Activo / Inactivo
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Estado, true, new { @class = "form-check-input", id = "EstadoControlM" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        @Measure.Recursos.Recurso.EstadoActivo
                     </label>
-                    <br />
-                    <div class="mt-3">
-                        @Html.CheckBoxFor(m => m.Estado, new { @class = "form-check-input", id = "EstadoControlM" })
-                    </div>
+                </div>
+                <div class="form-check">
+                    @Html.RadioButtonFor(m => m.Estado, false, new { @class = "form-check-input", id = "EstadoControlM" })
+                    <label class="form-check-label" for="flexCheckChecked">
+                        @Measure.Recursos.Recurso.EstadoInactivo
+                    </label>
                 </div>
             </div>
         </div>

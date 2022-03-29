@@ -250,6 +250,7 @@ namespace Measure.Controllers
                     case Enums.TipoComponente.ActualizarUsuario:
                         Item.ActulizarUsuario = new ViewUpdateUser
                         {
+                            Idioma = Login.Idioma,
                             DataPage = ActualizarUsuario(Login)
                         };
                         using (ModeloEncuesta db = new ModeloEncuesta())
@@ -395,8 +396,8 @@ namespace Measure.Controllers
                     if (item.Respuesta != null)
                     {
                         if (item.Respuesta.Count() > 0)
-                        {
-                            Pregunta _pregunta = db.Pregunta.Where(p => p.ControlId == new Guid(item.Id)).FirstOrDefault();
+                        {                            
+                            Pregunta _pregunta = db.Pregunta.Where(p => p.ControlId == new Guid(item.Id) && p.Estado).FirstOrDefault();
                             if (_pregunta != null)
                             {
                                 string Result = string.Join("|", item.Respuesta);

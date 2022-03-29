@@ -3,7 +3,7 @@
 <div>
     <dl class="dl-horizontal">
         <dt>
-           <strong></strong> @Html.DisplayNameFor(model => model.Modelo.Pais)
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Pais)</strong>
         </dt>
 
         <dd>
@@ -11,7 +11,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Modelo.Nombres)
+            <strong> @Html.DisplayNameFor(model => model.Modelo.Nombres)</strong>
         </dt>
 
         <dd>
@@ -19,7 +19,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Modelo.Apellidos)
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Apellidos)</strong>
         </dt>
 
         <dd>
@@ -27,7 +27,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Modelo.Telefono)
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Telefono)</strong>
         </dt>
 
         @if (!string.IsNullOrEmpty(Model.Modelo.Imagen))
@@ -38,11 +38,18 @@
         }
 
         <dt>
-            @Html.DisplayNameFor(model => model.Modelo.Estado)
+            <strong>@Html.DisplayNameFor(model => model.Modelo.Estado)</strong>
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Modelo.Estado)
+            @if (Model.Modelo.Estado)
+            {
+                @Measure.Recursos.Recurso.EstadoActivo
+            }
+            else
+            {
+                @Measure.Recursos.Recurso.EstadoInactivo
+            }            
         </dd>
 
     </dl>

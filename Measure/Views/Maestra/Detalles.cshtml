@@ -8,7 +8,7 @@
     ViewBag.Title = "Detalles";
     Layout = "~/Views/Shared/_Layout.cshtml";
     string Nombre = string.Empty;
-    bool Base = Model.Maestra.Base;
+    bool Base = (Model.Maestra.ClienteId == Guid.Empty);
 }
 @section style{
     @Styles.Render("~/Content/tables")
@@ -48,12 +48,9 @@
                             <th>
                                 Valor
                             </th>
-                            @if (!Base)
-                            {
-                                <th class="text-center">
-                                    Acciones
-                                </th>
-                            }
+                            <th class="text-center">
+                                Acciones
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,22 +61,20 @@
                                 <td>@item.en_US</td>
                                 <td>@item.pt_BR</td>
                                 <td>@item.Valor</td>
-                                @if (!Base)
-                                {
-                                    <td width="30%">
-                                        <div class="row">
-                                            <div class="col-12 col-md-6 text-center">
-                                                <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
-                                            </div>
-                                            <div class="col-12 col-md-6 text-center">
-                                                @{
-                                                    string Name = login.Idioma == 1 ? item.es_ES : login.Idioma == 2 ? item.en_US : item.pt_BR;
-                                                }
-                                                <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@Name')">Eliminar</button>
-                                            </div>
+                                <td width="30%">                                    
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 text-center">
+                                            <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="button" onclick="Editar('@(Json.Encode(item))')">Editar</button>
                                         </div>
-                                    </td>
-                                }
+                                        <div class="col-12 col-md-6 text-center">
+                                            @{
+                                                string Name = login.Idioma == 1 ? item.es_ES : login.Idioma == 2 ? item.en_US : item.pt_BR;
+                                            }
+                                            <button class="btn btn-danger btn-sm rounded-pill py-0 editLink" type="button" onclick="Eliminar(@item.Id,'@Name')">Inactivar</button>
+                                        </div>
+                                    </div>
+                                </td>
+                                
                             </tr>
                         }
                     </tbody>
@@ -88,7 +83,7 @@
         </div>
     </div>
 </div>
-@using (Html.BeginForm("DeleteDetail", "Maestra", FormMethod.Post, new { id = "MaestraDelete" }))
+@using (Html.BeginForm("InactiveDetail", "Maestra", FormMethod.Post, new { id = "MaestraDelete" }))
 {
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" id="DeleteEnc" value="" />
@@ -134,11 +129,17 @@
                         </div>
                         <div class="row mt-2">
                             <div class="form-check">
-                                @Html.CheckBoxFor(m => m.Modelo.Estado, new { @class = "form-check-input" })
-                                <label class="form-check-label ms-2" for="Modelo_Activo">
-                                    Activo / Inactivo
+                                @Html.RadioButtonFor(m => m.Modelo.Estado, true, new { @class = "form-check-input" })
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    @Measure.Recursos.Recurso.EstadoActivo
                                 </label>
                             </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Modelo.Estado, false, new { @class = "form-check-input" })
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    @Measure.Recursos.Recurso.EstadoInactivo
+                                </label>
+                            </div>                           
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -190,7 +191,7 @@
         function Eliminar(Id, Nombre) {
             Swal.fire({
                 title: '¿Estas seguro?',
-                text: "Desea eliminar el contenido " + Nombre,
+                text: "Desea Inactivar el contenido " + Nombre,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

@@ -282,8 +282,7 @@ namespace Measure.Controllers
                     using (ClsUtilities utilities = new ClsUtilities())
                     {                        
                         message.From = new MailAddress(utilities.Cifrado(smtpSection.Network.UserName, false));
-                    }
-                    message.From = new MailAddress(smtpSection.Network.UserName.ToString());
+                    }                    
                     message.To.Add(Email);
                     message.Subject = Recursos.Recurso.SujetoCorreo;
                     message.Body = mailbody;

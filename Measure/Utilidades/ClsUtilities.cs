@@ -14,6 +14,12 @@ namespace Measure.Utilidades
         private bool disposing = false;
 
         #region Utilidades
+        /// <summary>
+        /// Utilidadad para encriptar el contenido
+        /// </summary>
+        /// <param name="texto"></param>
+        /// <param name="Encrypt">True=encriptar/false=desencriptar</param>
+        /// <returns></returns>
         public string Cifrado(string texto, bool Encrypt)
         {
             string MyKey = "3nCu35t45B^6X5bS";

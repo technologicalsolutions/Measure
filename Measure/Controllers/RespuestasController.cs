@@ -76,6 +76,55 @@ namespace Measure.Controllers
             }
 
             ViewBag.Layout = Usuario.RolId == (int)Enums.UserRol.Encuestado ? "~/Views/Shared/_LayoutUser.cshtml" : "~/Views/Shared/_Layout.cshtml";
+            ViewAnswerResult Modelo = ContenidoRespuesta(Data, Usuario);
+
+            string path = Server.MapPath("/Content/images/");
+            List<string> Imagenes = new List<string>
+                {
+                    ConvertImagenPathFromBase64(path + "FondoBienvenida.png"),
+                    ConvertImagenPathFromBase64(path + "foother_pdf.png"),
+                    ConvertImagenPathFromBase64(path + (Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
+                };
+            ViewBag.Imagenes = Imagenes;
+
+            if (Data.Report)
+            {
+                return View("PDF", Modelo);
+            }
+            return View(Modelo);
+        }
+
+        [Route("Email")]
+        [HttpGet]
+        public ActionResult RespuestaEmail(ViewReport Data)
+        {
+            ViewLogin Usuario = HttpContext.Session["login"] as ViewLogin;
+            if (Usuario == null)
+            {
+                return RedirectToAction("index", "Login");
+            }
+
+            ViewBag.Layout = Usuario.RolId == (int)Enums.UserRol.Encuestado ? "~/Views/Shared/_LayoutUser.cshtml" : "~/Views/Shared/_Layout.cshtml";
+            ViewAnswerResult Modelo = ContenidoRespuesta(Data, Usuario);
+
+            string path = Server.MapPath("/Content/images/");
+            List<string> Imagenes = new List<string>
+            {
+                ConvertImagenPathFromBase64(path + "FondoBienvenida.png"),
+                ConvertImagenPathFromBase64(path + "foother_pdf.png"),
+                ConvertImagenPathFromBase64(path + (Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
+            };
+            ViewBag.Imagenes = Imagenes;
+            Modelo.Email = true;
+            Modelo.Report = Data.Report;
+
+            return View("PDF", Modelo);
+        }
+
+        private ViewAnswerResult ContenidoRespuesta(ViewReport Data, ViewLogin Usuario)
+        {
+            ViewAnswerResult Modelo = new ViewAnswerResult();
+
             ViewPoll _Encuesta = new ViewPoll();
 
             using (ClsProcedures clsProcedures = new ClsProcedures())
@@ -83,7 +132,6 @@ namespace Measure.Controllers
                 _Encuesta = clsProcedures.DetalleEncuestaUsuario(Data.Id, Usuario.Id);
             }
 
-            ViewAnswerResult Modelo = new ViewAnswerResult();
             Usuario Cliente = new Usuario();
             List<Grupo> Grupos = new List<Grupo>();
             List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
@@ -110,105 +158,7 @@ namespace Measure.Controllers
                     if (AddItem != null)
                     {
                         Grupos.Add(AddItem);
-                    }                    
-                }                
-            }
-
-            List<Tuple<int, string>> ConsolidadoMatriz = new List<Tuple<int, string>>();
-
-            foreach (Grupo item in Grupos)
-            {
-                ViewAnswerGroupPoll Addtem = new ViewAnswerGroupPoll
-                {
-                    Group = item,
-                };
-
-                switch (item.TipoReporte)
-                {
-                    case 0:
-                        Addtem.RespuestasAbierta = GraphicControlAbiero(Usuario, item, Data.Id);
-                        Lista.Add(Addtem);
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        Addtem.RespuestasMatriz = GraphicControlMatrizRange(Usuario, item, Data.Id);
-                        ConsolidadoMatriz.AddRange(Addtem.RespuestasMatriz.Select(l => new Tuple<int, string>(l.ResultQuestionMatrizRange.Radial.Serie, l.ResultQuestionMatrizRange.Radial.Label)).ToList());
-                        Lista.Add(Addtem);
-                        break;
-                    case 4:
-                        Modelo.Wellcome = GraphicPresentation(Usuario);
-                        break;
-                }
-            }
-
-            Modelo.Cliente = Cliente;
-            Modelo.ConsolidadoMatriz = ConsolidadoMatriz;
-            Modelo.DataEncuesta = _Encuesta;
-            Modelo.Grupos = Lista;
-
-            using (ModeloEncuesta db = new ModeloEncuesta())
-            {
-                Modelo.ContenidoReporte = db.Reporte.Find(_Encuesta.TipoReporteGeneral)
-                                          .ContenidosReporte.Where(c => c.Idioma == Usuario.Idioma && c.Estado).ToList();
-            }
-
-            string path = Server.MapPath("/Content/images/");
-            List<string> Imagenes = new List<string>
-                {
-                    ConvertImagenPathFromBase64(path+"FondoBienvenida.png"),
-                    ConvertImagenPathFromBase64(path+"foother_pdf.png"),
-                    ConvertImagenPathFromBase64(path+(Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
-                };
-            ViewBag.Imagenes = Imagenes;
-
-            if (Data.Report)
-            {
-                return View("PDF", Modelo);
-            }
-            return View(Modelo);
-        }
-
-        [Route("Email")]
-        [HttpGet]
-        public ActionResult RespuestaEmail(ViewReport Data)
-        {
-            ViewLogin Usuario = HttpContext.Session["login"] as ViewLogin;
-            if (Usuario == null)
-            {
-                return RedirectToAction("index", "Login");
-            }
-
-            ViewBag.Layout = Usuario.RolId == (int)Enums.UserRol.Encuestado ? "~/Views/Shared/_LayoutUser.cshtml" : "~/Views/Shared/_Layout.cshtml";
-            ViewPoll _Encuesta = new ViewPoll();
-
-            using (ClsProcedures clsProcedures = new ClsProcedures())
-            {
-                _Encuesta = clsProcedures.DetalleEncuestaUsuario(Data.Id, Usuario.Id);
-            }
-
-            ViewAnswerResult Modelo = new ViewAnswerResult();
-            Usuario Cliente = new Usuario();
-            List<Grupo> Grupos = new List<Grupo>();
-            List<ViewAnswerGroupPoll> Lista = new List<ViewAnswerGroupPoll>();
-
-            using (ModeloEncuesta db = new ModeloEncuesta())
-            {
-                Cliente = db.Usuario.Where(u => u.Id == _Encuesta.ClienteId).FirstOrDefault();
-
-                List<Guid> IdGrupos = db.ContenidoPorEncuesta.
-                    Where(c => c.EncuestaId == _Encuesta.id && c.ComponenteId != Guid.Empty).
-                    OrderBy(o => o.Orden).Select(s => s.ComponenteId).ToList();
-
-                if (Data.Report)
-                {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id)).ToList();
-                }
-                else
-                {
-                    Grupos = db.Grupo.Where(g => IdGrupos.Contains(g.Id) && g.TipoReporte != 0 && g.TipoReporte != null).ToList();
+                    }
                 }
             }
 
@@ -253,17 +203,7 @@ namespace Measure.Controllers
                                           .ContenidosReporte.Where(c => c.Idioma == Usuario.Idioma && c.Estado).ToList();
             }
 
-            string path = Server.MapPath("/Content/images/");
-            List<string> Imagenes = new List<string>
-            {
-                ConvertImagenPathFromBase64(path+"FondoBienvenida.png"),
-                ConvertImagenPathFromBase64(path+"foother_pdf.png"),
-                ConvertImagenPathFromBase64(path+(Usuario.Idioma == 1 ? "Dti_es.png": "Dti_en.png")),
-            };
-            ViewBag.Imagenes = Imagenes;
-            Modelo.Email = true;
-            Modelo.Report = Data.Report;
-            return View("PDF", Modelo);
+            return Modelo;
         }
 
         [HttpPost]
@@ -286,7 +226,11 @@ namespace Measure.Controllers
             byte[] DataHtml = ConvertHtmlToPdf(Data.Contenido);
 
             bool send = EmailSending(Usuario.Correo, DataHtml, mailbody);
-            send = EmailSending(ConfigurationManager.AppSettings["SecundaryEmail"].ToString(), DataHtml, mailbody);
+            using (ClsUtilities utilities = new ClsUtilities())
+            {
+                send = EmailSending(utilities.Cifrado(ConfigurationManager.AppSettings["SecundaryEmail"].ToString(), false), DataHtml, mailbody);
+            }
+
 
             if (Data.Report)
             {
@@ -335,6 +279,10 @@ namespace Measure.Controllers
 
                 using (MailMessage message = new MailMessage())
                 {
+                    using (ClsUtilities utilities = new ClsUtilities())
+                    {                        
+                        message.From = new MailAddress(utilities.Cifrado(smtpSection.Network.UserName, false));
+                    }
                     message.From = new MailAddress(smtpSection.Network.UserName.ToString());
                     message.To.Add(Email);
                     message.Subject = Recursos.Recurso.SujetoCorreo;
@@ -348,8 +296,12 @@ namespace Measure.Controllers
                     using (SmtpClient client = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
                     {
                         client.EnableSsl = true;
-                        client.UseDefaultCredentials = false;
-                        client.Credentials = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
+                        client.UseDefaultCredentials = false;                        
+                        using (ClsUtilities utilities = new ClsUtilities())
+                        {
+                            client.Credentials = new NetworkCredential(utilities.Cifrado(smtpSection.Network.UserName, false), utilities.Cifrado(smtpSection.Network.Password, false));                            
+                        }
+                        
                         client.DeliveryMethod = SmtpDeliveryMethod.Network;
 
                         client.Send(message);
@@ -562,7 +514,7 @@ namespace Measure.Controllers
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 User = db.Usuario.Find(Usuario.Id);
-                Client = db.Usuario.Find(User.ClienteId);
+                Client = db.Usuario.Find(User.AliadoId);
             }
 
             string DataJoin = "{0} {1}";

@@ -17,5 +17,7 @@ namespace Measure.Models
         public bool Resuelta { get; set; }
 
         public DateTime? FechaResuelta { get; set; }
+
+        public DateTime? FechaAsignacion { get; set; }
     }
 }

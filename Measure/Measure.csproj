@@ -191,11 +191,17 @@
     <Compile Include="ViewModels\Contenidos\ViewContentForPoll.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContentList.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewSurveyContent.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewAnaliticIndex.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboard.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasic.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardBasicDescription.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasicGraphic.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDashboardBasicQuantities.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardClientForPoll.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardDistCount.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDescripcionIndex.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewResponsePartial.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewResponsePollUser.cs" />
     <Compile Include="ViewModels\Encuesta\ViewEncuesta.cs" />
     <Compile Include="ViewModels\Encuesta\ViewFindPollAssign.cs" />
     <Compile Include="ViewModels\Encuesta\ViewPollAssign.cs" />
@@ -314,7 +320,6 @@
     <Content Include="Scripts\base\jquery-3.4.1.js" />
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.min.js" />
-    <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
     <None Include="Properties\PublishProfiles\IISProfile1.pubxml" />
     <None Include="Scripts\base\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\base\jquery.validate.js" />
@@ -608,6 +613,9 @@
     <Content Include="Scripts\ckeditor4\SECURITY.md" />
     <Content Include="Scripts\ckeditor4\skins\moono-lisa\readme.md" />
     <Content Include="Views\Usuario\UpdateUser.cshtml" />
+    <Content Include="Views\Dashboard\AnaliticaIndex.cshtml" />
+    <Content Include="Views\Dashboard\_ListaEncuestados.cshtml" />
+    <Content Include="Views\Dashboard\Descripcion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

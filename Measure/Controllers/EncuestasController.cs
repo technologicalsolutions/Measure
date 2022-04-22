@@ -256,7 +256,8 @@ namespace Measure.Controllers
                         using (ModeloEncuesta db = new ModeloEncuesta())
                         {
                             Item.ActulizarUsuario.Group = db.Grupo.Find(item.ComponenteId);
-                        }
+                        }       
+                        
                         Modelo.Lista.Add(Item);
                         break;
                     case Enums.TipoComponente.Inicio:

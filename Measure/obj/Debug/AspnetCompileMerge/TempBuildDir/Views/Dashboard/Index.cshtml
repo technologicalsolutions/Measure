@@ -68,6 +68,17 @@
 @section scripts{
     <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
     <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+
+            LoadDataTable("TblLista", false, true, null, 25);
+        });
+
         function LoadPoll(ClienteId) {
 
             if (ClienteId != "0") {

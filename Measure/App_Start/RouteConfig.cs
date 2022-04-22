@@ -85,7 +85,7 @@ namespace Measure
                name: "ListaUsuarios",
                url: "ListaUsuarios",
                defaults: new { controller = "Usuarios", action = "ListaUsuarios" }
-            );
+            );           
 
             routes.MapRoute(
                name: "ActualizarUsuario",
@@ -226,9 +226,21 @@ namespace Measure
             );
 
             routes.MapRoute(
+              name: "DashboardGeneralDescripcion",
+              url: "DashboardGeneralDescripcion/{Id}",
+              defaults: new { controller = "Dashboard", action = "Descripcion", Id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
               name: "BasicGraph",
               url: "BasicGraph",
               defaults: new { controller = "Dashboard", action = "BasicGraphic" }
+            );
+
+            routes.MapRoute(
+              name: "DashboardAnalitica",
+              url: "DashboardAnalitica/{Id}",
+              defaults: new { controller = "Dashboard", action = "AnaliticaIndex", Id = UrlParameter.Optional }
             );
 
             #endregion

@@ -1,5 +1,6 @@
 ﻿using Measure.Models;
 using Measure.Utilidades;
+using Measure.ViewModels.Dashboard;
 using Measure.ViewModels.Encuesta;
 using Measure.ViewModels.Error;
 using Measure.ViewModels.Usuario;
@@ -750,6 +751,7 @@ namespace Measure.Controllers
                                                     EncuestaId = (Guid)Data.DataEncuesta.id,
                                                     Id = Guid.NewGuid(),
                                                     UsuarioId = (Guid)s.Id,
+                                                    FechaAsignacion = DateTime.Now,
                                                 }).ToList();
 
             using (ModeloEncuesta db = new ModeloEncuesta())
@@ -815,5 +817,6 @@ namespace Measure.Controllers
             }
             return RedirectToRoute("ActualizarUsuario");
         }
+        
     }
 }

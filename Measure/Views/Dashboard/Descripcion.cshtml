@@ -1,0 +1,367 @@
+﻿@using Measure.ViewModels.Dashboard
+@model ViewDescripcionIndex
+@{
+    ViewBag.Title = "Descripcion";
+    ViewBag.DashShow = "show";
+    ViewBag.DsgDActive = "active";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string col = Model.User.RolId == (int)Measure.Enums.UserRol.Administrador ? "col-md-5" : "col-md-10";
+}
+@section style{    
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{    
+    @Scripts.Render("~/bundles/select2")    
+}
+<div class="container">
+    <div class="row">
+        @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
+        {
+            <div class="col-12 @col mt-4">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Clientes</label>
+                    <div class="col-md-10">
+                        <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Modelo_ClienteId" onchange="LoadPoll(this.value)">
+                            @foreach (var item in Model.Clientes)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-12 @col mt-4">
+            <div class="form-group">
+                <label class="control-label col-md-2">Encuestas</label>
+                <div class="col-md-10">
+                    <select class="form-select" data-init-plugin="select2" name="Modelo.EncuestaId" id="Modelo_EncuestaId">
+                        @foreach (var item in Model.Encuestas)
+                        {
+                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-2 mt-4">
+            <button class="btn btn-primary mt-3" onclick="Graph()">Graficar</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div id="Encuesta" class="wizard wizard-primary sw sw-theme-default sw-justified mt-3" style="width: 100%; padding: 0px">
+            <ul class="nav">
+                <li class="nav-item" id="LiCantidades">
+                    <a class="custom-end nav-link active" id="tabCantidades" href="#Cantidades">Cantidades</a>
+                </li>
+                <li class="nav-item" id="LiGraph">
+                    <a class="custom-end nav-link" id="tabGraph" href="#Graph">Graficos</a>
+                </li>
+                <li class="nav-item" id="LiDescripcion">
+                    <a class="custom-end nav-link" id="tabDescripcion" href="#Descripcion">Descriptivo</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="contentTab">
+                <div id="Cantidades" class="tab-pane" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-striped" style="width:100%" id="TableQuantity">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Aliado</th>
+                                        <th>Cantidad Asignados</th>
+                                        <th>Completadas</th>
+                                        <th>Sin Completar</th>
+                                        <th>Detalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center">Seleccione datos para graficar</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class="text-start">Total</td>
+                                        <td id="Total"></td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="Graph">
+                    <div id="Graphic"></div>
+                </div>
+                <div id="Descripcion" class="tab-pane" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-striped" style="width:100%" id="TableDesc">
+                                <thead>
+                                    <tr>
+                                        <th>Correo</th>
+                                        <th>Nombres</th>
+                                        <th>Apellidos</th>
+                                        <th>Pais</th>
+                                        <th>Estado</th>
+                                        <th>Fecha Asignado</th>
+                                        <th>Fecha Completado</th>
+                                        <th>Dias</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loader" style=" display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url(@Url.Content("~/Content/images/loader.gif")) center no-repeat, #fff;
+        z-index: 1000;
+     ">
+</div>
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
+    {
+        <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+        <script type="text/javascript">
+             $(document).ready(function () {
+                $('select').select2({
+                    "width": 'resolve',
+                    "theme": "bootstrap-5",
+                    "language": SelectedTranslate,
+                });                 
+            });
+
+            function LoadPoll(ClienteId) {
+                if (ClienteId != "0") {
+                    var params = {
+                        'ClienteId': ClienteId
+                    };
+
+                    $.ajax({
+                        data: params,
+                        url: '@Url.Action("ListaEncuestas", "Encuestas")',
+                        type: "GET",
+                        async: false,
+                        success: function (data) {
+                            $("#Modelo_EncuestaId").html("");
+
+                            var Html = '';
+                            $.each(data, function (pos, item){
+                                Html += '<option value="' + item.Value+'" ';
+                                Html += '>' + item.Text+'</option>';
+                            });
+                            $("#Modelo_EncuestaId").html(Html);
+
+                            $("#Modelo_EncuestaId").select2("destroy");
+                            $("#Modelo_EncuestaId").select2({
+                                "width": 'resolve',
+                                "theme": "bootstrap-5",
+                                "language": SelectedTranslate
+                            });
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        },
+                    });
+                }
+            }
+        </script>
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#Encuesta").smartWizard({
+                theme: "arrows",                
+                showStepURLhash: false,
+                toolbarSettings: {
+                    toolbarPosition: 'top',
+                    showNextButton: true,
+                    showPreviousButton: true,
+                },
+                lang: { // Language variables for button
+                    next: 'Siguiente',
+                    previous: 'Anterior'
+                }
+            });            
+        })
+
+        function Graph() {
+            if ($("#Modelo_EncuestaId").val() != "0") {
+                var params = {
+                    'Id': $("#Modelo_EncuestaId").val()
+                };
+
+                $.ajax({
+                    data: params,
+                    url: '@Url.Action("BasicTable","Dashboard")',
+                    type: "POST",
+                    async: true,
+                    beforeSend: function () {
+                        $("#loader").show();
+                    },
+                    success: function (Result) {
+                        tableQuantity(Result);
+                        graphQuantity(Result);
+                        var hg = $("#TableQuantity").height();
+                        $("#contentTab").height(hg + 15);
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+
+        function tableQuantity(Data) {
+            var Html = '';
+            var Total = 0;
+            $.each(Data, function (pos, item) {
+                Html += '<tr>';
+                Html += '<td class="text-start">' + item.Aliado.Nombres + '</td>';
+                Html += '<td class="text-center">' + item.Total + '</td>';
+                Html += '<td class="text-center">' + item.Completados + '</td>';
+                Html += '<td class="text-center">' + item.SinCompletar + '</td>';
+                Html += '<td class="text-center"><button class="btn btn-pill btn-dark btn-lg custom-backgroun-1" id="prev-btn" onclick="Descript(\'' + item.Aliado.Id + '\')">Ver Descipción</button></td>';
+                Html += '</tr>';
+                Total += item.Total;
+            });
+            $("#Total").html("<strong>" + Total + "</strong>");
+            $("#TableQuantity tbody").html(Html);
+        }
+
+        function graphQuantity(Data) {
+
+            var Series = [{
+                'name': 'Respondidas',
+                'data': Array()
+            }];
+
+            $.each(Data, function (pos, item) {
+                Series[0].data.push({
+                    x: item.Aliado.Nombres,
+                    y: item.Completados,
+                    goals: [
+                        {
+                            name: 'Asignadas',
+                            value: item.Total,
+                            strokeWidth: 5,
+                            strokeHeight: 10,
+                            strokeColor: '#4A0051'
+                        }
+                    ]
+                })
+            });
+
+            var options = {
+                series: Series,
+                chart: {
+                    type: 'bar',
+                    height: 800,
+                },
+                animations: {
+                    enabled: false,
+                    dynamicAnimation: {
+                        enabled: false,
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                    },
+                },
+                dataLabels: {
+                    formatter: function (val, opt) {
+                        const goals =
+                            opt.w.config.series[opt.seriesIndex].data[opt.dataPointIndex]
+                                .goals
+
+                        if (goals && goals.length) {
+                            return `${val} / ${goals[0].value}`
+                        }
+                        return val
+                    }
+                },
+                legend: {
+                    show: true,
+                    showForSingleSeries: true,
+                    customLegendItems: ['Respondidas', 'Asignadas'],
+                    markers: {
+                        fillColors: ['#00c0de', '#4A0051']
+                    }
+                }
+            };
+
+            $("#loader").hide();
+
+            var chart = new ApexCharts(document.querySelector("#Graphic"), options);
+            chart.render();
+        }
+
+        function Descript(Id) {
+            var params = {
+                'Id': Id
+            };
+            $.ajax({
+                data: params,
+                url: '@Url.Action("BasicDescription","Dashboard")',
+                type: "POST",
+                async: true,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (Result) {
+                    $("#TableDesc").DataTable().destroy();
+                    tableTableDesc(Result);                    
+                    var hg = $("#TableDesc").height();
+                    $("#contentTab").height(hg + 15);
+                    window.scrollTo(0, 0);
+                    $('#Encuesta').smartWizard("goToStep",2);
+                    $("#loader").hide();
+                },
+                error: function(data) {
+                    console.log(data);
+                },
+            });
+        }
+
+        function tableTableDesc(Data) {
+            var Html = '';
+            $.each(Data, function (pos, item) {
+                Html += '<tr>';
+                Html += '<td class="text-start">' + item.Correo + '</td>';
+                Html += '<td class="text-start">' + item.Nombres + '</td>';
+                Html += '<td class="text-start">' + item.Apellidos + '</td>';
+                Html += '<td class="text-start">' + item.Pais + '</td>';
+                Html += '<td class="text-start">' + item.Estado + '</td>';
+                Html += '<td class="text-start">';
+                var dateA = new Date(parseInt(item.FAsignado.substr(6)));
+                Html += dateA.getUTCDate() + "/" + (dateA.getUTCMonth() + 1) + "/" + dateA.getUTCDate() + "/" + dateA.getUTCFullYear() + " " + dateA.getUTCHours() + ":" + dateA.getUTCMinutes() + ":" + dateA.getUTCSeconds() + '</td>';
+                Html += '<td class="text-start">';
+                if (item.FCompletado == null) {
+                    Html += '</td>';
+                } else {
+                    var dateC = new Date(parseInt(item.FCompletado.substr(6)));
+                    Html += dateC.getUTCDate() + "/" + (dateC.getUTCMonth() + 1) + "/" + dateC.getUTCDate() + "/" + dateC.getUTCFullYear() + " " + dateC.getUTCHours() + ":" + dateC.getUTCMinutes() + ":" + dateC.getUTCSeconds() + '</td>';
+                }
+                Html += '<td class="text-start">' + item.Dias + '</td>';
+                Html += '</tr>';
+                Total += item.Total;
+            });
+            $("#TableDesc tbody").html(Html);
+        }
+    </script>
+}

@@ -188,7 +188,7 @@ namespace Measure.Controllers
 
                         _old.en_US = _old.en_US != Data.Modelo.en_US ? Data.Modelo.en_US : _old.en_US;
                         _old.es_ES = _old.es_ES != Data.Modelo.es_ES ? Data.Modelo.es_ES : _old.es_ES;
-                        _old.pt_BR = _old.pt_BR != Data.Modelo.pt_BR ? Data.Modelo.pt_BR : _old.pt_BR;
+                        _old.pt_BR = _old.pt_BR != Data.Modelo.pt_BR ? Data.Modelo.pt_BR : _old.pt_BR;                        
                         _old.Estado = _old.Estado != Data.Modelo.Estado ? Data.Modelo.Estado : _old.Estado;
 
                         db.Entry(_old).State = EntityState.Modified;
@@ -331,6 +331,8 @@ namespace Measure.Controllers
             {
                 MaestrasDetalle _Maestra = db.MaestrasDetalle.Find(Id);
                 _Maestra.Estado = false;
+
+                MaestraId = _Maestra.MaestraId;
                 db.Entry(_Maestra).State = EntityState.Modified;
                 db.SaveChanges();
             }

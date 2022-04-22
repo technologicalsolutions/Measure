@@ -1,5 +1,3 @@
-Measure\bin
-Measure\obj
+/Measure/bin
+/Measure/obj
 *.pdb
-
-/Measure/obj/Debug

@@ -7,6 +7,7 @@ namespace Measure.Models
     [Table("Encuesta")]
     public partial class Encuesta
     {
+        [Key]
         public Guid id { get; set; }
 
         public Guid ClienteId { get; set; }

@@ -183,3 +183,7 @@ function ShowModal(name) {
 function CloseModal(name) {
     $("#" + name).modal("hide");
 }
+
+function predict() {
+
+}

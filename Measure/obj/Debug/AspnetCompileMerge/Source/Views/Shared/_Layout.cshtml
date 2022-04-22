@@ -141,6 +141,16 @@
                                     <i class="align-middle me-2 fas fa-fw fa-chart-line"></i>General
                                 </a>
                             </li>
+                            <li class="sidebar-item @ViewBag.DsgDActive">
+                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardGeneralDescripcion",new { Id = ClienteID.ToString() })">
+                                    <i class="align-middle me-2 fas fa-fw fa-chart-bar"></i>Descripción
+                                </a>
+                            </li>
+                            <li class="sidebar-item @ViewBag.DsTActive">
+                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardAnalitica",new { Id = ClienteID.ToString() })">
+                                    <i class="align-middle me-2 fas fa-fw fa-chart-area"></i>Analítica
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     @if (login.RolId == (int)UserRol.Administrador)

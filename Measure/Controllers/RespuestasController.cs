@@ -279,10 +279,7 @@ namespace Measure.Controllers
 
                 using (MailMessage message = new MailMessage())
                 {
-                    using (ClsUtilities utilities = new ClsUtilities())
-                    {                        
-                        message.From = new MailAddress(utilities.Cifrado(smtpSection.Network.UserName, false));
-                    }                    
+                    message.From = new MailAddress(smtpSection.Network.UserName.ToString());
                     message.To.Add(Email);
                     message.Subject = Recursos.Recurso.SujetoCorreo;
                     message.Body = mailbody;
@@ -292,15 +289,17 @@ namespace Measure.Controllers
                     Stream DataStrem = new MemoryStream(DataHtml);
                     message.Attachments.Add(new Attachment(DataStrem, ConfigurationManager.AppSettings["FileName"].ToString()));
 
+                    string Clave = string.Empty;
+                    using (ClsUtilities utilities = new ClsUtilities())
+                    {
+                        Clave = utilities.Cifrado(smtpSection.Network.Password, false);
+                    }
+
                     using (SmtpClient client = new SmtpClient(smtpSection.Network.Host, smtpSection.Network.Port))
                     {
                         client.EnableSsl = true;
                         client.UseDefaultCredentials = false;                        
-                        using (ClsUtilities utilities = new ClsUtilities())
-                        {
-                            client.Credentials = new NetworkCredential(utilities.Cifrado(smtpSection.Network.UserName, false), utilities.Cifrado(smtpSection.Network.Password, false));                            
-                        }
-                        
+                        client.Credentials = new NetworkCredential(smtpSection.Network.UserName.ToString(), Clave);
                         client.DeliveryMethod = SmtpDeliveryMethod.Network;
 
                         client.Send(message);

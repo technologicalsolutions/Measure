@@ -1,0 +1,324 @@
+﻿@using Measure.ViewModels.Dashboard
+@model ViewAnaliticIndex
+@{
+    ViewBag.DashShow = "show";
+    ViewBag.DsTActive = "active";
+    ViewBag.Title = "Analitica";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+    <style>
+        .input-container {
+            background-color: #ffffff;
+            border: solid 0.5px #000;
+            border-radius: 5px;
+            height: 36px;
+            position: relative;
+        }
+
+        .inptext {
+            background-color: transparent;
+            border: none;
+            color: #000000;
+            height: inherit;
+            outline: none;
+            padding-left: 12px;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .suggestion {
+            align-items: center;
+            color: #868686;
+            display: flex;
+            height: inherit;
+            left: 0;
+            padding-left: 12px;
+            position: absolute;
+            top: 0;
+            width: inherit;
+            z-index: 2;
+        }
+    </style>
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    @Scripts.Render("~/bundles/unobtrusive")
+}
+<div class="container">
+    @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
+    {
+        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+        {
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = "ListUser",
+        }))
+        {
+            <div class="row">
+                <div class="col-12 col-sm-4 mt-4">
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Clientes</label>
+                        <div class="col-md-10">
+                            <select class="form-select" data-init-plugin="select2" id="Modelo_ClienteId" onchange="LoadPoll(this.value)">
+                                @foreach (var item in Model.Clientes)
+                                {
+                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-5 mt-4">
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Aliados</label>
+                        <div class="col-md-10">
+                            <select class="form-select" data-init-plugin="select2" name="IdAliado" id="Modelo_AliadoId">
+                                @foreach (var item in Model.Aliados)
+                                {
+                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-3 mt-4">
+                    <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
+                </div>
+            </div>
+        }
+    }
+    else if (Model.User.RolId == (int)Measure.Enums.UserRol.Cliente)
+    {
+        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+        {
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = "ListUser",
+        }))
+        {
+            <div class="col-12 col-md-9 mt-4">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Aliados</label>
+                    <div class="col-md-10">
+                        <select class="form-select" data-init-plugin="select2" name="IdAliado">
+                            @foreach (var item in Model.Aliados)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3 mt-4">
+                <button class="btn btn-primary mt-3" type="submit">Ver Encuestados</button>
+            </div>
+        }
+    }
+    <div class="row">
+        <div class="col-12 col-md-6 mt-4">
+            <div class="form-group">
+                <label class="control-label col-md-2">Tipo de Analísis</label>
+                <div class="col-md-10">
+                    <select class="form-select" data-init-plugin="select2" id="TipoAnalisis" name="TipoAnalisis">
+                        <option value="0">Seleccione...</option>
+                        <option value="1">Agrupados 1</option>
+                        <option value="2">Agrupados 2</option>
+                        <option value="3">Analisis</option>
+                        <option value="4">Resumen</option>
+                        <option value="5">Nivel de Madurez 1A</option>
+                        <option value="6">Nivel de Madurez 1B</option>
+                        <option value="7">Nivel de Madurez 2A</option>
+                        <option value="8">Nivel de Madurez 2B</option>
+                        <option value="9">Nivel de Madurez 3A</option>
+                        <option value="9">Nivel de Madurez 3B</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 mt-4">
+            <button class="btn btn-primary mt-3" type="button" onsubmit="return ValidarDatos();">Generar Analisis</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div id="ListUser">
+                @Html.Partial("_ListaEncuestados", Model.PartialIndex)
+            </div>
+            <div id="ResultadoAnalisis"></div>
+        </div>
+    </div>
+</div>
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
+    {
+        <script src="@Measure.Recursos.Recurso.LenguajeSelectScript" type="text/javascript"></script>
+        <script type="text/javascript">
+             $(document).ready(function () {
+                $('select').select2({
+                    "width": 'resolve',
+                    "theme": "bootstrap-5",
+                    "language": SelectedTranslate,
+                });
+            });
+
+            function LoadPoll(ClienteId) {
+
+                if (ClienteId != "0") {
+                    var params = {
+                        'ClienteId': ClienteId
+                    };
+
+                    $.ajax({
+                        data: params,
+                        url: '@Url.Action("BuscarAliados", "Usuario")',
+                        type: "GET",
+                        async: false,
+                        success: function (data) {
+                            $("#Modelo_AliadoId").html("");
+
+                            var Html = '';
+                            $.each(data, function (pos, item){
+                                Html += '<option value="' + item.Value+'" ';
+                                Html += '>' + item.Text+'</option>';
+                            });
+                            $("#Modelo_AliadoId").html(Html);
+
+                            $("#Modelo_AliadoId").select2("destroy");
+                            $("#Modelo_AliadoId").select2({
+                                "width": 'resolve',
+                                "theme": "bootstrap-5",
+                                "language": SelectedTranslate
+                            });
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        },
+                    });
+                }
+            }
+        </script>
+    }
+    <script type="text/javascript">
+        var Gerencias = Array();
+        var Roles = Array();
+
+        function onBlur(Obj) {
+            var Id = $(Obj).data("id");
+            var rol = Obj.classList.value.includes("rol");
+            var index = -1;
+
+            if (Obj.value != '') {
+                if (rol) {
+                    index = Roles.findIndex(f => f.Id == Id);
+                } else {
+                    index = Gerencias.findIndex(f => f.Id == Id);
+                }
+
+                if (index == -1) {
+                    if (rol) {
+                        Roles.push({
+                            'Id': Id,
+                            'Text': Obj.value
+                        });
+                    } else {
+                        Gerencias.push({
+                            'Id': Id,
+                            'Text': Obj.value
+                        });
+                    }
+                } else {
+                    if (rol) {
+                        Roles[index]['Text'] = Obj.value;
+                    } else {
+                        Gerencias[index]['Text'] = Obj.value;
+                    }
+                }
+
+                if (!Obj.parentElement.parentElement.parentElement.cells[0].firstElementChild.checked) {
+                    Obj.parentElement.parentElement.parentElement.cells[0].firstElementChild.checked = true;
+                    $(Obj.parentElement.parentElement.parentElement).addClass("selected");
+                }
+            } else {
+                if (rol) {
+                    index = Roles.findIndex(f => f.Id == Id);
+                } else {
+                    index = Gerencias.findIndex(f => f.Id == Id);
+                }
+
+                if (index > -1) {
+                    if (rol) {
+                        Roles.splice(index, 1);
+                    } else {
+                        Gerencias.splice(index, 1);
+                    }
+                }
+
+                if (Obj.parentElement.parentElement.parentElement.cells[0].firstElementChild.checked) {
+                    Obj.parentElement.parentElement.parentElement.cells[0].firstElementChild.checked = false;
+                    $(Obj.parentElement.parentElement.parentElement).removeClass("selected");
+                }
+            }
+
+            var span = (rol ? "#rol_" : "#rgerencia_") + Id;
+            $(span).html('');
+        }
+
+        function OnKeyUp(Obj) {
+            var Id = $(Obj).data("id");
+            var rol = Obj.classList.value.includes("rol");
+
+            var text = '';
+            if (Obj.value != '') {
+                let regex = new RegExp("^" + Obj.value, "i");
+                var item = null;
+                if (rol) {
+                    item = Roles.find(f => regex.test(f.Text));
+                } else {
+                    item = Gerencias.find(f => regex.test(f.Text));
+                }
+                text = item != undefined ? item['Text'] : '';
+            }
+
+            var span = (rol ? "#rol_" : "#rgerencia_") + Id;
+            $(span).html(text)
+        }
+
+        function ValidarDatos() {
+            var Result = '';
+
+            if ($("#TipoAnalisis").val() == "0") {
+                Result += 'Debe seleccionar un tipo de analísis';
+            }
+
+            if (Result != '') {
+                ToastError(Result);
+            }
+
+            return (Result == '');
+        }
+
+        function ToastError(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+
+}

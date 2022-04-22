@@ -69,13 +69,13 @@ namespace Measure.ViewModels.Usuario
             List<MaestrasDetalle> Empleados = new List<MaestrasDetalle>();
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                Empleados = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Empleados")).MaestrasDetalle.ToList();
+                Empleados = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Empleados")).MaestrasDetalle.Where(d => d.Estado).ToList();
             }
             return Empleados.Select(s => new SelectListItem
             {
                 Text = Idioma == (int)Idiomas.es_ES ? s.es_ES : Idioma == (int)Idiomas.en_US ? s.en_US : s.pt_BR,
                 Value = s.Id.ToString()
-            }).ToList();
+            }).OrderBy(o => o.Text).ToList();
         }
 
         private List<SelectListItem> ListaIndustrias()
@@ -83,13 +83,13 @@ namespace Measure.ViewModels.Usuario
             List<MaestrasDetalle> Industrias = new List<MaestrasDetalle>();
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                Industrias = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Industrias")).MaestrasDetalle.ToList();
+                Industrias = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Industrias")).MaestrasDetalle.Where(d => d.Estado).ToList();
             }
             return Industrias.Select(s => new SelectListItem
             {
                 Text = Idioma == (int)Idiomas.es_ES ? s.es_ES : Idioma == (int)Idiomas.en_US ? s.en_US : s.pt_BR,
                 Value = s.Id.ToString()
-            }).ToList();
+            }).OrderBy(o => o.Text).ToList();
         }
 
         private List<SelectListItem> ListaPaises()
@@ -97,14 +97,14 @@ namespace Measure.ViewModels.Usuario
             List<MaestrasDetalle> Paises = new List<MaestrasDetalle>();
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                Paises = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Pais")).MaestrasDetalle.ToList();
+                Paises = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Pais")).MaestrasDetalle.Where(d => d.Estado).ToList();
             }
             return Paises.Select(s => new SelectListItem
             {
                 Selected = (PaisId.ToString() == s.Valor),
                 Text = Idioma == (int)Idiomas.es_ES ? s.es_ES : Idioma == (int)Idiomas.en_US ? s.en_US : s.pt_BR,
                 Value = s.Valor.ToString()
-            }).ToList();
+            }).OrderBy(o => o.Text).ToList();
         }
     }
 }

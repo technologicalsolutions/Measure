@@ -54,7 +54,7 @@ namespace Measure.Utilidades
             return Result;
         }
 
-        public List<ViewResultList> ListaRespuestas(Guid? ClienteId)
+        public List<ViewResultList> ListaRespuestas(int Rol, Guid? ClienteId)
         {
             List<ViewResultList> Result = new List<ViewResultList>();
 
@@ -72,6 +72,16 @@ namespace Measure.Utilidades
                         cmd.CommandType = CommandType.StoredProcedure;
 
                         SqlParameter par = new SqlParameter
+                        {
+                            ParameterName = "@Rol",
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Input,
+                            SqlValue = Rol
+                        };
+                        cmd.Parameters.Add(par);
+
+                        par = null;
+                        par = new SqlParameter
                         {
                             ParameterName = "@ClienteId",
                             SqlDbType = SqlDbType.UniqueIdentifier,

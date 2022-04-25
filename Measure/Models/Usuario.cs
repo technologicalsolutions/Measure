@@ -9,6 +9,7 @@ namespace Measure.Models
     [Table("Usuario")]
     public partial class Usuario
     {
+        [Key]
         public Guid Id { get; set; }
 
         [Required]

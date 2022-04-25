@@ -527,6 +527,9 @@
     <Content Include="Scripts\datatables\dataTables.select.js" />
     <Content Include="Scripts\datatables\dataTables.select.min.js" />
     <Content Include="Scripts\datatables\jquery.dataTables.min.js" />
+    <Content Include="Scripts\datatables\jszip.min.js" />
+    <Content Include="Scripts\datatables\pdfmake.js" />
+    <Content Include="Scripts\datatables\vfs_fonts.js" />
     <Content Include="Scripts\jscolor\jscolor.js" />
     <Content Include="Scripts\jscolor\jscolor.min.js" />
     <Content Include="Scripts\pdf\addimage.js" />

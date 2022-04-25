@@ -7,6 +7,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string col = string.IsNullOrEmpty(Model.ClienteId) ? "col-md-5" : "col-md-10";
 }
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+}
 <div class="container">
     <div class="row">
         @if (string.IsNullOrEmpty(Model.ClienteId))

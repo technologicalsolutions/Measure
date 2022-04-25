@@ -61,27 +61,9 @@ namespace Measure.Controllers
                 }
                 else
                 {
-                    Modelo.Cliente = db.Usuario.FirstOrDefault(u => u.Id == Cliente);
-
-                    if (Modelo.Cliente.RolId == (int)Enums.UserRol.Aliado)
+                    if (Login.RolId == (int)Enums.UserRol.Cliente)
                     {
-                        Lista = (from b in db.UsuariosPorEncuenta
-                                 join s in db.Encuesta on b.EncuestaId equals s.id
-                                 where b.UsuarioId == Cliente
-                                 select new ViewPoll
-                                 {
-                                     ActualizaUsuario = s.ActualizaUsuario,
-                                     ClienteId = s.ClienteId,
-                                     Estado = s.Estado,
-                                     FechaCreacion = s.FechaCreacion,
-                                     id = s.id,
-                                     Nombre = s.Nombre,
-                                     Proposito = s.Proposito
-                                 }).ToList();
-
-                    }
-                    else if (Modelo.Cliente.RolId == (int)Enums.UserRol.Cliente)
-                    {
+                        Modelo.Cliente = db.Usuario.FirstOrDefault(u => u.Id == Cliente);
                         Lista = db.Encuesta.Where(e => e.ClienteId == Cliente).
                                 Select(s => new ViewPoll
                                 {
@@ -94,6 +76,22 @@ namespace Measure.Controllers
                                     Proposito = s.Proposito
                                 }).ToList();
                     }
+                    else if (Login.RolId == (int)Enums.UserRol.Aliado)
+                    {
+                        Usuario Aliado = db.Usuario.Find(Cliente);
+                        Modelo.Cliente = db.Usuario.FirstOrDefault(u => u.ClienteId == Aliado.ClienteId);
+                        Lista = db.Encuesta.Where(e => e.ClienteId == Aliado.ClienteId).
+                                Select(s => new ViewPoll
+                                {
+                                    ActualizaUsuario = s.ActualizaUsuario,
+                                    ClienteId = s.ClienteId,
+                                    Estado = s.Estado,
+                                    FechaCreacion = s.FechaCreacion,
+                                    id = s.id,
+                                    Nombre = s.Nombre,
+                                    Proposito = s.Proposito
+                                }).ToList();
+                    }                                        
 
                     Reportes = db.Reporte.Where(r => r.ClienteId == Cliente && r.Estado).ToList();
                 }

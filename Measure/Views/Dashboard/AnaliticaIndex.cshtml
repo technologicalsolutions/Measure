@@ -47,60 +47,27 @@
     @Scripts.Render("~/bundles/unobtrusive")
 }
 <div class="container">
-    @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
-    {
-        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+    <div class="row">
+        @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
         {
-            InsertionMode = InsertionMode.Replace,
-            UpdateTargetId = "ListUser",
-        }))
-        {
-            <div class="row">
-                <div class="col-12 col-sm-4 mt-4">
-                    <div class="form-group">
-                        <label class="control-label col-md-2">Clientes</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" id="Modelo_ClienteId" onchange="LoadPoll(this.value)">
-                                @foreach (var item in Model.Clientes)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
-                        </div>
+            <div class="col-12 col-md-4">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Clientes</label>
+                    <div class="col-md-10">
+                        <select class="form-select" data-init-plugin="select2" id="Modelo_ClienteId" onchange="LoadPoll(this.value)">
+                            @foreach (var item in Model.Clientes)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
                     </div>
-                </div>
-                <div class="col-12 col-sm-5 mt-4">
-                    <div class="form-group">
-                        <label class="control-label col-md-2">Aliados</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" name="IdAliado" id="Modelo_AliadoId">
-                                @foreach (var item in Model.Aliados)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-3 mt-4">
-                    <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
                 </div>
             </div>
-        }
-    }
-    else if (Model.User.RolId == (int)Measure.Enums.UserRol.Cliente)
-    {
-        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
-        {
-            InsertionMode = InsertionMode.Replace,
-            UpdateTargetId = "ListUser",
-        }))
-        {
-            <div class="col-12 col-md-9 mt-4">
+            <div class="col-12 col-md-4">
                 <div class="form-group">
                     <label class="control-label col-md-2">Aliados</label>
                     <div class="col-md-10">
-                        <select class="form-select" data-init-plugin="select2" name="IdAliado">
+                        <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
                             @foreach (var item in Model.Aliados)
                             {
                                 <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
@@ -109,34 +76,45 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-3 mt-4">
-                <button class="btn btn-primary mt-3" type="submit">Ver Encuestados</button>
-            </div>
+            using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+            {
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "ListUser",
+                OnComplete = "loadSelect()"
+            }, new { @class = "col-12 col-md-2" }))
+            {
+                <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
+                <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
+            }
         }
-    }
-    <div class="row">
-        <div class="col-12 col-md-6 mt-4">
-            <div class="form-group">
-                <label class="control-label col-md-2">Tipo de Analísis</label>
-                <div class="col-md-10">
-                    <select class="form-select" data-init-plugin="select2" id="TipoAnalisis" name="TipoAnalisis">
-                        <option value="0">Seleccione...</option>
-                        <option value="1">Agrupados 1</option>
-                        <option value="2">Agrupados 2</option>
-                        <option value="3">Analisis</option>
-                        <option value="4">Resumen</option>
-                        <option value="5">Nivel de Madurez 1A</option>
-                        <option value="6">Nivel de Madurez 1B</option>
-                        <option value="7">Nivel de Madurez 2A</option>
-                        <option value="8">Nivel de Madurez 2B</option>
-                        <option value="9">Nivel de Madurez 3A</option>
-                        <option value="9">Nivel de Madurez 3B</option>
-                    </select>
+        else if (Model.User.RolId == (int)Measure.Enums.UserRol.Cliente)
+        {
+            <div class="col-12 col-md-8">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Aliados</label>
+                    <div class="col-md-10">
+                        <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
+                            @foreach (var item in Model.Aliados)
+                            {
+                                <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-md-3 mt-4">
-            <button class="btn btn-primary mt-3" type="button" onsubmit="return ValidarDatos();">Generar Analisis</button>
+            using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+            {
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "ListUser",
+                OnComplete = "loadSelect()"
+            }, new { @class = "col-12 col-md-2" }))
+            {
+                <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
+                <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
+            }
+        }
+        <div class="col-12 col-md-2">
+            <button class="btn btn-primary mt-4" type="button" onclick="GenerarAnalisis()">Generar Analisis</button>
         </div>
     </div>
     <div class="row mt-4">
@@ -202,24 +180,32 @@
         </script>
     }
     <script type="text/javascript">
+        var Sucursales = Array();
         var Gerencias = Array();
         var Roles = Array();
 
         function onBlur(Obj) {
             var Id = $(Obj).data("id");
-            var rol = Obj.classList.value.includes("rol");
+            var rol = Obj.classList.value;
             var index = -1;
 
             if (Obj.value != '') {
-                if (rol) {
+                if (rol.includes("rol")) {
                     index = Roles.findIndex(f => f.Id == Id);
+                } else if (rol.includes("sucursal")) {
+                    index = Sucursales.findIndex(f => f.Id == Id);
                 } else {
                     index = Gerencias.findIndex(f => f.Id == Id);
                 }
 
                 if (index == -1) {
-                    if (rol) {
+                    if (rol.includes("rol")) {
                         Roles.push({
+                            'Id': Id,
+                            'Text': Obj.value
+                        });
+                    } else if (rol.includes("sucursal")) {
+                        Sucursales.push({
                             'Id': Id,
                             'Text': Obj.value
                         });
@@ -230,8 +216,10 @@
                         });
                     }
                 } else {
-                    if (rol) {
+                    if (rol.includes("rol")) {
                         Roles[index]['Text'] = Obj.value;
+                    } else if (rol.includes("sucursal")) {
+                        Sucursales[index]['Text'] = Obj.value;
                     } else {
                         Gerencias[index]['Text'] = Obj.value;
                     }
@@ -242,15 +230,19 @@
                     $(Obj.parentElement.parentElement.parentElement).addClass("selected");
                 }
             } else {
-                if (rol) {
+                if (rol.includes("rol")) {
                     index = Roles.findIndex(f => f.Id == Id);
+                } else if (rol.includes("sucursal")) {
+                    index = Sucursales.findIndex(f => f.Id == Id);
                 } else {
                     index = Gerencias.findIndex(f => f.Id == Id);
                 }
 
                 if (index > -1) {
-                    if (rol) {
+                    if (rol.includes("rol")) {
                         Roles.splice(index, 1);
+                    } else if (rol.includes("sucursal")) {
+                        Sucursales.splice(index, 1);
                     } else {
                         Gerencias.splice(index, 1);
                     }
@@ -268,29 +260,38 @@
 
         function OnKeyUp(Obj) {
             var Id = $(Obj).data("id");
-            var rol = Obj.classList.value.includes("rol");
+            var rol = Obj.classList.value;
 
             var text = '';
             if (Obj.value != '') {
                 let regex = new RegExp("^" + Obj.value, "i");
                 var item = null;
-                if (rol) {
+                if (rol.includes("rol")) {
                     item = Roles.find(f => regex.test(f.Text));
+                } else if (rol.includes("sucursal")) {
+                    item = Sucursales.find(f => regex.test(f.Text));
                 } else {
                     item = Gerencias.find(f => regex.test(f.Text));
                 }
                 text = item != undefined ? item['Text'] : '';
             }
 
-            var span = (rol ? "#rol_" : "#rgerencia_") + Id;
-            $(span).html(text)
+            var span = "";
+            if (rol.includes("rol")) {
+                span = "#rol_";
+            } else if (rol.includes("sucursal")) {
+                span = "#sucursal_";
+            } else {
+                span = "#gerencia_";
+            }
+            $(span + Id).html(text)
         }
 
-        function ValidarDatos() {
+        function GenerarAnalisis() {
             var Result = '';
 
-            if ($("#TipoAnalisis").val() == "0") {
-                Result += 'Debe seleccionar un tipo de analísis';
+            if ($("#Aliados").val() == "0") {
+                Result += 'Debe seleccionar un alido';
             }
 
             if (Result != '') {
@@ -317,6 +318,18 @@
                     x: positionX,
                     y: positionY
                 }
+            });
+        }
+
+        function Selected(Obj) {
+            document.getElementById(Obj.name).value = Obj.value;
+        }
+
+        function loadSelect() {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
             });
         }
     </script>

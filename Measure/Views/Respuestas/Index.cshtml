@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-    @if (Model.Clientes != null)
+    @if (Model.Clientes.Count() > 1)
     {
         <div class="row mt-4">
             <div class="col-12">
@@ -33,7 +33,7 @@
                     <div class="row">
                         <div class="col-12 col-sm-8">
                             <div class="form-group">
-                                <label class="control-label col-md-2">Encuestas</label>
+                                <label class="control-label col-md-2">Clientes</label>
                                 <div class="col-md-10">
                                     <select class="form-select" id="Cliente" name="Cliente" data-init-plugin="select2">
                                         @foreach (var item in Model.Clientes)
@@ -88,7 +88,7 @@
                 "language": SelectedTranslate,
             });
 
-            LoadDataTable("TblLista", false, true, null, 10);
+            LoadDataTable("TblLista", false, true, null, 25, true);
         })
     </script>
 }

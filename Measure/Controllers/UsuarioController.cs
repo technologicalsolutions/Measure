@@ -43,25 +43,26 @@ namespace Measure.Controllers
                 }
             };
 
-            using (ClsProcedures procedures = new ClsProcedures())
+            Guid? AliadoId = null;
+            if (ClienteId != null && ClienteId != Guid.Empty)
             {
-                Guid? AliadoId = null;
-                if (ClienteId != null && ClienteId != Guid.Empty)
+                using (ModeloEncuesta db = new ModeloEncuesta())
                 {
-                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    Models.Usuario User = db.Usuario.Find(ClienteId);
+                    if (_Usuario.RolId == (int)Enums.UserRol.Aliado)
                     {
-                        Models.Usuario User = db.Usuario.Find(ClienteId);
-                        if (User.RolId == (int)Enums.UserRol.Aliado)
-                        {
-                            AliadoId = User.AliadoId;
-                            ClienteId = User.ClienteId;
-                        }
+                        AliadoId = _Usuario.Id;
+                        ClienteId = User.ClienteId;
                     }
                 }
-                else
-                {
-                    ClienteId = null;
-                }
+            }
+            else
+            {
+                ClienteId = _Usuario.Id;
+            }
+
+            using (ClsProcedures procedures = new ClsProcedures())
+            {                
                 Model.Lista = procedures.UsuariosPorRol(Rol, ClienteId, AliadoId, _Usuario.Idioma, null);
             }
 

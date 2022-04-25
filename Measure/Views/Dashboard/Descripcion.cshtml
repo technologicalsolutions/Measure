@@ -84,8 +84,10 @@
                                 <tfoot>
                                     <tr>
                                         <td class="text-start">Total</td>
-                                        <td id="Total"></td>
-                                        <td colspan="3"></td>
+                                        <td class="text-center" id="Total"></td>
+                                        <td class="text-center" id="Completados"></td>
+                                        <td class="text-center" id="SinCompletar"></td>
+                                        <td></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -229,6 +231,9 @@
         function tableQuantity(Data) {
             var Html = '';
             var Total = 0;
+            var TotalC = 0;
+            var TotalS = 0;
+
             $.each(Data, function (pos, item) {
                 Html += '<tr>';
                 Html += '<td class="text-start">' + item.Aliado.Nombres + '</td>';
@@ -238,8 +243,12 @@
                 Html += '<td class="text-center"><button class="btn btn-pill btn-dark btn-lg custom-backgroun-1" id="prev-btn" onclick="Descript(\'' + item.Aliado.Id + '\')">Ver Descipción</button></td>';
                 Html += '</tr>';
                 Total += item.Total;
+                TotalC += item.Completados;
+                TotalS += item.SinCompletar;
             });
             $("#Total").html("<strong>" + Total + "</strong>");
+            $("#Completados").html("<strong>" + TotalC + "</strong>");
+            $("#SinCompletar").html("<strong>" + TotalS + "</strong>");
             $("#TableQuantity tbody").html(Html);
         }
 

@@ -42,9 +42,9 @@ function NumberOnly(event) {
     }
 }
 
-function NumberOnlyMax(event,max) {
+function NumberOnlyMax(event, max) {
     //no se aceptan Espacion en blanco, letras, acentos, Ñ/ñ
-    if ((event.charCode < 48 || event.charCode > 57)) {        
+    if ((event.charCode < 48 || event.charCode > 57)) {
         event.returnValue = false;
     } else {
         var newValue = parseInt(event.srcElement.value + String.fromCharCode(event.charCode));
@@ -92,18 +92,23 @@ function divLoading() {
     $("#divLoading").toggle();
 }
 
-function LoadDataTable(TableName, Select, Ordering, Data, PageLength) {
+function LoadDataTable(TableName, Select, Ordering, Data, PageLength, Export = false) {
     var options = {
         "autoWidth": false,
-        //dom: 'lBfrtip',
-        //buttons: [
-        //    { extend: 'copy', text: 'copiar'},
-        //    { extend: 'csv', text: 'csv' },
-        //],
         "responsive": true,
         "language": DataTableTranslate,
         "pageLength": PageLength,
     };
+
+    if (Export) {
+        options['dom'] = 'lBfrtip';
+        options['buttons'] = [
+            { extend: 'copy', text: 'copiar' },
+            { extend: 'csv', text: 'csv' },
+            { extend: 'excel', text: 'excel' },
+        ];
+    }
+
     if (Select) {
         options['columnDefs'] = [{
             orderable: false,
@@ -144,19 +149,19 @@ function seleccionarTodo(idTabla, idCheck) {
     }
 }
 
-function DeseleccionarFila(Obj,item) {
+function DeseleccionarFila(Obj, item) {
     if (Obj.checked) {
         $(Obj.parentElement.parentElement).addClass("selected")
         if (item == undefined) {
             Obj.parentElement.lastElementChild.value = true;
-        }        
+        }
     } else {
         if (Obj.parentElement.parentElement.className.includes("selected")) {
             $(Obj.parentElement.parentElement).removeClass("selected");
             if (item == undefined) {
                 Obj.parentElement.lastElementChild.value = false;
-            }            
-        }        
+            }
+        }
     }
 }
 
@@ -165,19 +170,19 @@ function ContarSeleccionados(idTabla) {
     var count = 0;
     $.each(Filas, function (pos, item) {
         if (item.cells[0].firstElementChild.checked) {
-            count++;            
-        }        
+            count++;
+        }
     });
 
     var Result = '';
     if (count == 0) {
         Result = 'Debe de seleccionar minimo una fila';
-    }    
+    }
     return Result;
 }
 
 function ShowModal(name) {
-    $("#"+name).modal("show");
+    $("#" + name).modal("show");
 }
 
 function CloseModal(name) {

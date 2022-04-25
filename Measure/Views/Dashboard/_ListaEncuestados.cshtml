@@ -8,17 +8,17 @@
             <th>Correo</th>
             <th>Nombres - Apellidos</th>
             <th>Fecha Respuesta</th>
-            <th style="width: 10%;">Pais</th>
+            <th style="width: 15%;">Pais</th>
             <th style="width: 10%;">Sucursal</th>
             <th style="width: 10%;">Gerencia</th>
             <th style="width: 10%;">Rol</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model.Count() == 0)
+        @if (Model.Encuestados.Count() == 0)
         {
             <tr>
-                <td colspan="6" class="text-center">No hay registros</td>
+                <td colspan="8" class="text-center">No hay registros</td>
             </tr>
         }
         else
@@ -35,10 +35,15 @@
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.FechaRespuesta)</td>
                     <td>
-
+                        <div class="form-group">
+                            @Html.DropDownList("Pais", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                        </div>
                     </td>
                     <td>
-
+                        <div class="input-container">
+                            <input type="text" class="inptext sucursal" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
+                            <span class="suggestion" id="sucursal_@item.Id"></span>
+                        </div>
                     </td>
                     <td>
                         <div class="input-container">
@@ -59,12 +64,14 @@
     </tbody>
     <tfoot>
         <tr>
-            <th>Analisis</th>
+            <th class="text-center">Analisis</th>
             <th>Correo</th>
             <th>Nombres - Apellidos</th>
             <th>Fecha Respuesta</th>
-            <th>Gerencia</th>
-            <th>Rol</th>
+            <th style="width: 15%;">Pais</th>
+            <th style="width: 10%;">Sucursal</th>
+            <th style="width: 10%;">Gerencia</th>
+            <th style="width: 10%;">Rol</th>
         </tr>
     </tfoot>
 </table>

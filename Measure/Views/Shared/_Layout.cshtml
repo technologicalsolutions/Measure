@@ -1,5 +1,5 @@
 ﻿@using Measure.ViewModels.Usuario
-@using Measure.Enums 
+@using Measure.Enums
 <!DOCTYPE html>
 @{
     ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
@@ -75,51 +75,54 @@
                                     </a>
                                 }
                             </li>
-                            <li class="sidebar-item @ViewBag.GruposActive">
-                                @using (Html.BeginRouteForm("Categorias", FormMethod.Post, new { id = "FrmGrp" }))
-                                {
-                                    <input type="hidden" name="Cliente" value="@ClienteID" />
-                                    <a class="sidebar-link" onclick="document.getElementById('FrmGrp').submit();">
-                                        <i class="align-middle me-2 fas fa-fw fa-object-ungroup"></i>Categorías
-                                    </a>
-                                }
-                            </li>
-                            <li class="sidebar-item @ViewBag.ContenidoActive">
-                                @using (Html.BeginRouteForm("Contenido", FormMethod.Post, new { id = "FrmCont" }))
-                                {
-                                    <input type="hidden" name="Cliente" value="@ClienteID" />
-                                    <a class="sidebar-link" onclick="document.getElementById('FrmCont').submit();">
-                                        <i class="align-middle me-2 fas fa-fw fa-list-ul"></i>Contenido
-                                    </a>
-                                }
-                            </li>
-                            <li class="sidebar-item @ViewBag.ReporteActive">
-                                @using (Html.BeginRouteForm("Reportes", FormMethod.Post, new { id = "FrmRpt" }))
-                                {
-                                    <input type="hidden" name="Cliente" value="@ClienteID" />
-                                    <a class="sidebar-link" onclick="document.getElementById('FrmRpt').submit();">
-                                        <i class="align-middle me-2 fas fa-fw fa-list-ul"></i>Reportes
-                                    </a>
-                                }
-                            </li>
-                            <li class="sidebar-item @ViewBag.MaestrasActive">
-                                @using (Html.BeginRouteForm("Maestras", FormMethod.Post, new { id = "FrmMaestra" }))
-                                {
-                                    <input type="hidden" name="Cliente" value="@ClienteID" />
-                                    <a class="sidebar-link" onclick="document.getElementById('FrmMaestra').submit();">
-                                        <i class="align-middle me-2 fas fa-fw fa-th-list"></i>Maestras
-                                    </a>
-                                }
-                            </li>
-                            <li class="sidebar-item @ViewBag.PreguntasActive">
-                                @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPre" }))
-                                {
-                                    <input type="hidden" name="Cliente" value="@ClienteID" />
-                                    <a class="sidebar-link" onclick="document.getElementById('FrmPre').submit();">
-                                        <i class="align-middle me-2 fas fa-fw fa-question"></i>Preguntas
-                                    </a>
-                                }
-                            </li>
+                            @if (login.RolId == (int)UserRol.Administrador || login.RolId == (int)UserRol.Cliente)
+                            {
+                                <li class="sidebar-item @ViewBag.GruposActive">
+                                    @using (Html.BeginRouteForm("Categorias", FormMethod.Post, new { id = "FrmGrp" }))
+                                    {
+                                        <input type="hidden" name="Cliente" value="@ClienteID" />
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmGrp').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-object-ungroup"></i>Categorías
+                                        </a>
+                                    }
+                                </li>
+                                <li class="sidebar-item @ViewBag.ContenidoActive">
+                                    @using (Html.BeginRouteForm("Contenido", FormMethod.Post, new { id = "FrmCont" }))
+                                    {
+                                        <input type="hidden" name="Cliente" value="@ClienteID" />
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmCont').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-list-ul"></i>Contenido
+                                        </a>
+                                    }
+                                </li>
+                                <li class="sidebar-item @ViewBag.ReporteActive">
+                                    @using (Html.BeginRouteForm("Reportes", FormMethod.Post, new { id = "FrmRpt" }))
+                                    {
+                                        <input type="hidden" name="Cliente" value="@ClienteID" />
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmRpt').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-list-ul"></i>Reportes
+                                        </a>
+                                    }
+                                </li>
+                                <li class="sidebar-item @ViewBag.MaestrasActive">
+                                    @using (Html.BeginRouteForm("Maestras", FormMethod.Post, new { id = "FrmMaestra" }))
+                                    {
+                                        <input type="hidden" name="Cliente" value="@ClienteID" />
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmMaestra').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-th-list"></i>Maestras
+                                        </a>
+                                    }
+                                </li>
+                                <li class="sidebar-item @ViewBag.PreguntasActive">
+                                    @using (Html.BeginRouteForm("Preguntas", FormMethod.Post, new { id = "FrmPre" }))
+                                    {
+                                        <input type="hidden" name="Cliente" value="@ClienteID" />
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmPre').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-question"></i>Preguntas
+                                        </a>
+                                    }
+                                </li>
+                            }
                             <li class="sidebar-item @ViewBag.RespuestasActive">
                                 @using (Html.BeginRouteForm("Respuestas", FormMethod.Post, new { id = "FrmResp" }))
                                 {

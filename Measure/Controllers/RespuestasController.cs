@@ -33,13 +33,28 @@ namespace Measure.Controllers
 
             ViewResultAnswer modelo = new ViewResultAnswer
             {
-                Clientes = new List<SelectListItem>()
+                Clientes = new List<SelectListItem>(),                
             };
 
-            using (ClsProcedures clsProcedures = new ClsProcedures())
+            int Rol = 0;
+
+            if (Cliente == Guid.Empty)
             {
-                Cliente = Cliente == Guid.Empty ? null : Cliente;
-                modelo.Lista = clsProcedures.ListaRespuestas(Cliente);
+                Cliente = null;
+            }
+            else
+            {
+                using (ModeloEncuesta db = new ModeloEncuesta())
+                {
+                    Usuario User = db.Usuario.Find(Cliente);
+                    Cliente = User.Id;
+                    Rol = User.RolId;
+                }
+            }
+
+            using (ClsProcedures clsProcedures = new ClsProcedures())
+            {                 
+                modelo.Lista = clsProcedures.ListaRespuestas(Rol, Cliente);
             }
 
             if (Login.RolId == (int)Enums.UserRol.Administrador)
@@ -124,12 +139,28 @@ namespace Measure.Controllers
         private ViewAnswerResult ContenidoRespuesta(ViewReport Data, ViewLogin Usuario)
         {
             ViewAnswerResult Modelo = new ViewAnswerResult();
-
             ViewPoll _Encuesta = new ViewPoll();
 
-            using (ClsProcedures clsProcedures = new ClsProcedures())
+            using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                _Encuesta = clsProcedures.DetalleEncuestaUsuario(Data.Id, Usuario.Id);
+                _Encuesta = (from A in db.UsuariosPorEncuenta
+                             join B in db.Encuesta on A.EncuestaId equals B.id
+                             join C in db.Usuario on B.ClienteId equals C.Id
+                             join D in db.Usuario on A.UsuarioId equals D.Id
+                             where A.Id == Data.Id && A.UsuarioId == Usuario.Id
+                             select new ViewPoll
+                             {
+                                 id = B.id,
+                                 ClienteId = B.ClienteId,
+                                 NombreCliente = D.Empresa,
+                                 Nombre = B.Nombre,
+                                 FechaCreacion = B.FechaCreacion,
+                                 Estado = B.Estado,
+                                 IdAsignacion = A.Id,
+                                 TipoReporteGeneral = B.TipoReporteGeneral,
+                                 FechaRespuesta = A.FechaResuelta,
+                                 Finalizada = A.Resuelta
+                             }).FirstOrDefault();
             }
 
             Usuario Cliente = new Usuario();
@@ -230,7 +261,6 @@ namespace Measure.Controllers
             {
                 send = EmailSending(utilities.Cifrado(ConfigurationManager.AppSettings["SecundaryEmail"].ToString(), false), DataHtml, mailbody);
             }
-
 
             if (Data.Report)
             {
@@ -507,19 +537,17 @@ namespace Measure.Controllers
 
         private ViewPresentation GraphicPresentation(ViewLogin Usuario)
         {
-            Usuario User = new Usuario();
-            Usuario Client = new Usuario();
+            string DataJoin = "{0} {1}";
+            Usuario User = new Usuario();            
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                User = db.Usuario.Find(Usuario.Id);
-                Client = db.Usuario.Find(User.AliadoId);
+                User = db.Usuario.Find(Usuario.Id);                
             }
-
-            string DataJoin = "{0} {1}";
+            
 
             return new ViewPresentation
             {
-                NombreEmpresa = string.Format(DataJoin, Client.Nombres, Client.Apellidos),
+                NombreEmpresa = User.Empresa,
                 Nombres = string.Format(DataJoin, User.Nombres, User.Apellidos),
             };
         }

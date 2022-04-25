@@ -12,12 +12,14 @@ namespace Measure.Controllers
     public class DashboardController : Controller
     {
         [HttpGet]
-        [Route("DashboardGeneral/{Id ?}")]
+        [Route("DashboardGeneral/{Id?}")]
         public ActionResult Index(string Id)
         {
             ViewDashboard Model = new ViewDashboard
             {
                 ClienteId = Id,
+                Clientes = new List<SelectListItem>(),
+                Encuestas = new List<SelectListItem>()
             };
 
             if (HttpContext.Session["login"] == null)
@@ -26,7 +28,7 @@ namespace Measure.Controllers
             }
             else
             {
-                if (Id == null)
+                if (Id == Guid.Empty.ToString())
                 {
                     Model.Clientes = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
                     Model.Encuestas = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
@@ -256,11 +258,13 @@ namespace Measure.Controllers
         }
 
         [HttpGet]
-        [Route("DashboardGeneralDescripcion/{Id ?}")]
+        [Route("DashboardGeneralDescripcion/{Id?}")]
         public ActionResult Descripcion(string Id)
         {
             ViewDescripcionIndex Model = new ViewDescripcionIndex
             {
+                Clientes = new List<SelectListItem>(),
+                Encuestas = new List<SelectListItem>(),                
                 User = new Usuario()
             };
 
@@ -270,7 +274,7 @@ namespace Measure.Controllers
             }
             else
             {
-                if (Id == null)
+                if (Id == Guid.Empty.ToString())
                 {
                     Model.Clientes = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
                     Model.Encuestas = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
@@ -408,18 +412,17 @@ namespace Measure.Controllers
         }
 
         [HttpGet]
-        [Route("DashboardAnalitica/{Id ?}")]
+        [Route("DashboardAnalitica/{Id?}")]
         public ActionResult AnaliticaIndex(string Id)
         {
             ViewLogin Login = HttpContext.Session["login"] as ViewLogin;
 
             ViewAnaliticIndex Model = new ViewAnaliticIndex
             {
-
-                User = new Usuario(),
+                Aliados = new List<SelectListItem>(),
+                Clientes = new List<SelectListItem>(),
                 PartialIndex = new ViewResponsePartial
-                {
-                    Idioma = Login.Idioma,
+                {                    
                     Encuestados = new List<ViewResponsePollUser>()
                 }
             };
@@ -430,7 +433,9 @@ namespace Measure.Controllers
             }
             else
             {
-                if (Id == null)
+                Model.PartialIndex.Idioma = Login.Idioma;
+                Model.User = new Usuario { RolId = Login.RolId};
+                if (string.IsNullOrEmpty(Id))
                 {
                     Model.User = new Usuario { RolId = (int)Enums.UserRol.Administrador };
                     Model.Clientes = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
@@ -494,17 +499,7 @@ namespace Measure.Controllers
 
                     }
                     else if (Model.User.RolId == (int)Enums.UserRol.Aliado)
-                    {
-                        using (ModeloEncuesta db = new ModeloEncuesta())
-                        {
-                            Model.Aliados.AddRange(db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Aliado && e.Id == ClienteId)
-                            .Select(s => new SelectListItem
-                            {
-                                Text = s.Nombres,
-                                Value = s.Id.ToString()
-                            }).ToList());
-                        }
-
+                    {                        
                         using (ModeloEncuesta db = new ModeloEncuesta())
                         {
                             Model.PartialIndex.Encuestados = ListarEncuestados(ClienteId);

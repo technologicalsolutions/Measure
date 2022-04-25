@@ -34,6 +34,9 @@ namespace Measure
             bundles.Add(new ScriptBundle("~/bundles/tables").Include(
                        "~/Scripts/datatables/jquery.dataTables.min.js",
                        "~/Scripts/datatables/dataTables.buttons.min.js",
+                       "~/Scripts/datatables/jszip.min.js",
+                       "~/Scripts/datatables/pdfmake.js",
+                       "~/Scripts/datatables/vfs_fonts.js",
                        "~/Scripts/datatables/buttons.flash.min.js",
                        "~/Scripts/datatables/buttons.html5.min.js",
                        "~/Scripts/datatables/dataTables.select.min.js",

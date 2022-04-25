@@ -5,6 +5,7 @@
     ViewBag.EncuestaActive = "active";
     ViewBag.Title = "Encuestas";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string col = Model.RolId == (int)Measure.Enums.UserRol.Administrador ? "4" : "6";
 }
 @section style{
     @Styles.Render("~/Content/tables")
@@ -82,19 +83,22 @@
                                 </td>
                                 <td>
                                     <div class="row">
-                                        <div class="col-sm-12 col-lg-4 text-center">
+                                        <div class="col-sm-12 col-md-@col text-center">
                                             @using (Html.BeginRouteForm("BuscarUsuarios", FormMethod.Post))
                                             {
                                                 <button name="id" value="@item.id" type="submit" class="btn btn-secondary btn-sm rounded-pill py-0 editLink">Asignar</button>
                                             }
                                         </div>
-                                        <div class="col-sm-12 col-lg-4 text-center">
-                                            @using (Html.BeginRouteForm("ContenidoEncuesta", FormMethod.Get))
-                                            {
-                                                <button name="EncuestaId" value="@item.id" type="submit" class="btn btn-info btn-sm rounded-pill py-0 editLink">Contenido</button>
-                                            }
-                                        </div>
-                                        <div class="col-sm-12 col-lg-4 text-center">
+                                        @if (Model.RolId == (int)Measure.Enums.UserRol.Administrador || Model.RolId == (int)Measure.Enums.UserRol.Cliente)
+                                        {
+                                            <div class="col-sm-12 col-md-4 text-center">
+                                                @using (Html.BeginRouteForm("ContenidoEncuesta", FormMethod.Get))
+                                                {
+                                                    <button name="EncuestaId" value="@item.id" type="submit" class="btn btn-info btn-sm rounded-pill py-0 editLink">Contenido</button>
+                                                }
+                                            </div>
+                                        }
+                                        <div class="col-sm-12 col-md-@col text-center">
                                             <button name="id" type="button" onclick="Asignada('@item.id')" class="btn btn-danger btn-sm rounded-pill py-0 editLink">Asignada</button>
                                         </div>
                                     </div>

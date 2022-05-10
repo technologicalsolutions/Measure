@@ -12,6 +12,7 @@ namespace Measure.Models
         {
         }
 
+        public virtual DbSet<Analitica> Analitica { get; set; }
         public virtual DbSet<Contenido> Contenido { get; set; }
         public virtual DbSet<ContenidoPorEncuesta> ContenidoPorEncuesta { get; set; }
         public virtual DbSet<ContenidoReporte> ContenidoReporte { get; set; }
@@ -36,6 +37,12 @@ namespace Measure.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Grupo>()
+                .HasMany(e => e.Analitica)
+                .WithRequired(e => e.Grupo)
+                .HasForeignKey(e => e.GrupoId)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<ControlMatriz>()
                 .HasMany(e => e.ControlMatrizColumna)
                 .WithRequired(e => e.ControlMatriz)

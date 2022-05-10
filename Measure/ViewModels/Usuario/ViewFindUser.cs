@@ -8,6 +8,8 @@ namespace Measure.ViewModels.Usuario
 
         public Guid ClienteId { get; set; }
 
+        public Guid AliadoId { get; set; }
+
         public int? PaisId { get; set; }        
         
         public int? Idioma { get; set; }

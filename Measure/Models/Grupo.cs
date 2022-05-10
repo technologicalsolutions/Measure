@@ -4,11 +4,15 @@ namespace Measure.Models
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
 
     [Table("Grupo")]
     public partial class Grupo
     {
+        public Grupo()
+        {
+            Analitica = new HashSet<Analitica>();
+        }
+
         public Guid Id { get; set; }
 
         public Guid ClienteId { get; set; }
@@ -43,5 +47,8 @@ namespace Measure.Models
         public string Color { get; set; }
 
         public bool Estado { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Analitica> Analitica { get; set; }        
     }
 }

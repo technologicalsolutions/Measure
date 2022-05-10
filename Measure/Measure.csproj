@@ -128,6 +128,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AnaliticaController.cs" />
     <Compile Include="Controllers\ContenidoController.cs" />
     <Compile Include="Controllers\ContenidoEncuestaController.cs" />
     <Compile Include="Controllers\ContenidoEncuestas.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Analitica.cs" />
     <Compile Include="Models\Contenido.cs" />
     <Compile Include="Models\ContenidoPorEncuesta.cs" />
     <Compile Include="Models\ContenidoReporte.cs" />
@@ -183,14 +185,25 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Recurso.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilidades\ClsAnalitics.cs" />
     <Compile Include="Utilidades\ClsProcedures.cs" />
     <Compile Include="Utilidades\ClsUtilities.cs" />
+    <Compile Include="ViewModels\Analitic\SquareDetail.cs" />
+    <Compile Include="ViewModels\Analitic\SquareFive.cs" />
+    <Compile Include="ViewModels\Analitic\SquareFourth.cs" />
+    <Compile Include="ViewModels\Analitic\SquareResult.cs" />
+    <Compile Include="ViewModels\Analitic\SquareSix.cs" />
+    <Compile Include="ViewModels\Analitic\SquareThree.cs" />
+    <Compile Include="ViewModels\Analitic\SquareTwo.cs" />
+    <Compile Include="ViewModels\Analitic\ViewAnalitic.cs" />
+    <Compile Include="ViewModels\Analitic\ViewIndex.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContenidosEncuesta.cs" />
     <Compile Include="ViewModels\Contenidos\ViewContenidoEncuesta.cs" />
     <Compile Include="ViewModels\Contenidos\ViewContent.cs" />
     <Compile Include="ViewModels\Contenidos\ViewContentForPoll.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContentList.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewSurveyContent.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewAnaliticBasic.cs" />
     <Compile Include="ViewModels\Dashboard\ViewAnaliticIndex.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboard.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasic.cs" />
@@ -199,6 +212,8 @@
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasicQuantities.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardClientForPoll.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardDistCount.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDataAnalitic.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewDataAnaliticDetail.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDescripcionIndex.cs" />
     <Compile Include="ViewModels\Dashboard\ViewResponsePartial.cs" />
     <Compile Include="ViewModels\Dashboard\ViewResponsePollUser.cs" />
@@ -245,8 +260,10 @@
     <Compile Include="ViewModels\Respuesta\ViewEmail.cs" />
     <Compile Include="ViewModels\Respuesta\ViewPresentation.cs" />
     <Compile Include="ViewModels\Respuesta\ViewReport.cs" />
+    <Compile Include="ViewModels\Respuesta\ViewResultAnalitic.cs" />
     <Compile Include="ViewModels\Respuesta\ViewResultList.cs" />
     <Compile Include="ViewModels\Respuesta\ViewResultMatrizRange.cs" />
+    <Compile Include="ViewModels\Analitic\SquareOne.cs" />
     <Compile Include="ViewModels\Usuario\ViewFindUser.cs" />
     <Compile Include="ViewModels\Usuario\ViewLogin.cs" />
     <Compile Include="ViewModels\Usuario\ViewUpdateUser.cs" />
@@ -619,6 +636,14 @@
     <Content Include="Views\Dashboard\AnaliticaIndex.cshtml" />
     <Content Include="Views\Dashboard\_ListaEncuestados.cshtml" />
     <Content Include="Views\Dashboard\Descripcion.cshtml" />
+    <Content Include="Views\Usuario\Clientes.cshtml" />
+    <Content Include="Views\Usuario\CreateOrEditClient.cshtml" />
+    <Content Include="Views\Usuario\Aliados.cshtml" />
+    <Content Include="Views\Usuario\CreateOrEditAllied.cshtml" />
+    <Content Include="Views\Analitica\Index.cshtml" />
+    <Content Include="Views\Analitica\_Detail.cshtml" />
+    <Content Include="Views\Analitica\CreateOrEdit.cshtml" />
+    <Content Include="Views\Analitica\_PartialPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

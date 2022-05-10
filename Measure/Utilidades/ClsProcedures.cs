@@ -47,10 +47,10 @@ namespace Measure.Utilidades
                     if (Lista.Count() > 0)
                     {
                         Result.Add(Lista.FirstOrDefault());
-                    }                    
+                    }
                 }
             }
-            
+
             return Result;
         }
 
@@ -60,59 +60,60 @@ namespace Measure.Utilidades
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                using (DbConnection con = db.Database.Connection)
+                DbProviderFactory dbFactory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = dbFactory.CreateConnection())
                 {
-                    con.Open();
-                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(con);
-
-                    using (DbCommand cmd = dbFactory.CreateCommand())
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
                     {
-                        cmd.Connection = con;
-                        cmd.CommandText = "[DBO].[LISTARESPUESTAS]";
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (DbCommand cmd = dbFactory.CreateCommand())
+                        {
+                            cmd.Connection = con;
+                            cmd.CommandText = "[DBO].[LISTARESPUESTAS]";
+                            cmd.CommandType = CommandType.StoredProcedure;
 
-                        SqlParameter par = new SqlParameter
-                        {
-                            ParameterName = "@Rol",
-                            SqlDbType = SqlDbType.Int,
-                            Direction = ParameterDirection.Input,
-                            SqlValue = Rol
-                        };
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@ClienteId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (ClienteId != null)
-                        {
-                            par.SqlValue = ClienteId;
-                        }
-                        else
-                        {
-                            par.SqlValue = DBNull.Value;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        using (DbDataReader DataR = cmd.ExecuteReader())
-                        {
-                            while (DataR.Read())
+                            SqlParameter par = new SqlParameter
                             {
-                                ViewResultList data = new ViewResultList
+                                ParameterName = "@Rol",
+                                SqlDbType = SqlDbType.Int,
+                                Direction = ParameterDirection.Input,
+                                SqlValue = Rol
+                            };
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@ClienteId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (ClienteId != null)
+                            {
+                                par.SqlValue = ClienteId;
+                            }
+                            else
+                            {
+                                par.SqlValue = DBNull.Value;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
                                 {
-                                    Correo = DataR.GetString(2),
-                                    FechaRespuesta = DataR.GetDateTime(4),
-                                    NombreCliente = DataR.GetString(1),
-                                    Usuario = DataR.GetString(3),
-                                };
-                                Result.Add(data);
+                                    ViewResultList data = new ViewResultList
+                                    {
+                                        Correo = DataR.GetString(2),
+                                        FechaRespuesta = DataR.GetDateTime(4),
+                                        NombreCliente = DataR.GetString(1),
+                                        Usuario = DataR.GetString(3),
+                                    };
+                                    Result.Add(data);
+                                }
                             }
                         }
                     }
-                    con.Close();
                 }
             }
 
@@ -125,69 +126,64 @@ namespace Measure.Utilidades
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                using (DbConnection con = db.Database.Connection)
+                DbProviderFactory dbFactory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = dbFactory.CreateConnection())
                 {
-                    con.Open();
-                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(con);
-
-                    using (DbCommand cmd = dbFactory.CreateCommand())
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
                     {
-                        cmd.Connection = con;
-                        cmd.CommandText = "[DBO].[ENCUESTADETALLEUSUARIO]";
-                        cmd.CommandType = CommandType.StoredProcedure;
-
-                        SqlParameter par = new SqlParameter
+                        using (DbCommand cmd = dbFactory.CreateCommand())
                         {
-                            ParameterName = "@IdAsignacion",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = EncuestaId,
-                            Direction = ParameterDirection.Input
-                        };
-                        cmd.Parameters.Add(par);
+                            cmd.Connection = con;
+                            cmd.CommandText = "[DBO].[ENCUESTADETALLEUSUARIO]";
+                            cmd.CommandType = CommandType.StoredProcedure;
 
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@UsuarioId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = UsuarioId,
-                            Direction = ParameterDirection.Input
-                        };
-                        cmd.Parameters.Add(par);
-
-                        //DataTable dt = new DataTable(); 
-                        //using (DbDataReader DataR = cmd.ExecuteReader())
-                        //{
-                        //    dt.Load(DataR);
-                        //}
-
-                        using (DbDataReader DataR = cmd.ExecuteReader())
-                        {
-                            while (DataR.Read())
+                            SqlParameter par = new SqlParameter
                             {
-                                ViewPoll data = new ViewPoll
-                                {
-                                    id = DataR.GetGuid(0),
-                                    ClienteId = DataR.GetGuid(1),
-                                    NombreCliente = DataR.GetString(2),
-                                    Nombre = DataR.GetString(3),
-                                    FechaCreacion = DataR.GetDateTime(4),
-                                    Estado = DataR.GetBoolean(6),
-                                    IdAsignacion = DataR.GetGuid(8),
-                                    TipoReporteGeneral = DataR.GetGuid(9),
-                                };
+                                ParameterName = "@IdAsignacion",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = EncuestaId,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
 
-                                if (!DataR.IsDBNull(5))
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@UsuarioId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = UsuarioId,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
                                 {
-                                    data.FechaRespuesta = DataR.GetDateTime(5);
-                                    data.Finalizada = DataR.GetBoolean(7);
+                                    ViewPoll data = new ViewPoll
+                                    {
+                                        id = DataR.GetGuid(0),
+                                        ClienteId = DataR.GetGuid(1),
+                                        NombreCliente = DataR.GetString(2),
+                                        Nombre = DataR.GetString(3),
+                                        FechaCreacion = DataR.GetDateTime(4),
+                                        Estado = DataR.GetBoolean(6),
+                                        IdAsignacion = DataR.GetGuid(8),
+                                        TipoReporteGeneral = DataR.GetGuid(9),
+                                    };
+
+                                    if (!DataR.IsDBNull(5))
+                                    {
+                                        data.FechaRespuesta = DataR.GetDateTime(5);
+                                        data.Finalizada = DataR.GetBoolean(7);
+                                    }
+
+                                    Result.Add(data);
                                 }
-
-                                Result.Add(data);
                             }
                         }
                     }
-                    con.Close();
                 }
             }
 
@@ -200,286 +196,367 @@ namespace Measure.Utilidades
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                using (DbConnection con = db.Database.Connection)
+                DbProviderFactory dbFactory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = dbFactory.CreateConnection())
                 {
-                    con.Open();
-                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(con);
-
-                    using (DbCommand cmd = dbFactory.CreateCommand())
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
                     {
-                        cmd.Connection = con;
-                        cmd.CommandText = "[dbo].[BuscarEncustados]";
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (DbCommand cmd = dbFactory.CreateCommand())
+                        {
+                            cmd.Connection = con;
+                            cmd.CommandText = "[dbo].[BuscarEncustados]";
+                            cmd.CommandType = CommandType.StoredProcedure;
 
-                        SqlParameter par = new SqlParameter
-                        {
-                            ParameterName = "@ClienteId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = Data.ClienteId,
-                            Direction = ParameterDirection.Input
-                        };
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@PaisId",
-                            SqlDbType = SqlDbType.Int,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (Data.PaisId != 0)
-                        {
-                            par.SqlValue = Data.PaisId;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@Idioma",
-                            SqlDbType = SqlDbType.Int,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (Data.Idioma != 0)
-                        {
-                            par.SqlValue = Data.Idioma;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@Correo",
-                            SqlDbType = SqlDbType.NVarChar,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (!string.IsNullOrEmpty(Data.Correo))
-                        {
-                            par.SqlValue = Data.Correo;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@Nombre",
-                            SqlDbType = SqlDbType.NVarChar,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (!string.IsNullOrEmpty(Data.Nombre))
-                        {
-                            par.SqlValue = Data.Nombre;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        using (DbDataReader DataR = cmd.ExecuteReader())
-                        {
-                            while (DataR.Read())
+                            SqlParameter par = new SqlParameter
                             {
-                                ViewUser data = new ViewUser
+                                ParameterName = "@ClienteId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (Data.ClienteId != Guid.Empty)
+                            {
+                                par.SqlValue = Data.ClienteId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@AliadoId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (Data.AliadoId != Guid.Empty)
+                            {
+                                par.SqlValue = Data.AliadoId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@PaisId",
+                                SqlDbType = SqlDbType.Int,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (Data.PaisId != 0)
+                            {
+                                par.SqlValue = Data.PaisId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@Idioma",
+                                SqlDbType = SqlDbType.Int,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (Data.Idioma != 0)
+                            {
+                                par.SqlValue = Data.Idioma;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@Correo",
+                                SqlDbType = SqlDbType.NVarChar,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (!string.IsNullOrEmpty(Data.Correo))
+                            {
+                                par.SqlValue = Data.Correo;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@Nombre",
+                                SqlDbType = SqlDbType.NVarChar,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (!string.IsNullOrEmpty(Data.Nombre))
+                            {
+                                par.SqlValue = Data.Nombre;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
                                 {
-                                    Id = DataR.GetGuid(0),
-                                    Correo = DataR.GetString(1),
-                                    Clave = DataR.GetString(2),
-                                    RolId = DataR.GetInt32(3),
-                                    Cliente = DataR.GetValue(5).ToString(),
-                                    Color = DataR.GetValue(8).ToString(),
-                                    Idioma = DataR.GetInt32(9),
-                                    NombreIdioma = DataR.GetString(10),
-                                    Nombres = DataR.GetString(11),
-                                    Apellidos = DataR.GetValue(12).ToString(),
-                                    Telefono = DataR.GetValue(13).ToString(),
-                                    Titulo = DataR.GetValue(14).ToString(),
-                                    CorreoTrabajo = DataR.GetValue(15).ToString(),
-                                    Empresa = DataR.GetValue(16).ToString(),
-                                    Subsidiario = DataR.GetValue(19).ToString(),
-                                    Pais = DataR.GetValue(21).ToString(),
-                                    DireccionTrabajo = DataR.GetValue(22).ToString(),
-                                    Estado = DataR.GetBoolean(23),
-                                };
-                                if (DataR.GetValue(4).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.ClienteId = DataR.GetGuid(4);
+                                    ViewUser data = new ViewUser
+                                    {
+                                        Id = DataR.GetGuid(0),
+                                        Correo = DataR.GetString(1),
+                                        Clave = DataR.GetString(2),
+                                        RolId = DataR.GetInt32(3),
+                                        Cliente = DataR.GetValue(5).ToString(),
+                                        Color = DataR.GetValue(8).ToString(),
+                                        Idioma = DataR.GetInt32(9),
+                                        NombreIdioma = DataR.GetString(10),
+                                        Nombres = DataR.GetString(11),
+                                        Apellidos = DataR.GetValue(12).ToString(),
+                                        Telefono = DataR.GetValue(13).ToString(),
+                                        Titulo = DataR.GetValue(14).ToString(),
+                                        CorreoTrabajo = DataR.GetValue(15).ToString(),
+                                        Empresa = DataR.GetValue(16).ToString(),
+                                        Subsidiario = DataR.GetValue(19).ToString(),
+                                        Pais = DataR.GetValue(21).ToString(),
+                                        DireccionTrabajo = DataR.GetValue(22).ToString(),
+                                        Estado = DataR.GetBoolean(23),
+                                    };
+                                    if (DataR.GetValue(4).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.ClienteId = DataR.GetGuid(4);
+                                    }
+                                    if (DataR.GetValue(6).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.AliadoId = DataR.GetGuid(6);
+                                    }
+                                    if (DataR.GetValue(7).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.ByteIMage = (byte[])DataR.GetValue(7);
+                                    }
+                                    if (DataR.GetValue(17).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.CEmpleadosId = DataR.GetInt32(17);
+                                    }
+                                    if (DataR.GetValue(18).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.IndustriaId = DataR.GetInt32(18);
+                                    }
+                                    if (DataR.GetValue(20).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.PaisId = DataR.GetInt32(20);
+                                    }
+                                    Result.Add(data);
                                 }
-                                if (DataR.GetValue(6).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.AliadoId = DataR.GetGuid(6);
-                                }
-                                if (DataR.GetValue(7).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.ByteIMage = (byte[])DataR.GetValue(7);
-                                }
-                                if (DataR.GetValue(17).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.CEmpleadosId = DataR.GetInt32(17);
-                                }
-                                if (DataR.GetValue(18).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.IndustriaId = DataR.GetInt32(18);
-                                }
-                                if (DataR.GetValue(20).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.PaisId = DataR.GetInt32(20);
-                                }
-                                Result.Add(data);
                             }
                         }
                     }
-                    con.Close();
                 }
             }
 
             return Result;
         }
 
-        public List<ViewUser> UsuariosPorRol(int? Rol, Guid? ClienteId, Guid? AliadoId, int? Idioma, Guid? EncuestaId)
+        public List<ViewUser> UsuariosPorRol(int? Rol, Guid? EncuestaId, Guid? ClienteId, Guid? AliadoId, int Idioma)
         {
             List<ViewUser> Result = new List<ViewUser>();
 
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                using (DbConnection con = db.Database.Connection)
+                DbProviderFactory dbFactory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = dbFactory.CreateConnection())
                 {
-                    con.Open();
-                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(con);
-
-                    using (DbCommand cmd = dbFactory.CreateCommand())
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
                     {
-                        cmd.Connection = con;
-                        cmd.CommandText = "[dbo].[USUARIOSPORROL]";
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (DbCommand cmd = dbFactory.CreateCommand())
+                        {
+                            cmd.Connection = con;
+                            cmd.CommandText = "[dbo].[USUARIOSPORROL]";
+                            cmd.CommandType = CommandType.StoredProcedure;
 
-                        SqlParameter par = new SqlParameter
-                        {
-                            ParameterName = "@Rol",
-                            SqlDbType = SqlDbType.Int,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (Rol != null)
-                        {
-                            par.SqlValue = Rol;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@EncuestaId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (EncuestaId != null)
-                        {
-                            par.SqlValue = EncuestaId;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@ClienteId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (ClienteId != null)
-                        {
-                            par.SqlValue = ClienteId;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@AliadoId",
-                            SqlDbType = SqlDbType.UniqueIdentifier,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (AliadoId != null)
-                        {
-                            par.SqlValue = AliadoId;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        par = null;
-                        par = new SqlParameter
-                        {
-                            ParameterName = "@Idioma",
-                            SqlDbType = SqlDbType.Int,
-                            SqlValue = DBNull.Value,
-                            Direction = ParameterDirection.Input
-                        };
-                        if (Idioma != null)
-                        {
-                            par.SqlValue = Idioma;
-                        }
-                        cmd.Parameters.Add(par);
-
-                        using (DbDataReader DataR = cmd.ExecuteReader())
-                        {
-                            while (DataR.Read())
+                            SqlParameter par = new SqlParameter
                             {
-                                ViewUser data = new ViewUser
+                                ParameterName = "@Rol",
+                                SqlDbType = SqlDbType.Int,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (Rol != null)
+                            {
+                                par.SqlValue = Rol;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@EncuestaId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (EncuestaId != null)
+                            {
+                                par.SqlValue = EncuestaId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@ClienteId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (ClienteId != null)
+                            {
+                                par.SqlValue = ClienteId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@AliadoId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (AliadoId != null)
+                            {
+                                par.SqlValue = AliadoId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@Idioma",
+                                SqlDbType = SqlDbType.Int,
+                                SqlValue = Idioma,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
                                 {
-                                    Id = DataR.GetGuid(0),
-                                    Correo = DataR.GetString(1),
-                                    Clave = DataR.GetString(2),
-                                    RolId = DataR.GetInt32(3),
-                                    Cliente = DataR.GetValue(5).ToString(),
-                                    Color = DataR.GetValue(8).ToString(),
-                                    Idioma = DataR.GetInt32(9),
-                                    NombreIdioma = DataR.GetString(10),
-                                    Nombres = DataR.GetString(11),
-                                    Apellidos = DataR.GetValue(12).ToString(),
-                                    Telefono = DataR.GetValue(13).ToString(),
-                                    Titulo = DataR.GetValue(14).ToString(),
-                                    CorreoTrabajo = DataR.GetValue(15).ToString(),
-                                    Empresa = DataR.GetValue(16).ToString(),
-                                    Subsidiario = DataR.GetValue(19).ToString(),
-                                    Pais = DataR.GetValue(21).ToString(),
-                                    DireccionTrabajo = DataR.GetValue(22).ToString(),
-                                    Estado = DataR.GetBoolean(23),
-                                };
-                                if (DataR.GetValue(4).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.ClienteId = DataR.GetGuid(4);
+                                    ViewUser data = new ViewUser
+                                    {
+                                        Id = DataR.GetGuid(0),
+                                        Correo = DataR.GetString(1),
+                                        Clave = DataR.GetString(2),
+                                        RolId = DataR.GetInt32(3),
+                                        Cliente = DataR.GetValue(5).ToString(),
+                                        Color = DataR.GetValue(8).ToString(),
+                                        Idioma = DataR.GetInt32(9),
+                                        NombreIdioma = DataR.GetString(10),
+                                        Nombres = DataR.GetString(11),
+                                        Apellidos = DataR.GetValue(12).ToString(),
+                                        Telefono = DataR.GetValue(13).ToString(),
+                                        Titulo = DataR.GetValue(14).ToString(),
+                                        CorreoTrabajo = DataR.GetValue(15).ToString(),
+                                        Empresa = DataR.GetValue(16).ToString(),
+                                        Subsidiario = DataR.GetValue(19).ToString(),
+                                        Pais = DataR.GetValue(21).ToString(),
+                                        DireccionTrabajo = DataR.GetValue(22).ToString(),
+                                        Estado = DataR.GetBoolean(23),
+                                    };
+                                    if (DataR.GetValue(4).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.ClienteId = DataR.GetGuid(4);
+                                    }
+                                    if (DataR.GetValue(6).GetType().ToString() != "System.DBNull")
+                                    {
+                                        AliadoId = DataR.GetGuid(6);
+                                    }
+                                    if (DataR.GetValue(7).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.ByteIMage = (byte[])DataR.GetValue(7);
+                                    }
+                                    if (DataR.GetValue(17).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.CEmpleadosId = DataR.GetInt32(17);
+                                    }
+                                    if (DataR.GetValue(18).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.IndustriaId = DataR.GetInt32(18);
+                                    }
+                                    if (DataR.GetValue(20).GetType().ToString() != "System.DBNull")
+                                    {
+                                        data.PaisId = DataR.GetInt32(20);
+                                    }
+                                    if (EncuestaId != null)
+                                    {
+                                        data.IdAsignacion = DataR.GetGuid(24);
+                                    }
+                                    Result.Add(data);
                                 }
-                                if (DataR.GetValue(6).GetType().ToString() != "System.DBNull")
-                                {
-                                    AliadoId = DataR.GetGuid(6);
-                                }
-                                if (DataR.GetValue(7).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.ByteIMage = (byte[])DataR.GetValue(7);
-                                }
-                                if (DataR.GetValue(17).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.CEmpleadosId = DataR.GetInt32(17);
-                                }
-                                if (DataR.GetValue(18).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.IndustriaId = DataR.GetInt32(18);
-                                }
-                                if (DataR.GetValue(20).GetType().ToString() != "System.DBNull")
-                                {
-                                    data.PaisId = DataR.GetInt32(20);
-                                }
-                                if (EncuestaId != null)
-                                {
-                                    data.IdAsignacion = DataR.GetGuid(24);
-                                }
-                                Result.Add(data);
                             }
                         }
                     }
-                    con.Close();
+                }
+            }
+
+            return Result;
+        }
+
+        public List<ViewResultAnalitic> RespuestaEncuesta(Guid EncuestaId, Guid? AliadoId)
+        {
+            List<ViewResultAnalitic> Result = new List<ViewResultAnalitic>();
+
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                DbProviderFactory dbFactory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = dbFactory.CreateConnection())
+                {
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
+                    {
+                        using (DbCommand cmd = dbFactory.CreateCommand())
+                        {
+                            cmd.Connection = con;
+                            cmd.CommandText = "[DBO].[ContentAnalitic]";
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter par = new SqlParameter
+                            {
+                                ParameterName = "@EncuestaId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = EncuestaId,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@AliadoId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (AliadoId != null)
+                            {
+                                par.Value = AliadoId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
+                                {
+                                    ViewResultAnalitic data = new ViewResultAnalitic
+                                    {
+                                        IdAsignacion = DataR.GetGuid(0),
+                                        Correo = DataR.GetString(1),
+                                        OrdenGrupo = DataR.GetInt32(2),
+                                        Grupo = DataR.GetString(3),
+                                        OrdenPregunta = DataR.GetInt32(4),
+                                        Pregunta = DataR.GetString(5),
+                                        Respuesta = DataR.GetInt32(6)
+                                    };
+                                    Result.Add(data);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

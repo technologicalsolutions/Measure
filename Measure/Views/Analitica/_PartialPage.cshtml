@@ -1,0 +1,66 @@
+﻿
+@model List<Measure.ViewModels.Analitic.ViewAnalitic>
+
+<table class="table table-striped" style="width:100%" id="TblLista">
+    <thead>
+        <tr>
+            <th>Dimensiones</th>
+            <th>Variable 1</th>
+            <th>Variable 2</th>
+            <th>Valor Maximo</th>
+            <th>Valor Minimo</th>
+            <th>Titulo Grafico</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (item.Dimensiones)
+                    {
+                        <label>Todas</label>
+                    }
+                    else
+                    {
+                        <label>@item.GrupoName</label>
+                    }
+                </td>
+                <td>@item.Variable1</td>
+                <td>@item.Variable2</td>
+                <td>@item.ValorMaximo</td>
+                <td>@item.ValorMinimo</td>
+                <td>@item.TituloGrafico</td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <label>Activo</label>
+                    }
+                    else
+                    {
+                        <label>InActivo</label>
+                    }
+                </td>
+                <td>
+                    <div class="row">
+                        <div class="col-12 col-lg-4">
+                            @using (Html.BeginForm("CreateOrEdit", "Analitica", FormMethod.Post))
+                            {
+                                <input type="hidden" name="Id" value="@item.Id" />
+                                <button class="btn btn-secondary btn-sm rounded-pill py-0 editLink" type="submit">Editar</button>
+                            }
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <a class="btn btn-info btn-sm rounded-pill py-0 editLink" onclick="Detalles('@item.Id')">Detalles</a>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <a class="btn btn-danger btn-sm rounded-pill py-0 editLink" onclick="Eliminar('@item.Id','@item.TituloGrafico')">Eliminar</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

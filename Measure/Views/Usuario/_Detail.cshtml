@@ -1,15 +1,7 @@
 ﻿@model Measure.ViewModels.Usuario.ViewUsuario
 
 <div>
-    <dl class="dl-horizontal">
-        <dt>
-            <strong>@Html.DisplayNameFor(model => model.Modelo.Pais)</strong>
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Modelo.Pais)
-        </dd>
-
+    <dl class="dl-horizontal">       
         <dt>
             <strong> @Html.DisplayNameFor(model => model.Modelo.Nombres)</strong>
         </dt>
@@ -17,23 +9,40 @@
         <dd>
             @Html.DisplayFor(model => model.Modelo.Nombres)
         </dd>
+        @if (Model.Modelo.RolId == (int)Measure.Enums.UserRol.Encuestado)
+        {
+            <dt>
+                <strong>@Html.DisplayNameFor(model => model.Modelo.Apellidos)</strong>
+            </dt>
 
-        <dt>
-            <strong>@Html.DisplayNameFor(model => model.Modelo.Apellidos)</strong>
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Modelo.Apellidos)
-        </dd>
-
-        <dt>
-            <strong>@Html.DisplayNameFor(model => model.Modelo.Telefono)</strong>
-        </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Modelo.Apellidos)
+            </dd>
+        }
+        @if (Model.Modelo.RolId == (int)Measure.Enums.UserRol.Encuestado)
+        {
+            <dt>
+                <strong>@Html.DisplayNameFor(model => model.Modelo.Telefono)</strong>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Modelo.Telefono)
+            </dd>
+        }
 
         @if (!string.IsNullOrEmpty(Model.Modelo.Imagen))
         {
             <dd>
                 <img src="@Model.Modelo.Imagen" class="img-thumbnail" width="50" height="50" />
+            </dd>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Modelo.PaisId.ToString()))
+        {
+            <dt>
+                <strong>@Html.DisplayNameFor(model => model.Modelo.Pais)</strong>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Modelo.Pais)
             </dd>
         }
 
@@ -49,7 +58,7 @@
             else
             {
                 @Measure.Recursos.Recurso.EstadoInactivo
-            }            
+            }
         </dd>
 
     </dl>

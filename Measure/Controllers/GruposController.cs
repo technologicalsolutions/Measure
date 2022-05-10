@@ -219,5 +219,22 @@ namespace Measure.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public JsonResult GrupoPorEncuesta(Guid EncuestaId, int Idioma)
+        {
+            List<SelectListItem> Result = new List<SelectListItem>();
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                List<Guid> temp = db.ContenidoPorEncuesta.Where(c => c.EncuestaId == EncuestaId && c.TipoComponente == (int)Enums.TipoComponente.CategoriaEncuesta).Select(s => s.ComponenteId).ToList();
+                Result = db.Grupo.Where(g => temp.Contains(g.Id)).Select(s => new SelectListItem
+                {
+                    Text = Idioma == (int)Enums.Idiomas.es_ES ? s.es_Es : Idioma == (int)Enums.Idiomas.en_US ? s.en_US : s.pt_BR,
+                    Value = s.Id.ToString()
+                }).ToList();
+            }
+
+            return new JsonResult { Data = Result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
     }
 }

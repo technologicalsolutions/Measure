@@ -149,18 +149,35 @@ function seleccionarTodo(idTabla, idCheck) {
     }
 }
 
-function DeseleccionarFila(Obj, item) {
+function DeseleccionarFila(Obj, Item, Analitic) {
     if (Obj.checked) {
         $(Obj.parentElement.parentElement).addClass("selected")
-        if (item == undefined) {
+        if (Item == undefined) {
             Obj.parentElement.lastElementChild.value = true;
         }
     } else {
         if (Obj.parentElement.parentElement.className.includes("selected")) {
             $(Obj.parentElement.parentElement).removeClass("selected");
-            if (item == undefined) {
+            if (Item == undefined) {
                 Obj.parentElement.lastElementChild.value = false;
             }
+        }
+        if (Analitic != undefined) {
+            var index = Roles.findIndex(f => f.Id == Item);
+            if (index > -1) {
+                Roles.splice(index, 1);
+            }
+            index = Sucursales.findIndex(f => f.Id == Item);
+            if (index > -1) {
+                Sucursales.splice(index, 1);
+            }
+            index = Gerencias.findIndex(f => f.Id == Item);
+            if (index > -1) {
+                Gerencias.splice(index, 1);
+            }
+            Obj.parentElement.parentElement.cells[5].firstElementChild.firstElementChild.value = '';
+            Obj.parentElement.parentElement.cells[6].firstElementChild.firstElementChild.value = '';
+            Obj.parentElement.parentElement.cells[7].firstElementChild.firstElementChild.value = '';
         }
     }
 }

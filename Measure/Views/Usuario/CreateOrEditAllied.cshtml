@@ -1,7 +1,7 @@
 ﻿@model Measure.ViewModels.Usuario.ViewUsuario
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = ViewBag.Accion + " Encuestado";
+    ViewBag.Title = ViewBag.Accion + " Aliado";
 }
 @section style{
     @Styles.Render("~/Content/select2")
@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    @using (Html.BeginRouteForm("AccionesUsuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "FrmUser" }))
+    @using (Html.BeginRouteForm("AccionesAliado", FormMethod.Post, new { enctype = "multipart/form-data", id = "FrmUser" }))
     {
         <div class="row mt-2">
             @Html.AntiForgeryToken()
@@ -53,28 +53,10 @@
                         </div>
                     </div>
                 </div>
-            }
-            else if (Model.FindUser.RolId == (int)Measure.Enums.UserRol.Cliente)
-            {
-                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
-                <div class="col-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" name="Modelo.AliadoId" id="Modelo_ClienteId" required>
-                                @foreach (var item in Model.Aliados)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            }
+            }            
             else
             {
-                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
-                @Html.HiddenFor(modelo => modelo.Modelo.AliadoId);
+                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);                
             }
             <div class="col-12 col-md-6 mt-2">
                 <div class="form-group">
@@ -233,7 +215,7 @@
         function AsignarValor(obj) {
             document.getElementById(obj.name).value = obj.value;
         }
-       
+
         function BackForm() {
             $("#FrmBack").submit();
         }

@@ -1,10 +1,13 @@
 ﻿using Measure.Models;
+using Measure.Utilidades;
+using Measure.ViewModels.Analitic;
 using Measure.ViewModels.Dashboard;
 using Measure.ViewModels.Usuario;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Measure.Controllers
@@ -355,32 +358,43 @@ namespace Measure.Controllers
         [HttpPost]
         public JsonResult BasicTable(string Id)
         {
-            Encuesta _Encuesta = new Encuesta();
-            List<Usuario> Aliados = new List<Usuario>();
-            using (ModeloEncuesta db = new ModeloEncuesta())
-            {
-                Guid EncuestaId = new Guid(Id);
-                _Encuesta = db.Encuesta.Find(EncuestaId);
-                Aliados = db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Aliado && e.ClienteId == _Encuesta.ClienteId).ToList();
-            }
-
+            ViewLogin Login = HttpContext.Session["login"] as ViewLogin;
             List<ViewDashboardBasicQuantities> Result = new List<ViewDashboardBasicQuantities>();
-            foreach (Usuario Aliado in Aliados)
+            if (Login != null)
             {
-                List<UsuariosPorEncuenta> Respuestas = new List<UsuariosPorEncuenta>();
+                Encuesta _Encuesta = new Encuesta();
+                List<Usuario> Aliados = new List<Usuario>();
                 using (ModeloEncuesta db = new ModeloEncuesta())
                 {
-                    List<Guid> Encuestados = db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Encuestado && e.AliadoId == Aliado.Id).OrderBy(o => o.Nombres).Select(s => s.Id).ToList();
-                    Respuestas = db.UsuariosPorEncuenta.Where(u => Encuestados.Contains(u.UsuarioId)).ToList();
+                    Guid EncuestaId = new Guid(Id);
+                    _Encuesta = db.Encuesta.Find(EncuestaId);
+                    if (Login.RolId != (int)Enums.UserRol.Aliado)
+                    {
+                        Aliados = db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Aliado && e.ClienteId == _Encuesta.ClienteId).ToList();
+                    }
+                    else
+                    {
+                        Aliados = db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Aliado && e.ClienteId == _Encuesta.ClienteId && e.Id == Login.Id).ToList();
+                    }                    
                 }
-
-                Result.Add(new ViewDashboardBasicQuantities
+               
+                foreach (Usuario Aliado in Aliados)
                 {
-                    Aliado = Aliado,
-                    Total = Respuestas.Count(),
-                    Completados = Respuestas.Count(r => r.Resuelta),
-                    SinCompletar = Respuestas.Count(r => !r.Resuelta)
-                });
+                    List<UsuariosPorEncuenta> Respuestas = new List<UsuariosPorEncuenta>();
+                    using (ModeloEncuesta db = new ModeloEncuesta())
+                    {
+                        List<Guid> Encuestados = db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Encuestado && e.AliadoId == Aliado.Id).OrderBy(o => o.Nombres).Select(s => s.Id).ToList();
+                        Respuestas = db.UsuariosPorEncuenta.Where(u => Encuestados.Contains(u.UsuarioId)).ToList();
+                    }
+
+                    Result.Add(new ViewDashboardBasicQuantities
+                    {
+                        Aliado = Aliado,
+                        Total = Respuestas.Count(),
+                        Completados = Respuestas.Count(r => r.Resuelta),
+                        SinCompletar = Respuestas.Count(r => !r.Resuelta)
+                    });
+                }
             }
 
             return new JsonResult { Data = Result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
@@ -421,10 +435,11 @@ namespace Measure.Controllers
             {
                 Aliados = new List<SelectListItem>(),
                 Clientes = new List<SelectListItem>(),
+                Paises = new List<SelectListItem>(),
                 PartialIndex = new ViewResponsePartial
                 {                    
                     Encuestados = new List<ViewResponsePollUser>()
-                }
+                }                
             };
 
             if (Login == null)
@@ -435,9 +450,22 @@ namespace Measure.Controllers
             {
                 Model.PartialIndex.Idioma = Login.Idioma;
                 Model.User = new Usuario { RolId = Login.RolId};
-                if (string.IsNullOrEmpty(Id))
+
+                List<MaestrasDetalle> Paises = new List<MaestrasDetalle>();
+                using (ModeloEncuesta db = new ModeloEncuesta())
+                {
+                    Paises = db.Maestras.FirstOrDefault(m => m.es_ES.Equals("Pais")).MaestrasDetalle.Where(d => d.Estado).ToList();
+                }
+                Model.Paises = Paises.Select(s => new SelectListItem
+                {
+                    Text = Login.Idioma == (int)Enums.Idiomas.es_ES ? s.es_ES : Login.Idioma == (int)Enums.Idiomas.en_US ? s.en_US : s.pt_BR,
+                    Value = s.Valor
+                }).OrderBy(o => o.Text).ToList();
+
+                if (Id == Guid.Empty.ToString())
                 {
                     Model.User = new Usuario { RolId = (int)Enums.UserRol.Administrador };
+                    Model.Encuestas = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
                     Model.Clientes = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
                     Model.Aliados = new List<SelectListItem> { new SelectListItem { Text = "Seleccione...", Value = "0" } };
 
@@ -465,6 +493,13 @@ namespace Measure.Controllers
                                 Text = s.Text,
                                 Value = s.Value
                             }).ToList();
+
+                            Model.Encuestas.AddRange(db.Encuesta.Where(e => e.ClienteId == ClientZero)
+                            .Select(s => new SelectListItem
+                            {
+                                Text = s.Nombre,
+                                Value = s.id.ToString()
+                            }).ToList());
 
                             Model.Aliados.AddRange(db.Usuario.Where(e => e.RolId == (int)Enums.UserRol.Aliado && e.ClienteId == ClientZero)
                             .Select(s => new SelectListItem
@@ -495,6 +530,13 @@ namespace Measure.Controllers
                                 Text = s.Nombres,
                                 Value = s.Id.ToString()
                             }).ToList());
+
+                            Model.Encuestas.AddRange(db.Encuesta.Where(e => e.ClienteId == ClienteId)
+                            .Select(s => new SelectListItem
+                            {
+                                Text = s.Nombre,
+                                Value = s.id.ToString()
+                            }).ToList());
                         }
 
                     }
@@ -502,7 +544,7 @@ namespace Measure.Controllers
                     {                        
                         using (ModeloEncuesta db = new ModeloEncuesta())
                         {
-                            Model.PartialIndex.Encuestados = ListarEncuestados(ClienteId);
+                            Model.PartialIndex.Encuestados = ListarEncuestados(ClienteId, null);
                         }
                     }
                 }
@@ -511,7 +553,35 @@ namespace Measure.Controllers
         }
 
         [HttpPost]
-        public PartialViewResult ListaDeEncuestados(string IdAliado)
+        [Route("GenerarAnalisis")]
+        public ActionResult GenerarAnalisis(string Data)
+        {
+            ViewDataAnalitic DatosBrutos = JsonConvert.DeserializeObject<ViewDataAnalitic>(Data);
+            int PaisCount = DatosBrutos.Encuestados.GroupBy(g => g.Pais).Distinct().Count();
+            int SucursalCount = DatosBrutos.Encuestados.GroupBy(g => g.Sucursal).Distinct().Count();
+            int GerenciaCount = DatosBrutos.Encuestados.GroupBy(g => g.Gerencia).Distinct().Count();
+            int RolCount = DatosBrutos.Encuestados.GroupBy(g => g.Rol).Distinct().Count();
+
+            string IdAsignaciones = string.Join("|", DatosBrutos.Encuestados.Select(s => s.Id.ToString()).ToList());
+            string DataJson = JsonConvert.SerializeObject(DatosBrutos.Encuestados);
+
+            ViewAnaliticBasic TempData = new ViewAnaliticBasic();
+            using (ClsAnalitics Analitica = new ClsAnalitics())
+            {
+                TempData.CuadroUno = Analitica.AnaliticSquareOne(DatosBrutos.EncuestaId, IdAsignaciones);
+                TempData.CuadroDos =  Analitica.AnaliticSquareTwo(DatosBrutos.EncuestaId, DataJson);
+                TempData.CuadroTres = Analitica.AnaliticSquareThree(DatosBrutos.EncuestaId, DataJson);
+                TempData.CuadroCuatro = Analitica.AnaliticSquareFourth(DatosBrutos.EncuestaId, DataJson);
+                TempData.CuadroCinco = Analitica.AnaliticSquareFive(DatosBrutos.EncuestaId, IdAsignaciones);
+                TempData.CuadroSeis = Analitica.AnaliticSquareSix(DatosBrutos.EncuestaId, DataJson);
+            }
+
+
+            return View();
+        }
+
+        [HttpPost]
+        public PartialViewResult ListaDeEncuestados(string IdAliado, string IdEncuesta)
         {
             ViewLogin Login = HttpContext.Session["login"] as ViewLogin;
 
@@ -521,24 +591,26 @@ namespace Measure.Controllers
                 Encuestados = new List<ViewResponsePollUser>()
             };
 
-            if (!string.IsNullOrEmpty(IdAliado) && !IdAliado.Equals("0"))
+            if (!string.IsNullOrEmpty(IdAliado) && !IdAliado.Equals("0") && !string.IsNullOrEmpty(IdEncuesta) && !IdEncuesta.Equals("0"))
             {
                 Guid AliadoId = new Guid(IdAliado);
-
-                Result.Encuestados = ListarEncuestados(AliadoId);
+                Guid EncuestaId = new Guid(IdEncuesta);
+                Result.Encuestados = ListarEncuestados(AliadoId, EncuestaId);
             }
 
             return PartialView("_ListaEncuestados", Result);
         }
 
-        private List<ViewResponsePollUser> ListarEncuestados(Guid AliadoId)
+        private List<ViewResponsePollUser> ListarEncuestados(Guid AliadoId, Guid? EncuestaId)
         {
             List<ViewResponsePollUser> Encuestados = new List<ViewResponsePollUser>();
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 Encuestados = (from s in db.Usuario
                                join a in db.UsuariosPorEncuenta on s.Id equals a.UsuarioId
-                               where s.AliadoId == AliadoId && a.Resuelta == true
+                               where s.AliadoId == AliadoId
+                               && ((EncuestaId == null) || (a.EncuestaId == EncuestaId))
+                               && a.Resuelta == true
                                select new ViewResponsePollUser
                                {
                                    Id = a.Id,

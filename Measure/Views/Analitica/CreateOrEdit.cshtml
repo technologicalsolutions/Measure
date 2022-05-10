@@ -1,0 +1,211 @@
+﻿@using Measure.ViewModels.Analitic
+@using Measure.ViewModels.Usuario
+
+@model ViewIndex
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+}
+@section style{    
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{    
+    @Scripts.Render("~/bundles/select2")    
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">@ViewBag.Title</h1>
+            </div>
+        </div>
+    </div>
+    @using (Html.BeginForm("Save", "Analitica", FormMethod.Post, new { @class = "row" }))
+    {
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Dimensiones</label>
+                <select class="form-select" data-init-plugin="select2" onchange="Todas()">
+                    <option value="0">Grupo</option>
+                    <option value="1">Todos los grupos</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 grupo">
+            <div class="form-group">
+                <label class="control-label">Encuesta</label>
+                <select class="form-select" data-init-plugin="select2" id="Encuestas" onchange="Selected(this.value)">
+                    @foreach (var item in Model.Encuestas)
+                    {
+                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 grupo">
+            <div class="form-group">
+                <label class="control-label">Grupos</label>
+                <select class="form-select" data-init-plugin="select2" id="Grupos" name="GrupoId">
+                    @foreach (var item in Model.Grupos)
+                    {
+                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Variable 1</label>
+                <input type="text" class="form-control" name="Variable1" value="@Model.Modelo.Variable1" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Variable 2</label>
+                <input type="text" class="form-control" name="Variable2" value="@Model.Modelo.Variable2" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Valor Minimo</label>
+                <input type="number" class="form-control" name="ValorMinimo" value="@Convert.ToInt64(Model.Modelo.ValorMinimo)" required />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Valor Maximo</label>
+                <input type="number" class="form-control" name="ValorMaximo" value="@Convert.ToInt64(Model.Modelo.ValorMaximo)" required />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Alcance</label>
+                <input type="text" class="form-control" name="Alcance" value="@Model.Modelo.Alcance" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Calificación Matematica</label>
+                <input type="text" class="form-control" name="CalificacionMatematica" value="@Model.Modelo.CalificacionMatematica" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Calificación Conceptual</label>
+                <input type="text" class="form-control" name="CalificacionConceptual" value="@Model.Modelo.CalificacionConceptual" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Madurez matematica</label>
+                <input type="text" class="form-control" name="MadurezMatematica" value="@Model.Modelo.MadurezMatematica" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Madurez Conceptual</label>
+                <input type="text" class="form-control" name="MadurezConceptual" value="@Model.Modelo.MadurezConceptual" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Descripción Riesgos</label>
+                <input type="text" class="form-control" name="DescripcionRiesgos" value="@Model.Modelo.DescripcionRiesgos" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Descripción Actividades a Emprender</label>
+                <input type="text" class="form-control" name="DescripcionActividadesEm" value="@Model.Modelo.DescripcionActividadesEm" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Descripción Actividades a Mantener</label>
+                <input type="text" class="form-control" name="DescripcionActividadesMa" value="@Model.Modelo.DescripcionActividadesMa" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">Titulo Grafico</label>
+                <input type="text" class="form-control" name="TituloGrafico" value="@Model.Modelo.TituloGrafico" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-group">
+                <label class="control-label">SubTitulo Grafico</label>
+                <input type="text" class="form-control" name="SubTituloGrafico" value="@Model.Modelo.SubTituloGrafico" />
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="form-check mt-3">
+                <input type="radio" value="1" name="Estado" class="form-check-input" @(Model.Modelo.Estado ? "checked": "")/>
+                <label class="form-check-label" for="Modelo_estado">
+                    @Measure.Recursos.Recurso.EstadoActivo
+                </label>
+            </div>
+            <div class="form-check">
+                <input type="radio" value="0" name="Estado" class="form-check-input" @(!Model.Modelo.Estado ? "checked": "") />
+                <label class="form-check-label" for="Modelo_estado">
+                    @Measure.Recursos.Recurso.EstadoInactivo
+                </label>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <input type="hidden" name="Id" value="@Model.Modelo.Id" />
+            <button class="btn btn-primary mt-4">Guardar</button>
+        </div>
+    }
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+        });
+
+        function Todas() {
+            $(".grupo").toggle();
+        }
+
+        function Selected(EncuestaId) {
+            if (EncuestaId != "0") {
+                var params = {
+                    'EncuestaId': Obj.value,
+                    'Idioma': @(login.Idioma),
+                };
+
+                $.ajax({
+                    data: params,
+                    url: '@Url.Action("GrupoPorEncuesta", "Grupos")',
+                    type: "POST",
+                    async: false,
+                    success: function (data) {
+                        $("#Grupos").html("");
+
+                        var Html = '<option>Seleccione...</option>';
+                        $.each(data, function (pos, item){
+                            Html += '<option value="' + item.Value+'" ';
+                            Html += '>' + item.Text+'</option>';
+                        });
+                        $("#Grupos").html(Html);
+
+                        $("#Grupos").select2("destroy");
+                        $("#Grupos").select2({
+                            "width": 'resolve',
+                            "theme": "bootstrap-5",
+                            "language": SelectedTranslate
+                        });
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    },
+                });
+            }
+        }
+    </script>
+}

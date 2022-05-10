@@ -1,0 +1,227 @@
+﻿@using Measure.ViewModels.Analitic
+@using Measure.ViewModels.Usuario
+
+@model ViewIndex
+@{
+    ViewBag.adminShow = "show";
+    ViewBag.AnaliticActive = "active";
+    ViewBag.Title = "Analitica";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewUser login = HttpContext.Current.Session["login"] as ViewUser;
+}
+@section style{
+    @Styles.Render("~/Content/tables")
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/tables")
+    @Scripts.Render("~/bundles/select2")
+    @Scripts.Render("~/bundles/unobtrusive")
+}
+<div class="container">
+    <div class="row">
+        <div class="d-flex align-items-center p-2 my-2 text-white rounded shadow-sm custom-backgroun-2">
+            <img class="me-2" src="@Url.Content("~/Content/images/Icono.png")" width="36">
+            <div class="lh-1">
+                <h1 class="h3 mb-0 text-white lh-1">Parametros Analitica</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="form-group">
+                <label class="control-label">Encuesta</label>
+                <select class="form-select" data-init-plugin="select2" name="Encuesta" onchange="Selected(this)">
+                    @foreach (var item in Model.Encuestas)
+                    {
+                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group">
+                <label class="control-label">Grupos</label>
+                <select class="form-select" data-init-plugin="select2" name="Grupo" onchange="Selected(this)">
+                    @foreach (var item in Model.Grupos)
+                    {
+                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        @using (Ajax.BeginForm("PartialPage", "Analitica", FormMethod.Post, new AjaxOptions
+        {
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = "ListUser",
+            LoadingElementId = "divLoading",
+            OnComplete = "LoadNewTable"
+        }, new { @class = "col-12 col-md-4 text-center" }))
+        {
+            <input type="hidden" name="GrupoId" id="Grupo" />
+            <input type="hidden" name="EncuestaId" id="Encuesta" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : "0")" />
+            <input type="hidden" name="Idioma" value="@login.Idioma" />
+            <button class="btn btn-primary mt-4" type="submit">Ver Parametros</button>
+        }
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-12 d-flex justify-content-between align-items-center">
+            <div>
+                @using (Html.BeginForm("CreateOrEdit", "Analitica", FormMethod.Post))
+                {
+                    <button class="btn btn-primary btn-sm rounded-pill py-0" type="submit"><i class="bi-plus-circle"></i> Crear Parametro</button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="table-responsive-lg" id="ListUser">
+                @Html.Partial("_PartialPage", Model.Parametros)
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Delete", "Analitica", FormMethod.Post, new { id = "AnaliticaDelete" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="DeleteAnalitica" value="" />
+}
+<div id="loader" style=" display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;
+    background: url( @Url.Content("~/Content/images/Loader.gif") ) center no-repeat, #fff; ">
+</div>
+@section ModalSection{
+    <div class="modal fade" tabindex="-1" id="AnaliticModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle Analitica</h5>
+                    <button type="button" class="btn-close" onclick="CloseModal('AnaliticModal')"></button>
+                </div>
+                <div class="modal-body" id="Detail"></div>
+            </div>
+        </div>
+    </div>
+}
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('select').select2({
+                "width": 'resolve',
+                "theme": "bootstrap-5",
+                "language": SelectedTranslate,
+            });
+
+            LoadNewTable();
+        });
+
+        function LoadNewTable() {
+            LoadDataTable("TblLista", false, true, null, 25, true);
+        }
+
+        function Selected(Obj) {
+            var Id = Obj.name;
+
+            if (Id == "Encuesta") {
+                if (Obj.value != "0") {
+                    var params = {
+                        'EncuestaId': Obj.value,
+                        'Idioma': @(login.Idioma),
+                    };
+
+                    $.ajax({
+                        data: params,
+                        url: '@Url.Action("GrupoPorEncuesta", "Grupos")',
+                        type: "POST",
+                        async: false,
+                        success: function (data) {
+                            $("#Grupos").html("");
+
+                            var Html = '<option>Seleccione...</option>';
+                            $.each(data, function (pos, item){
+                                Html += '<option value="' + item.Value+'" ';
+                                Html += '>' + item.Text+'</option>';
+                            });
+                            $("#Grupos").html(Html);
+
+                            $("#Grupos").select2("destroy");
+                            $("#Grupos").select2({
+                                "width": 'resolve',
+                                "theme": "bootstrap-5",
+                                "language": SelectedTranslate
+                            });
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        },
+                    });
+                }
+            }
+
+            $("#" + Id).val(Obj.value);
+        }
+
+        function Detalles(Id) {
+            $.ajax({
+                url: '@Url.Action("Detail", "Analitica")',
+                dataType: 'html',
+                method: 'Post',
+                data: { 'Id': Id , 'Idioma' : @(login.Idioma) },
+                success: function (result) {
+                    $("#Detail").html('').html(result);
+                    ShowModal("AnaliticModal");
+                },
+                error: function (Error) {
+                    console.log(Error);
+                }
+            });
+        }
+
+        function ToastError(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+
+        function divLoading() {
+            $("#loader").toggle();
+        }
+
+        function Eliminar(Id, Correo) {
+            Swal.fire({
+                title: '¿Estas seguro?',
+                text: "Desea eliminar el parametro de analisis de titulo " + Correo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'No',
+                confirmButtonText: 'Sí, bórralo'
+            }).then((result) => {
+                if (result.value) {
+                    $("#DeleteAnalitica").val(Id);
+                    Swal.fire(
+                        'Exito!',
+                        'Tu registro ha sido eliminado.',
+                        'success'
+                    )
+                    $("#AnaliticaDelete").submit();
+                }
+            });
+        }
+    </script>
+}

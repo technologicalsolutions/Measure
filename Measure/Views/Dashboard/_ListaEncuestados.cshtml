@@ -9,9 +9,9 @@
             <th>Nombres - Apellidos</th>
             <th>Fecha Respuesta</th>
             <th style="width: 15%;">Pais</th>
-            <th style="width: 10%;">Sucursal</th>
-            <th style="width: 10%;">Gerencia</th>
-            <th style="width: 10%;">Rol</th>
+            <th style="width: 15%;">Sucursal</th>
+            <th style="width: 15%;">Gerencia</th>
+            <th style="width: 15%;">Rol</th>
         </tr>
     </thead>
     <tbody>
@@ -27,33 +27,34 @@
             {
                 <tr>
                     <td class="text-center">
-                        <input type="checkbox" onchange="DeseleccionarFila(this,0)" />
+                        <input type="checkbox" class="chkValidate" data-id="@item.Id" onchange="DeseleccionarFila(this,'@item.Id',true)" />
                     </td>
-                    <td>@Html.DisplayFor(modelItem => item.Correo)</td>
+                    <td>
+                        <label id="Correo_@item.Id">@Html.DisplayFor(modelItem => item.Correo)</label></td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Nombres)  @Html.DisplayFor(modelItem => item.Apellidos)
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.FechaRespuesta)</td>
                     <td>
                         <div class="form-group">
-                            @Html.DropDownList("Pais", Model.Paises, htmlAttributes: new { @class = "form-select", data_init_plugin = "select2", required = "required" })
+                            @Html.DropDownList("Pais", Model.Paises, htmlAttributes: new { id = "Pais_" + item.Id, @class = "form-select", data_init_plugin = "select2", required = "required" })
                         </div>
                     </td>
                     <td>
                         <div class="input-container">
-                            <input type="text" class="inptext sucursal" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
+                            <input type="text" class="inptext sucursal" id="Sucursal_@item.Id" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
                             <span class="suggestion" id="sucursal_@item.Id"></span>
                         </div>
                     </td>
                     <td>
                         <div class="input-container">
-                            <input type="text" class="inptext gerencia" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
+                            <input type="text" class="inptext gerencia" id="Gerencia_@item.Id" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
                             <span class="suggestion" id="gerencia_@item.Id"></span>
                         </div>
                     </td>
                     <td>
                         <div class="input-container">
-                            <input type="text" class="inptext rol" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
+                            <input type="text" class="inptext rol" id="Rol_@item.Id" autocomplete="off" data-id="@item.Id" onblur="onBlur(this);" onkeyup="OnKeyUp(this);" />
                             <span class="suggestion" id="rol_@item.Id"></span>
                         </div>
                     </td>

@@ -39,10 +39,8 @@
                             @if (login.RolId == (int)UserRol.Administrador || login.RolId == (int)UserRol.Cliente)
                             {
                                 <li class="sidebar-item @ViewBag.AliadoActive">
-                                    @using (Html.BeginRouteForm("Usuarios", FormMethod.Get, new { id = "frmAlid" }))
-                                    {
-                                        <input type="hidden" name="ClienteId" value="@ClienteID" />
-                                        <input type="hidden" name="Rol" value="@((int)UserRol.Aliado)" />
+                                    @using (Html.BeginRouteForm("Aliados", FormMethod.Get, new { id = "frmAlid" }))
+                                    {                                        
                                         <a class="sidebar-link @ViewBag.AliadoActive" onclick="document.getElementById('frmAlid').submit();">
                                             <i class="align-middle me-2 fas fa-fw fa-hands-helping"></i>Aliados
                                         </a>
@@ -51,9 +49,7 @@
                             }
                             <li class="sidebar-item @ViewBag.EncuestadoActive">
                                 @using (Html.BeginRouteForm("Usuarios", FormMethod.Get, new { id = "frmEnc" }))
-                                {
-                                    <input type="hidden" name="ClienteId" value="@ClienteID" />
-                                    <input type="hidden" name="Rol" value="@((int)UserRol.Encuestado)" />
+                                {                                    
                                     <a class="sidebar-link" onclick="document.getElementById('frmEnc').submit();">
                                         <i class="align-middle me-2 fas fa-fw fa-user-graduate"></i>Encuestados
                                     </a>
@@ -164,10 +160,8 @@
                             </a>
                             <ul id="Administracion" class="sidebar-dropdown list-unstyled collapse @ViewBag.adminShow" data-bs-parent="#sidebar">
                                 <li class="sidebar-item @ViewBag.ClienteActive">
-                                    @using (Html.BeginRouteForm("Usuarios", FormMethod.Get, new { id = "frmCli" }))
+                                    @using (Html.BeginRouteForm("Clientes", FormMethod.Get, new { id = "frmCli" }))
                                     {
-                                        <input type="hidden" name="ClienteId" value="@ClienteID" />
-                                        <input type="hidden" name="Rol" value="@((int)UserRol.Cliente)" />
                                         <a class="sidebar-link" onclick="document.getElementById('frmCli').submit();">
                                             <i class="align-middle me-2 fas fa-fw fa-hands-helping"></i>Clientes
                                         </a>
@@ -186,6 +180,14 @@
                                     {
                                         <a class="sidebar-link" onclick="document.getElementById('FrmIdioma').submit();">
                                             <i class="align-middle me-2 fas fa-fw fa-language"></i>Idiomas
+                                        </a>
+                                    }
+                                </li>
+                                <li class="sidebar-item @ViewBag.AnaliticActive">
+                                    @using (Html.BeginRouteForm("Analitica", FormMethod.Post, new { id = "FrmAnalitica" }))
+                                    {
+                                        <a class="sidebar-link" onclick="document.getElementById('FrmAnalitica').submit();">
+                                            <i class="align-middle me-2 fas fa-fw fa-chart-pie"></i>Analitica
                                         </a>
                                     }
                                 </li>

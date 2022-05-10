@@ -13,6 +13,6 @@ namespace Measure.ViewModels.Usuario
         public List<SelectListItem> Idiomas { get; set; }
         public ViewUser Modelo { get; set; }
         public DbAcciones Accion { get; set; }
-        public int FindRolId { get; set; }
+        public ViewLogin FindUser { get; set; }
     }
 }

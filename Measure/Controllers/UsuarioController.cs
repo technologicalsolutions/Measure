@@ -18,70 +18,49 @@ namespace Measure.Controllers
 {
     public class UsuarioController : Controller
     {
-        public static int RolItem { get; set; }
-
         [Route("Usuarios")]
-        public ActionResult Index(int Rol, Guid? ClienteId)
+        public ActionResult Index()
         {
-            ViewLogin _Usuario = HttpContext.Session["login"] as ViewLogin;
-            if (_Usuario == null)
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
             {
                 return RedirectToAction("Index", "Login");
-            }
-            else
-            {
-                RolItem = Rol;
             }
 
             ViewUsuario Model = new ViewUsuario
             {
-                FindRolId = _Usuario.RolId,
                 Modelo = new ViewUser
                 {
-                    ClienteId = ClienteId,
-                    RolId = Rol
-                }
+                    RolId = (int)Enums.UserRol.Encuestado
+                },
+                Lista = new List<ViewUser>()
             };
 
-            Guid? AliadoId = null;
-            if (ClienteId != null && ClienteId != Guid.Empty)
+            if (login.RolId == (int)Enums.UserRol.Administrador)
             {
-                using (ModeloEncuesta db = new ModeloEncuesta())
+                using (ClsProcedures procedures = new ClsProcedures())
                 {
-                    Models.Usuario User = db.Usuario.Find(ClienteId);
-                    if (_Usuario.RolId == (int)Enums.UserRol.Aliado)
-                    {
-                        AliadoId = _Usuario.Id;
-                        ClienteId = User.ClienteId;
-                    }
+                    Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, null, null, null, login.Idioma);
+                }
+            }
+            else if (login.RolId == (int)Enums.UserRol.Cliente)
+            {
+                Model.Modelo.ClienteId = login.Id;
+                using (ClsProcedures procedures = new ClsProcedures())
+                {
+                    Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, null, login.Id, null, login.Idioma);
                 }
             }
             else
             {
-                ClienteId = _Usuario.Id;
+                Model.Modelo.ClienteId = login.ClienteId;
+                Model.Modelo.AliadoId = login.Id;
+                using (ClsProcedures procedures = new ClsProcedures())
+                {
+                    Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, null, login.ClienteId, login.Id, login.Idioma);
+                }
             }
 
-            using (ClsProcedures procedures = new ClsProcedures())
-            {                
-                Model.Lista = procedures.UsuariosPorRol(Rol, ClienteId, AliadoId, _Usuario.Idioma, null);
-            }
-
-            switch ((Enums.UserRol)Rol)
-            {
-                case Enums.UserRol.Cliente:
-                    ViewBag.adminShow = "show";
-                    ViewBag.ClienteActive = "active";
-                    break;
-                case Enums.UserRol.Aliado:
-                    ViewBag.userShow = "show";
-                    ViewBag.AliadoActive = "active";
-                    break;
-                case Enums.UserRol.Encuestado:
-                    ViewBag.userShow = "show";
-                    ViewBag.EncuestadoActive = "active";
-                    break;
-            }
-            ViewBag.BtnCreate = ((Enums.UserRol)Rol).ToString();
             return View(Model);
         }
 
@@ -89,16 +68,195 @@ namespace Measure.Controllers
         [Route("Usuario")]
         public ActionResult Usuario(ViewUsuario Data)
         {
-            if (HttpContext.Session["login"] == null)
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
             {
                 return RedirectToAction("Index", "Login");
             }
             else
             {
+                ViewBag.Accion = ((Enums.DbAcciones)Data.Accion).ToString();
+                Data.FindUser = login;
+                Data.Modelo.RolId = (int)Enums.UserRol.Encuestado;
                 Data = CreateData(Data);
                 ModelState.Clear();
             }
             return View("CreateOrEdit", Data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("AccionesUsuario")]
+        public ActionResult Acciones(ViewUsuario Data)
+        {
+            Tuple<bool, ViewUsuario> Load = LoadCreateOrEdit(Data);
+
+            if (!Load.Item1)
+            {
+                Data = CreateData(Data);
+                return View("CreateOrEdit", Data);
+            }
+            else
+            {
+                ViewCatchError Error = CreateOrEdit(Data);
+                if (Error.Error)
+                {
+                    return new JsonResult { Data = Error, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+            
+            return RedirectToRoute("Usuarios");
+        }
+
+        [Route("Aliados")]
+        public ActionResult Aliados()
+        {
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            ViewUsuario Model = new ViewUsuario
+            {
+                Modelo = new ViewUser
+                {
+                    RolId = (int)Enums.UserRol.Aliado
+                },
+                Lista = new List<ViewUser>()
+            };
+
+            if (login.RolId == (int)Enums.UserRol.Administrador)
+            {
+                using (ClsProcedures procedures = new ClsProcedures())
+                {
+                    Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Aliado, null, null, null, login.Idioma);
+                }
+            }
+            else if (login.RolId == (int)Enums.UserRol.Cliente)
+            {
+                Model.Modelo.ClienteId = login.Id;
+                using (ClsProcedures procedures = new ClsProcedures())
+                {
+                    Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Aliado, null, login.Id, null, login.Idioma);
+                }
+            }            
+
+            return View(Model);
+        }
+
+        [HttpPost]
+        [Route("Aliado")]
+        public ActionResult Aliado(ViewUsuario Data)
+        {
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            else
+            {
+                ViewBag.Accion = ((Enums.DbAcciones)Data.Accion).ToString();
+                Data.FindUser = login;
+                Data.Modelo.RolId = (int)Enums.UserRol.Aliado;
+                Data = CreateData(Data);
+                ModelState.Clear();
+            }
+            return View("CreateOrEditAllied", Data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("AccionesAliado")]
+        public ActionResult AccionesAliado(ViewUsuario Data)
+        {
+            Tuple<bool, ViewUsuario> Load = LoadCreateOrEdit(Data);
+
+            if (!Load.Item1)
+            {
+                Data = CreateData(Data);
+                return View("CreateOrEditAllied", Data);
+            }
+            else
+            {
+                ViewCatchError Error = CreateOrEdit(Data);
+                if (Error.Error)
+                {
+                    return new JsonResult { Data = Error, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+
+            return RedirectToRoute("Aliados");
+        }
+
+        [Route("Clientes")]
+        public ActionResult Clientes()
+        {
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            ViewUsuario Model = new ViewUsuario
+            {
+                Modelo = new ViewUser
+                {
+                    RolId = (int)Enums.UserRol.Cliente
+                },
+                Lista = new List<ViewUser>()
+            };
+
+            using (ClsProcedures procedures = new ClsProcedures())
+            {
+                Model.Lista = procedures.UsuariosPorRol((int)Enums.UserRol.Cliente, null, null, null, login.Idioma);
+            }
+
+            return View(Model);
+        }
+
+        [HttpPost]
+        [Route("Cliente")]
+        public ActionResult Cliente(ViewUsuario Data)
+        {
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            else
+            {
+                ViewBag.Accion = ((Enums.DbAcciones)Data.Accion).ToString();
+                Data.FindUser = login;
+                Data.Modelo.RolId = (int)Enums.UserRol.Cliente;
+                Data = CreateData(Data);
+                ModelState.Clear();
+            }
+            return View("CreateOrEditClient", Data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("AccionesCliente")]
+        public ActionResult AccionesCliente(ViewUsuario Data)
+        {
+            Tuple<bool, ViewUsuario> Load = LoadCreateOrEdit(Data);
+
+            if (!Load.Item1)
+            {
+                Data = CreateData(Data);
+                return View("CreateOrEditClient", Data);
+            }
+            else
+            {
+                ViewCatchError Error = CreateOrEdit(Data);
+                if (Error.Error)
+                {
+                    return new JsonResult { Data = Error, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+            }
+
+            return RedirectToRoute("Clientes");
         }
 
         private ViewUsuario CreateData(ViewUsuario Data)
@@ -106,10 +264,10 @@ namespace Measure.Controllers
             Enums.Idiomas BasePlataforma = (Enums.Idiomas)HttpContext.Session["BaseIdioma"];
 
             SelectListItem Seleccione = new SelectListItem { Text = "Seleccione...", Value = "0" };
-            Data.Clientes = new List<SelectListItem> { Seleccione };
-            Data.Aliados = new List<SelectListItem> { Seleccione };
             Data.Idiomas = new List<SelectListItem> { Seleccione };
             Data.Paises = new List<SelectListItem> { Seleccione };
+            Data.Clientes = new List<SelectListItem> { Seleccione };
+            Data.Aliados = new List<SelectListItem> { Seleccione };
 
             List<MaestrasDetalle> Lenguaje = new List<MaestrasDetalle>();
             List<MaestrasDetalle> Paises = new List<MaestrasDetalle>();
@@ -139,246 +297,110 @@ namespace Measure.Controllers
                 Value = s.Valor.ToString()
             }).ToList());
 
-            if (Data.Modelo.ClienteId == Guid.Empty || Data.Modelo.ClienteId == null)
+            if (Data.FindUser.RolId == (int)Enums.UserRol.Administrador)
             {
-                switch ((Enums.UserRol)Data.Modelo.RolId)
+                using (ModeloEncuesta db = new ModeloEncuesta())
                 {
-                    case Enums.UserRol.Aliado:
-                        using (ModeloEncuesta db = new ModeloEncuesta())
-                        {
-                            Data.Clientes.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente)
-                            .Select(s => new SelectListItem
-                            {
-                                Text = s.Nombres,
-                                Value = s.Id.ToString()
-                            }).ToList());
-                        }
-                        break;
-                    case Enums.UserRol.Encuestado:
-                        using (ModeloEncuesta db = new ModeloEncuesta())
-                        {
-                            Data.Clientes.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente)
-                            .Select(s => new SelectListItem
-                            {
-                                Text = s.Nombres,
-                                Value = s.Id.ToString()
-                            }).ToList());
+                    Data.Clientes.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente)
+                    .Select(s => new SelectListItem
+                    {
+                        Text = s.Nombres,
+                        Value = s.Id.ToString()
+                    }).ToList());
+                }
+            }
+            else if (Data.FindUser.RolId == (int)Enums.UserRol.Cliente)
+            {                
+                using (ModeloEncuesta db = new ModeloEncuesta())
+                {
+                    Data.Aliados.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Aliado && u.ClienteId == Data.FindUser.Id)
+                    .Select(s => new SelectListItem
+                    {
+                        Text = s.Nombres,
+                        Value = s.Id.ToString()
+                    }).ToList());
+                }
+            }            
 
-                            if (Data.Clientes.Count() > 1)
-                            {
-                                Guid CrClienteId = new Guid(Data.Clientes[1].Value);
-                                Data.Aliados.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Aliado && u.ClienteId == CrClienteId)
-                                .Select(s => new SelectListItem
-                                {
-                                    Text = s.Nombres,
-                                    Value = s.Id.ToString()
-                                }).ToList());
-                            }
-                        }
-                        break;
+            if (Data.Accion == Enums.DbAcciones.Actualiza)
+            {
+                string Correo = Data.Modelo.Correo;
+                using (ModeloEncuesta db = new ModeloEncuesta())
+                {
+                    Data.Modelo = ResultViewUser(db.Usuario.Where(u => u.Correo == Correo).FirstOrDefault());
                 }
 
-                if (Data.Accion == Enums.DbAcciones.Crea)
+                Data.Idiomas = Data.Idiomas.Select(s => new SelectListItem
                 {
-                    ViewBag.Title = "Crear";
-                }
-                else if (Data.Accion == Enums.DbAcciones.Actualiza)
-                {
-                    ViewBag.Title = "Editar";
-                    string Correo = Data.Modelo.Correo;
-                    using (ModeloEncuesta db = new ModeloEncuesta())
-                    {
-                        Data.Modelo = ResultViewUser(db.Usuario.Where(u => u.Correo == Correo).FirstOrDefault());
-                    }
+                    Selected = (s.Value == Data.Modelo.Idioma.ToString()),
+                    Text = s.Text,
+                    Value = s.Value
+                }).ToList();
 
-                    Data.Idiomas = Data.Idiomas.Select(s => new SelectListItem
+                if (Data.Modelo.PaisId != null)
+                {
+                    Data.Paises = Data.Paises.Select(s => new SelectListItem
                     {
-                        Selected = (s.Value == Data.Modelo.Idioma.ToString()),
+                        Selected = (s.Value == Data.Modelo.PaisId.ToString()),
                         Text = s.Text,
                         Value = s.Value
                     }).ToList();
-
-                    if (Data.Modelo.ClienteId != null)
-                    {
-                        Data.Clientes = Data.Clientes.Select(s => new SelectListItem
-                        {
-                            Selected = (s.Value == Data.Modelo.ClienteId.ToString()),
-                            Text = s.Text,
-                            Value = s.Value
-                        }).ToList();
-                    }
-
-                    if (Data.Modelo.AliadoId != null)
-                    {
-                        Data.Aliados = Data.Aliados.Select(s => new SelectListItem
-                        {
-                            Selected = (s.Value == Data.Modelo.AliadoId.ToString()),
-                            Text = s.Text,
-                            Value = s.Value
-                        }).ToList();
-                    }
-
-                    if (Data.Modelo.PaisId != null)
-                    {
-                        Data.Paises = Data.Paises.Select(s => new SelectListItem
-                        {
-                            Selected = (s.Value == Data.Modelo.PaisId.ToString()),
-                            Text = s.Text,
-                            Value = s.Value
-                        }).ToList();
-                    }
-
-                    switch ((Enums.UserRol)Data.Modelo.RolId)
-                    {
-                        case Enums.UserRol.Aliado:
-                            using (ModeloEncuesta db = new ModeloEncuesta())
-                            {
-                                Data.Clientes.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente)
-                                .Select(s => new SelectListItem
-                                {
-                                    Selected = (Data.Modelo.ClienteId == s.Id),
-                                    Text = s.Nombres,
-                                    Value = s.Id.ToString()
-                                }).ToList());
-                            }
-                            break;
-                        case Enums.UserRol.Encuestado:
-                            using (ModeloEncuesta db = new ModeloEncuesta())
-                            {
-                                Data.Clientes.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Cliente)
-                                .Select(s => new SelectListItem
-                                {
-                                    Selected = (Data.Modelo.ClienteId == s.Id),
-                                    Text = s.Nombres,
-                                    Value = s.Id.ToString()
-                                }).ToList());
-
-                                if (Data.Clientes.Count() > 1)
-                                {
-                                    Guid CrClienteId = new Guid(Data.Clientes[1].Value);
-                                    Data.Aliados.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Aliado && u.ClienteId == CrClienteId)
-                                    .Select(s => new SelectListItem
-                                    {
-                                        Selected = (Data.Modelo.AliadoId == s.Id),
-                                        Text = s.Nombres,
-                                        Value = s.Id.ToString()
-                                    }).ToList());
-                                }
-                            }
-                            break;
-                    }
                 }
-            }
-            else
-            {
-                if (Data.Accion == Enums.DbAcciones.Crea)
-                {
-                    ViewBag.Title = "Crear";
-                    switch ((Enums.UserRol)Data.Modelo.RolId)
-                    {
-                        case Enums.UserRol.Encuestado:
-                            using (ModeloEncuesta db = new ModeloEncuesta())
-                            {
-                                Guid CrClienteId = (Guid)Data.Modelo.ClienteId;
-                                Data.Aliados.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Aliado && u.ClienteId == CrClienteId)
-                                .Select(s => new SelectListItem
-                                {
-                                    Text = s.Nombres,
-                                    Value = s.Id.ToString()
-                                }).ToList());
-                            }
-                            break;
-                    }
-                }
-                else if (Data.Accion == Enums.DbAcciones.Actualiza)
-                {
-                    ViewBag.Title = "Editar";
-                    string Correo = Data.Modelo.Correo;
-                    using (ModeloEncuesta db = new ModeloEncuesta())
-                    {
-                        Data.Modelo = ResultViewUser(db.Usuario.Where(u => u.Correo == Correo).FirstOrDefault());
-                    }
 
-                    Data.Idiomas = Data.Idiomas.Select(s => new SelectListItem
+                if (Data.FindUser.RolId == (int)Enums.UserRol.Administrador)
+                {
+                    Data.Clientes = Data.Clientes.Select(s => new SelectListItem
                     {
-                        Selected = (s.Value == Data.Modelo.Idioma.ToString()),
+                        Selected = (Data.Modelo.ClienteId.ToString() == s.Value),
                         Text = s.Text,
                         Value = s.Value
                     }).ToList();
-
-                    if (Data.Modelo.PaisId != null)
+                }
+                else if (Data.FindUser.RolId == (int)Enums.UserRol.Administrador)
+                {
+                    Data.Aliados = Data.Aliados.Select(s => new SelectListItem
                     {
-                        Data.Paises = Data.Paises.Select(s => new SelectListItem
-                        {
-                            Selected = (s.Value == Data.Modelo.PaisId.ToString()),
-                            Text = s.Text,
-                            Value = s.Value
-                        }).ToList();
-                    }
-
-                    switch ((Enums.UserRol)Data.Modelo.RolId)
-                    {
-                        case Enums.UserRol.Encuestado:
-                            using (ModeloEncuesta db = new ModeloEncuesta())
-                            {
-                                Guid CrClienteId = (Guid)Data.Modelo.ClienteId;
-                                Data.Aliados.AddRange(db.Usuario.Where(u => u.RolId == (int)Enums.UserRol.Aliado && u.ClienteId == CrClienteId)
-                                .Select(s => new SelectListItem
-                                {
-                                    Selected = (Data.Modelo.AliadoId == s.Id),
-                                    Text = s.Nombres,
-                                    Value = s.Id.ToString()
-                                }).ToList());
-                            }
-                            break;
-                    }
+                        Selected = (Data.Modelo.AliadoId.ToString() == s.Value),
+                        Text = s.Text,
+                        Value = s.Value
+                    }).ToList();
                 }
             }
-
             return Data;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("UserAcciones")]
-        public ActionResult Acciones(ViewUsuario Data)
+        private Tuple<bool, ViewUsuario> LoadCreateOrEdit(ViewUsuario Data)
         {
-            ViewLogin _Usuario = HttpContext.Session["login"] as ViewLogin;
-            if (_Usuario == null)
+            ModelState.Clear();
+            bool validar = true;
+
+            if (string.IsNullOrEmpty(Data.Modelo.Clave))
             {
-                return RedirectToAction("Index", "Login");
+                ModelState.AddModelError("Modelo.Clave", "La clave no puede ir vacia.");
+                validar = false;
             }
 
-            using (ModeloEncuesta db = new ModeloEncuesta())
+            if (Data.Modelo.Idioma == 0)
             {
-                ModelState.Clear();
-                bool validar = true;
+                ModelState.AddModelError("Modelo.Idioma", "Debe seleccionar un idioma");
+                validar = false;
+            }
 
-                if (string.IsNullOrEmpty(Data.Modelo.Clave))
-                {
-                    ModelState.AddModelError("Modelo.Clave", "La clave no puede ir vacia.");
-                    validar = false;
-                }
+            if (string.IsNullOrEmpty(Data.Modelo.Nombres))
+            {
+                ModelState.AddModelError("Modelo.Nombres", "Debe de escribir un nombre");
+                validar = false;
+            }
 
-                if (Data.Modelo.Idioma == 0)
-                {
-                    ModelState.AddModelError("Modelo.Idioma", "Debe seleccionar un idioma");
-                    validar = false;
-                }
+            if (Data.Modelo.PaisId == 0)
+            {
+                ModelState.AddModelError("Modelo.PaisId", "Debe seleccionar un pais");
+                validar = false;
+            }
 
-                if (string.IsNullOrEmpty(Data.Modelo.Nombres))
-                {
-                    ModelState.AddModelError("Modelo.Nombres", "Debe de escribir un nombre");
-                    validar = false;
-                }
-
-                if (Data.Modelo.PaisId == 0)
-                {
-                    ModelState.AddModelError("Modelo.PaisId", "Debe seleccionar un pais");
-                    validar = false;
-                }
-
-                if (Data.Accion == Enums.DbAcciones.Crea)
+            if (Data.Accion == Enums.DbAcciones.Crea)
+            {
+                using (ModeloEncuesta db = new ModeloEncuesta())
                 {
                     if (db.Usuario.Count(u => u.Correo == Data.Modelo.Correo) > 0)
                     {
@@ -386,51 +408,58 @@ namespace Measure.Controllers
                         validar = false;
                     }
                 }
+            }
 
+            return new Tuple<bool, ViewUsuario>(validar, Data);
+        }
 
-                if (!validar)
+        private ViewCatchError CreateOrEdit(ViewUsuario Data)
+        {
+            ViewCatchError Error = new ViewCatchError();
+            try
+            {
+                Usuario User = ResultUser(Data.Modelo);
+                switch (Data.Accion)
                 {
-                    Data = CreateData(Data);
-                    return View("CreateOrEdit", Data);
-                }
-                try
-                {
-                    Usuario User = ResultUser(Data.Modelo);
-                    switch (Data.Accion)
-                    {
-                        case Enums.DbAcciones.Crea:
-                            using (ClsUtilities clsUtilities = new ClsUtilities())
-                            {
-                                string pass = clsUtilities.Cifrado(User.Clave, true);
-                                User.Clave = pass;
-                            }
+                    case Enums.DbAcciones.Crea:
+                        using (ClsUtilities clsUtilities = new ClsUtilities())
+                        {
+                            string pass = clsUtilities.Cifrado(User.Clave, true);
+                            User.Clave = pass;
+                        }
+                        using (ModeloEncuesta db = new ModeloEncuesta())
+                        {
                             db.Usuario.Add(User);
-                            break;
-                        case Enums.DbAcciones.Actualiza:
+                            db.SaveChanges();
+                        }
+                        break;
+                    case Enums.DbAcciones.Actualiza:
+                        using (ModeloEncuesta db = new ModeloEncuesta())
+                        {
                             Usuario _OldUser = db.Usuario.Where(u => u.Correo == User.Correo).FirstOrDefault();
                             Usuario OldUser = CompareUser(_OldUser, User);
                             db.Entry(OldUser).State = EntityState.Modified;
-                            break;
-                    }
-                    db.SaveChanges();
+                            db.SaveChanges();
+                        }
+                        break;
                 }
-                catch (DbEntityValidationException e)
-                {
-                    using (ClsUtilities ClaseUtil = new ClsUtilities())
-                    {
-                        ViewCatchError Error = ClaseUtil.CatchException(e);
-                        return new JsonResult { Data = Error, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-                    }
-                }
-                return RedirectToRoute("Usuarios", new { Rol = RolItem, ClienteId = _Usuario.ClienteId });
             }
+            catch (DbEntityValidationException e)
+            {
+                using (ClsUtilities ClaseUtil = new ClsUtilities())
+                {
+                    Error = ClaseUtil.CatchException(e);                    
+                }
+            }
+
+            return Error;
         }
 
         [HttpPost]
         public PartialViewResult Detail(ViewUsuario Data)
         {
             using (ModeloEncuesta db = new ModeloEncuesta())
-            {                
+            {
                 Usuario FindUser = db.Usuario.Find(Data.Modelo.Id);
                 Data.Modelo = ResultViewUser(FindUser);
             }
@@ -447,14 +476,28 @@ namespace Measure.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
+            int Rol = 0;
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 Guid IdUsuario = new Guid(Id);
                 Usuario usuario = db.Usuario.Find(IdUsuario);
+                Rol = usuario.RolId;
+
                 db.Usuario.Remove(usuario);
                 db.SaveChanges();
+            }
 
-                return RedirectToRoute("Usuarios", new { Rol = RolItem, ClienteId = _Usuario.ClienteId });
+            if (Rol == (int)Enums.UserRol.Cliente)
+            {
+                return RedirectToRoute("Clientes");
+            }
+            if (Rol == (int)Enums.UserRol.Aliado)
+            {
+                return RedirectToRoute("Aliados");
+            }
+            else
+            {
+                return RedirectToRoute("Usuarios");
             }
         }
 
@@ -593,7 +636,7 @@ namespace Measure.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            ViewPollAssign Model = DataFind(Usuario, id,new ViewFindUser());
+            ViewPollAssign Model = DataFind(Usuario, id, new ViewFindUser());
 
             ViewBag.Asignar = "Encuestados";
             ViewBag.Disable = "disabled";
@@ -629,7 +672,7 @@ namespace Measure.Controllers
                 else
                 {
                     Data.DataEncuesta = db.Encuesta.Find(Id);
-                }                
+                }
 
                 if (Usuario.RolId == (int)Enums.UserRol.Administrador)
                 {
@@ -683,7 +726,7 @@ namespace Measure.Controllers
                     Selected = (p.Value == Find.PaisId.ToString())
                 }).ToList();
             }
-                        
+
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 if (Usuario.RolId == (int)Enums.UserRol.Administrador)
@@ -708,19 +751,35 @@ namespace Measure.Controllers
         [Route("Busqueda")]
         public ActionResult Busqueda(ViewFindUser Find)
         {
-            ViewLogin Usuario = HttpContext.Session["login"] as ViewLogin;
-            if (Usuario == null)
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
+            if (login == null)
             {
                 return RedirectToAction("Index", "Login");
             }
 
-            ViewPollAssign Data = DataFind(Usuario, Guid.Empty, Find);
+            ViewPollAssign Data = DataFind(login, Guid.Empty, Find);
 
             using (ClsProcedures procedures = new ClsProcedures())
             {
-                Data.Usuarios = procedures.BuscarEncustados(Find);
+                if (login.RolId == (int)Enums.UserRol.Administrador)
+                {
+                    Find.ClienteId = Guid.Empty;
+                    Data.Usuarios = procedures.BuscarEncustados(Find);
+                }
+                else if (login.RolId == (int)Enums.UserRol.Cliente)
+                {
+                    Find.ClienteId = login.Id;
+                    Data.Usuarios = procedures.BuscarEncustados(Find);
+                }
+                else
+                {
+                    Find.ClienteId = (Guid)login.ClienteId;
+                    Find.AliadoId = (Guid)login.Id;
+                    Data.Usuarios = procedures.BuscarEncustados(Find);
+                }
             }
             ViewBag.Disable = string.Empty;
+            ViewBag.Asignar = "Encuestados";
 
             return View("BuscarUsuarios", Data);
         }
@@ -731,7 +790,7 @@ namespace Measure.Controllers
         {
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
-                List<SelectListItem> Result = db.Usuario.Where(u => u.ClienteId == ClienteId).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
+                List<SelectListItem> Result = db.Usuario.Where(u =>u.RolId == (int)Enums.UserRol.Aliado &&  u.ClienteId == ClienteId).Select(s => new SelectListItem { Text = s.Nombres, Value = s.Id.ToString() }).ToList();
                 return new JsonResult { Data = Result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
         }
@@ -782,22 +841,34 @@ namespace Measure.Controllers
         [Route("ListaUsuarios")]
         public JsonResult ListaUsuarios(string idEncuesta)
         {
+            ViewLogin login = HttpContext.Session["login"] as ViewLogin;
             List<ViewUser> Result = new List<ViewUser>();
-            Guid EncuestaId = new Guid(idEncuesta);
+            Guid EncuestaId = new Guid(idEncuesta);            
 
             using (ClsProcedures procedures = new ClsProcedures())
             {
-                Result = procedures.UsuariosPorRol(null, null, null, null, EncuestaId);
+                if (login.RolId == (int)Enums.UserRol.Administrador)
+                {
+                    Result = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, EncuestaId, null, null, login.Idioma);
+                }
+                else if (login.RolId == (int)Enums.UserRol.Cliente)
+                {                    
+                    Result = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, EncuestaId, login.Id, null, login.Idioma);
+                }
+                else
+                {                    
+                    Result = procedures.UsuariosPorRol((int)Enums.UserRol.Encuestado, EncuestaId, login.ClienteId, login.Id, login.Idioma);
+                }                
             }
 
             return new JsonResult { Data = Result, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
-        
+
         [Route("ActualizarUsuario")]
         public ActionResult UpdateUser()
         {
             ViewUpdateUserIndex Model = new ViewUpdateUserIndex
-            {                
+            {
                 Modelo = new UsuarioLabel()
             };
             using (ModeloEncuesta db = new ModeloEncuesta())
@@ -818,6 +889,6 @@ namespace Measure.Controllers
             }
             return RedirectToRoute("ActualizarUsuario");
         }
-        
+
     }
 }

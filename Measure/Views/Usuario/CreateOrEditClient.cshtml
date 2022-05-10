@@ -1,13 +1,28 @@
 ﻿@model Measure.ViewModels.Usuario.ViewUsuario
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = ViewBag.Accion + " Encuestado";
+    ViewBag.Title = ViewBag.Accion + " Cliente";
 }
 @section style{
     @Styles.Render("~/Content/select2")
 }
 @section scriptsHead{
     @Scripts.Render("~/bundles/select2")
+    @Scripts.Render("~/bundles/jscolor")
+    <script type="text/javascript">
+        jscolor.presets.default = {
+            width: 141,               // make the picker a little narrower
+            position: 'right',        // position it to the right of the target
+            previewPosition: 'right', // display color preview on the right
+            previewSize: 40,          // make the color preview bigger
+            palette: [
+                '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
+                '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
+                '#ffffff', '#c3c3c3', '#b87957', '#feaec9', '#ffc80d',
+                '#eee3af', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7',
+            ],
+        };
+    </script>
 }
 <div class="container">
     <div class="row">
@@ -18,63 +33,45 @@
             </div>
         </div>
     </div>
-    @using (Html.BeginRouteForm("AccionesUsuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "FrmUser" }))
+    @using (Html.BeginRouteForm("AccionesCliente", FormMethod.Post, new { enctype = "multipart/form-data", id = "FrmUser" }))
     {
         <div class="row mt-2">
             @Html.AntiForgeryToken()
             @Html.HiddenFor(modelo => modelo.Accion)
             @Html.HiddenFor(modelo => modelo.Modelo.Id)
             @Html.HiddenFor(modelo => modelo.Modelo.RolId)
-            @if (Model.FindUser.RolId == (int)Measure.Enums.UserRol.Administrador)
-            {
-                <div class="col-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolCliente</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" name="Modelo.ClienteId" id="Clientes" onchange="LoadAliado(this.value);">
-                                @foreach (var item in Model.Clientes)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Color</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-2 text-center">
+                                <button class="mt-1" type="button" data-jscolor="{valueElement:'#Modelo_Color'}"></button>
+                            </div>
+                            <div class="col-10">
+                                @Html.TextBoxFor(model => model.Modelo.Color, new { @class = "form-control", @readonly = "readonly" })
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 mt-2">
-                    <div class="form-group">
-                        <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" name="Modelo.AliadoId" id="Modelo_ClienteId" required>
-                                @foreach (var item in Model.Aliados)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
-                        </div>
+            </div>
+            <div class="col-12 col-md-6 mt-2">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Imagen</label>
+                    <div class="col-md-10">
+                        <input class="form-control" type="file" name="Modelo.Image" accept="image/*">
                     </div>
                 </div>
-            }
-            else if (Model.FindUser.RolId == (int)Measure.Enums.UserRol.Cliente)
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Modelo.Imagen))
             {
-                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
                 <div class="col-12 col-md-6 mt-2">
                     <div class="form-group">
-                        <label class="control-label col-md-2">@Measure.Recursos.Recurso.RolAliado</label>
-                        <div class="col-md-10">
-                            <select class="form-select" data-init-plugin="select2" name="Modelo.AliadoId" id="Modelo_ClienteId" required>
-                                @foreach (var item in Model.Aliados)
-                                {
-                                    <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                                }
-                            </select>
-                        </div>
+                        <label for="formFileSm" class="form-label">Imagen</label>
+                        <br />
+                        <img src="@Model.Modelo.Imagen" class="img-thumbnail" width="35" height="35" style="cursor:pointer" onclick="ViewImage(this)" />
                     </div>
                 </div>
-            }
-            else
-            {
-                @Html.HiddenFor(modelo => modelo.Modelo.ClienteId);
-                @Html.HiddenFor(modelo => modelo.Modelo.AliadoId);
             }
             <div class="col-12 col-md-6 mt-2">
                 <div class="form-group">
@@ -104,14 +101,6 @@
                     @Html.LabelFor(model => model.Modelo.Nombres, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
                         @Html.EditorFor(model => model.Modelo.Nombres, new { htmlAttributes = new { @class = "form-control", required = "required", @onkeypress = "TextAndWhiteOnly(event);" } })
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 mt-2">
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Modelo.Apellidos, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.Modelo.Apellidos, new { htmlAttributes = new { @type = "text", @class = "form-control" } })
                     </div>
                 </div>
             </div>
@@ -202,38 +191,15 @@
 
         });
 
-        function LoadAliado(ClienteId) {
-            if (ClienteId != '0' ) {
-                $.ajax({
-                    url: '@Url.Action("BuscarAliados", "Usuario")',
-                    method: 'Post',
-                    data: { 'ClienteId': ClienteId },
-                    success: function (result) {
-                        var Html = '<option value="0">Seleccione...</option>';
-                        $.each(result, function (pos, item) {
-                            Html += '<option value="' + item.Value + '" >' + item.Text + '</option>';
-                        });
-                        $("#Modelo_ClienteId").html(Html);
-
-                        $("#Modelo_ClienteId").select2("destroy");
-                        $("#Modelo_ClienteId").select2({
-                            "width": 'resolve',
-                            "theme": "bootstrap-5",
-                            "language": SelectedTranslate
-                        });
-
-                    },
-                    error: function (Error) {
-                        console.log(Error);
-                    }
-                });
-            }
-        }
-
         function AsignarValor(obj) {
             document.getElementById(obj.name).value = obj.value;
         }
-       
+
+        function ViewImage(obj) {
+            document.getElementById("imageResize").src = obj.src;
+            ShowModal("Preview");
+        }
+
         function BackForm() {
             $("#FrmBack").submit();
         }

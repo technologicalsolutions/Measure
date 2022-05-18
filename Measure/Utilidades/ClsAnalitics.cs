@@ -76,10 +76,9 @@ namespace Measure.Utilidades
             return Result;
         }
 
-        public SquareTwo AnaliticSquareTwo(Guid EncuestaId, string DataJson)
+        public List<SquareDetail> AnaliticSquareTwo(Guid EncuestaId, string DataJson)
         {
-            SquareTwo Result = new SquareTwo();
-            DataSet data = new DataSet();
+            List<SquareDetail> Result = new List<SquareDetail>();
             using (ModeloEncuesta db = new ModeloEncuesta())
             {
                 DbProviderFactory factory = DbProviderFactories.GetFactory(db.Database.Connection);
@@ -88,6 +87,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = factory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -113,18 +113,28 @@ namespace Measure.Utilidades
                             };
                             cmd.Parameters.Add(par);
 
-
-                            DbDataAdapter adapter = factory.CreateDataAdapter();
-                            adapter.SelectCommand = cmd;
-                            adapter.Fill(data);
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                while (DataR.Read())
+                                {
+                                    SquareDetail data = new SquareDetail
+                                    {
+                                        IdAsignacion = DataR.GetGuid(0),
+                                        Pais = DataR.GetString(1),
+                                        Sucursal = DataR.GetString(2),
+                                        Gerencia = DataR.GetString(3),
+                                        Rol = DataR.GetString(4),
+                                        Grupo = DataR.GetString(5),
+                                        Color = DataR.GetString(6),
+                                        Promedio = DataR.GetDecimal(7),
+                                    };
+                                    Result.Add(data);
+                                }
+                            }
                         }
                     }
                 }
             }
-
-            Result.Base = ConvertDetail(data.Tables[0], new SquareDetail());
-            Result.SubTotal = ConvertDetail(data.Tables[1], new SquareDetail());
-            Result.Total = ConvertDetail(data.Tables[2], new SquareDetail());
 
             return Result;
         }
@@ -175,9 +185,9 @@ namespace Measure.Utilidades
                 }
             }
 
-            Result.Base = ConvertDetail(data.Tables[0], new SquareDetail());
-            Result.SubTotal = ConvertDetail(data.Tables[1], new SquareDetail());
-            Result.Total = ConvertDetail(data.Tables[2], new SquareDetail());
+            Result.Base = ConvertDetail<SquareDetail>(data.Tables[0]);
+            Result.SubTotal = ConvertDetail<SquareDetail>(data.Tables[1]);
+            Result.Total = ConvertDetail<SquareDetail>(data.Tables[2]);
 
             return Result;
         }
@@ -291,7 +301,7 @@ namespace Measure.Utilidades
                                         Pregunta = DataR.GetString(3),
                                         Respuesta = DataR.GetInt32(4),
                                         Conteo = DataR.GetInt32(5),
-                                        Percentaje = DataR.GetDecimal(6),                                        
+                                        Percentaje = DataR.GetDecimal(6),
                                     };
                                     Result.Add(data);
                                 }
@@ -350,32 +360,39 @@ namespace Measure.Utilidades
                 }
             }
 
-            Result.Base = ConvertDetail(data.Tables[0], new SquareResult());
-            Result.SubTotal = ConvertDetail(data.Tables[1], new SquareResult());
-            Result.Total = ConvertDetail(data.Tables[2], new SquareResult());
+            Result.Base = ConvertDetail<SquareResult>(data.Tables[0]);
+            Result.SubTotal = ConvertDetail<SquareResult>(data.Tables[1]);
+            Result.Total = ConvertDetail<SquareResult>(data.Tables[2]);
 
             return Result;
         }
 
-        private List<T> ConvertDetail<T>(DataTable Data, T AddItem)
+        public List<T> ConvertDetail<T>(DataTable dt)
         {
-            List<T> Result = new List<T>();
-
-            foreach (DataRow Fila in Data.Rows)
-            {                
-                foreach (DataColumn Columna in Data.Columns)
+            var columnNames = dt.Columns.Cast<DataColumn>()
+                    .Select(c => c.ColumnName)
+                    .ToList();
+            var properties = typeof(T).GetProperties();
+            return dt.AsEnumerable().Select(row =>
+            {
+                var objT = Activator.CreateInstance<T>();
+                foreach (var pro in properties)
                 {
-                    PropertyInfo Property = AddItem.GetType().GetProperty(Columna.ColumnName);
-                    Type tipo = Type.GetType(Property.PropertyType.FullName);
-                    if (!string.IsNullOrEmpty(Fila[Columna].ToString()))
+                    if (columnNames.Contains(pro.Name))
                     {
-                        Property.SetValue(AddItem, Convert.ChangeType(Fila[Columna], tipo));
+                        PropertyInfo pI = objT.GetType().GetProperty(pro.Name);
+                        if (pI.PropertyType.FullName.Equals("System.Guid"))
+                        {
+                            pro.SetValue(objT, new Guid(row[pro.Name].ToString()));
+                        }
+                        else
+                        {
+                            pro.SetValue(objT, row[pro.Name] == DBNull.Value ? null : Convert.ChangeType(row[pro.Name], pI.PropertyType));
+                        }                        
                     }
                 }
-                Result.Add(AddItem);
-            }
-
-            return Result;
+                return objT;
+            }).ToList();
         }
 
         public void Dispose()

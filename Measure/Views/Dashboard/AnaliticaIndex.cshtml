@@ -93,7 +93,7 @@
                 OnComplete = "loadSelect"
             }, new { @class = "col-12 col-md-3 text-center" }))
             {
-                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" />
+                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)"  />
                 <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
                 <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
             }
@@ -130,7 +130,7 @@
                 OnComplete = "loadSelect"
             }, new { @class = "col-12 col-md-3 text-center" }))
             {
-                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" />
+                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)" />
                 <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
                 <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
             }

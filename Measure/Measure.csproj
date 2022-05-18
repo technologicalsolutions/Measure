@@ -188,13 +188,17 @@
     <Compile Include="Utilidades\ClsAnalitics.cs" />
     <Compile Include="Utilidades\ClsProcedures.cs" />
     <Compile Include="Utilidades\ClsUtilities.cs" />
+    <Compile Include="ViewModels\Analitic\DataGeneral.cs" />
+    <Compile Include="ViewModels\Analitic\DataSeries.cs" />
+    <Compile Include="ViewModels\Analitic\GraphicOne.cs" />
+    <Compile Include="ViewModels\Analitic\GraphicTwo.cs" />
+    <Compile Include="ViewModels\Analitic\GraphicTwoBase.cs" />
     <Compile Include="ViewModels\Analitic\SquareDetail.cs" />
     <Compile Include="ViewModels\Analitic\SquareFive.cs" />
     <Compile Include="ViewModels\Analitic\SquareFourth.cs" />
     <Compile Include="ViewModels\Analitic\SquareResult.cs" />
     <Compile Include="ViewModels\Analitic\SquareSix.cs" />
     <Compile Include="ViewModels\Analitic\SquareThree.cs" />
-    <Compile Include="ViewModels\Analitic\SquareTwo.cs" />
     <Compile Include="ViewModels\Analitic\ViewAnalitic.cs" />
     <Compile Include="ViewModels\Analitic\ViewIndex.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContenidosEncuesta.cs" />
@@ -205,6 +209,7 @@
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewSurveyContent.cs" />
     <Compile Include="ViewModels\Dashboard\ViewAnaliticBasic.cs" />
     <Compile Include="ViewModels\Dashboard\ViewAnaliticIndex.cs" />
+    <Compile Include="ViewModels\Dashboard\ViewAnaliticSquare.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboard.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasic.cs" />
     <Compile Include="ViewModels\Dashboard\ViewDashboardBasicDescription.cs" />
@@ -337,6 +342,7 @@
     <Content Include="Scripts\base\jquery-3.4.1.js" />
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\base\jquery.unobtrusive-ajax.min.js" />
+    <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
     <None Include="Properties\PublishProfiles\IISProfile1.pubxml" />
     <None Include="Scripts\base\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\base\jquery.validate.js" />
@@ -547,6 +553,7 @@
     <Content Include="Scripts\datatables\jszip.min.js" />
     <Content Include="Scripts\datatables\pdfmake.js" />
     <Content Include="Scripts\datatables\vfs_fonts.js" />
+    <Content Include="Scripts\apexcharts\Init.js" />
     <Content Include="Scripts\jscolor\jscolor.js" />
     <Content Include="Scripts\jscolor\jscolor.min.js" />
     <Content Include="Scripts\pdf\addimage.js" />
@@ -644,6 +651,7 @@
     <Content Include="Views\Analitica\_Detail.cshtml" />
     <Content Include="Views\Analitica\CreateOrEdit.cshtml" />
     <Content Include="Views\Analitica\_PartialPage.cshtml" />
+    <Content Include="Views\Dashboard\GenerarAnalisis.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

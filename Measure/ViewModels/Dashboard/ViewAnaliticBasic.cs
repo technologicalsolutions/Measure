@@ -5,8 +5,8 @@ namespace Measure.ViewModels.Dashboard
 {
     public class ViewAnaliticBasic
     {
-        public List<SquareOne> CuadroUno { get; set; }
-        public SquareTwo CuadroDos { get; set; }
+        public List<SquareOne> CuadroUno { get; set; }        
+        public List<SquareDetail> CuadroDos { get; set; }
         public SquareThree CuadroTres { get; set; }
         public List<SquareFourth> CuadroCuatro { get; set; }
         public List<SquareFive> CuadroCinco { get; set; }

@@ -69,12 +69,9 @@ namespace Measure
 
             bundles.Add(new ScriptBundle("~/bundles/unobtrusive").Include(
                         "~/Scripts/base/jquery.unobtrusive-ajax.js",
-                        "~/Scripts/base/jquery.unobtrusive-ajax.min.js",
                         "~/Scripts/base/jquery.validate-vsdoc.js",
                         "~/Scripts/base/jquery.validate.js",
-                        "~/Scripts/base/jquery.validate.min.js",
-                        "~/Scripts/base/jquery.validate.unobtrusive.js",
-                        "~/Scripts/base/jquery.validate.unobtrusive.min.js"));
+                        "~/Scripts/base/jquery.validate.unobtrusive.js"));
             
             bundles.Add(new ScriptBundle("~/bundles/ckeditor").Include(
                         "~/Scripts/ckeditor4/ckeditor.js",

@@ -15,6 +15,84 @@ namespace Measure.Utilidades
     {
         private bool disposing = false;
 
+        public List<ViewAnaliticResultQuestion> ResultQuestionForUser(Guid EncuestaId, string IdAsignaciones, Guid? UsuarioId, string Correo)
+        {
+            DataTable data = new DataTable();
+            using (ModeloEncuesta db = new ModeloEncuesta())
+            {
+                DbProviderFactory factory = DbProviderFactories.GetFactory(db.Database.Connection);
+                using (DbConnection con = factory.CreateConnection())
+                {
+                    con.ConnectionString = db.Database.Connection.ConnectionString;
+                    using (con)
+                    {
+                        con.Open();
+                        using (DbCommand cmd = factory.CreateCommand())
+                        {
+                            cmd.Connection = con;
+                            cmd.CommandText = "[dbo].[AnaliticResultQuestion]";
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            SqlParameter par = new SqlParameter
+                            {
+                                ParameterName = "@EncuestaId",
+                                SqlDbType = SqlDbType.UniqueIdentifier,
+                                SqlValue = EncuestaId,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@IdAsignaciones",
+                                SqlDbType = SqlDbType.NVarChar,
+                                SqlValue = IdAsignaciones,
+                                Direction = ParameterDirection.Input
+                            };
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@UsuarioId",
+                                SqlDbType = SqlDbType.NVarChar,                                
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (UsuarioId != null)
+                            {
+                                par.SqlValue = UsuarioId;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            par = null;
+                            par = new SqlParameter
+                            {
+                                ParameterName = "@Correo",
+                                SqlDbType = SqlDbType.NVarChar,
+                                SqlValue = DBNull.Value,
+                                Direction = ParameterDirection.Input
+                            };
+                            if (!string.IsNullOrEmpty(Correo))
+                            {
+                                par.SqlValue = Correo;
+                            }
+                            cmd.Parameters.Add(par);
+
+                            using (DbDataReader DataR = cmd.ExecuteReader())
+                            {
+                                data.Load(DataR);
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<ViewAnaliticResultQuestion> Result = ConvertDetail<ViewAnaliticResultQuestion>(data);
+            return Result;
+        }
+
         public List<SquareOne> AnaliticSquareOne(Guid EncuestaId, string IdAsignaciones)
         {
             List<SquareOne> Result = new List<SquareOne>();
@@ -151,6 +229,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = factory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -326,6 +405,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = factory.CreateCommand())
                         {
                             cmd.Connection = con;

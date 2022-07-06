@@ -262,14 +262,14 @@ namespace Measure
             );
 
             routes.MapRoute(
-              name: "DashboardGeneral",
-              url: "DashboardGeneral/{Id}",
+              name: "DashboardDataGeneral",
+              url: "DashboardDataGeneral/{Id}",
               defaults: new { controller = "Dashboard", action = "Index", Id = UrlParameter.Optional }
             );
 
             routes.MapRoute(
-              name: "DashboardGeneralDescripcion",
-              url: "DashboardGeneralDescripcion/{Id}",
+              name: "DashboardDataGeneralDescripcion",
+              url: "DashboardDataGeneralDescripcion/{Id}",
               defaults: new { controller = "Dashboard", action = "Descripcion", Id = UrlParameter.Optional }
             );
 
@@ -284,13 +284,13 @@ namespace Measure
               url: "DashboardAnalitica/{Id}",
               defaults: new { controller = "Dashboard", action = "AnaliticaIndex", Id = UrlParameter.Optional }
             );
-
+            
             routes.MapRoute(
               name: "GenerarAnalisis",
               url: "GenerarAnalisis",
               defaults: new { controller = "Dashboard", action = "GenerarAnalisis" }
             );
-
+           
             #endregion
 
             #region Preguntas

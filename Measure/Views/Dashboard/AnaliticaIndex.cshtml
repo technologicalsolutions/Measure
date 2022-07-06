@@ -49,116 +49,173 @@
     @Scripts.Render("~/bundles/unobtrusive")
 }
 <div class="container">
-    <div class="row">
-        @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
-        {
-            <div class="col-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label col-md-2">Clientes</label>
-                    <select class="form-select" data-init-plugin="select2" id="Modelo_ClienteId" onchange="LoadItems(this.value)">
-                        @foreach (var item in Model.Clientes)
+    <div id="smartwizard" class="wizard wizard-primary mb-4 sw sw-theme-default sw-justified">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#step-1">
+                    <div class="num">Paso 1</div>
+                    <small>Seleccionar Población</small>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#step-2">
+                    <div class="num">Paso 2</div>
+                    <small>Seleccionar Filtros A graficar</small>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div id="step-1" class="tab-pane" role="tabpanel" aria-labelledby="step-1">
+                <div class="row">
+                    @if (Model.User.RolId == (int)Measure.Enums.UserRol.Administrador)
+                    {
+                        <div class="col-12 col-md-3">
+                            <div class="form-group">
+                                <label class="control-label col-md-2">Clientes</label>
+                                <select class="form-select" data-init-plugin="select2" id="Modelo_ClienteId" onchange="LoadItems(this.value)">
+                                    @foreach (var item in Model.Clientes)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <div class="form-group">
+                                <label class="control-label">Encuestas</label>
+                                <select class="form-select" data-init-plugin="select2" id="Encuestas" name="Modelo_EncuestaId" onchange="Selected(this)">
+                                    @foreach (var item in Model.Encuestas)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <div class="form-group">
+                                <label class="control-label col-md-2">Aliados</label>
+                                <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
+                                    @foreach (var item in Model.Aliados)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
                         {
-                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                            InsertionMode = InsertionMode.Replace,
+                            UpdateTargetId = "ListUser",
+                            OnBegin = "divLoading",
+                            OnComplete = "loadSelect"
+                        }, new { @class = "col-12 col-md-3 text-center", id = "FrmList" }))
+                        {
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)" />
+                                    <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
+                                    <button class="btn btn-info mt-4" id="BtnList" type="submit">Ver Encuestados</button>
+                                </div>
+                                <div class="col-6" id="divFiltro" style="display:none">
+                                    <button class="btn btn-primary mt-4" type="button" onclick="GenerarDataAnalisis()">Generar Filtros</button>
+                                </div>
+                            </div>
                         }
-                    </select>
+                    }
+                    else if (Model.User.RolId == (int)Measure.Enums.UserRol.Cliente)
+                    {
+                        <div class="col-12 col-md-3">
+                            <div class="form-group">
+                                <label class="control-label">Encuestas</label>
+                                <select class="form-select" data-init-plugin="select2" id="Encuestas" name="Modelo_EncuestaId" onchange="Selected(this)">
+                                    @foreach (var item in Model.Encuestas)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label class="control-label">Aliados</label>
+                                <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
+                                    @foreach (var item in Model.Aliados)
+                                    {
+                                        <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
+                        {
+                            InsertionMode = InsertionMode.Replace,
+                            UpdateTargetId = "ListUser",
+                            OnBegin = "divLoading",
+                            OnComplete = "loadSelect"
+                        }, new { @class = "col-12 col-md-3 text-center", id = "FrmList" }))
+                        {
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)" />
+                                    <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
+                                    <button class="btn btn-info mt-4" id="BtnList" type="submit">Ver Encuestados</button>
+                                </div>
+                                <div class="col-6" id="divFiltro" style="display:none">
+                                    <button class="btn btn-primary mt-4" type="button" onclick="GenerarDataAnalisis()">Generar Filtros</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="row mt-4" id="Encuestados">
+                    <div class="col-12">
+                        <div class="table-responsive-lg" id="ListUser">
+                            @Html.Partial("_ListaEncuestados", Model.PartialIndex)
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">Encuestas</label>
-                    <select class="form-select" data-init-plugin="select2"  id="Encuestas" name="Modelo_EncuestaId" onchange="Selected(this)">
-                        @foreach (var item in Model.Encuestas)
-                        {
-                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                        }
-                    </select>
-                </div>                
-            </div>
-            <div class="col-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label col-md-2">Aliados</label>
-                    <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
-                        @foreach (var item in Model.Aliados)
-                        {
-                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                        }
-                    </select>
+            <div id="step-2" class="tab-pane" role="tabpanel" aria-labelledby="step-2">
+                <div class="row" id="Filtro">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Pais</label>
+                            <select class="form-select" data-init-plugin="select2" id="Pais"></select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Sucursal</label>
+                            <select class="form-select" data-init-plugin="select2" id="Sucursal"></select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Gerencia</label>
+                            <select class="form-select" data-init-plugin="select2" id="Gerencia"></select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Rol</label>
+                            <select class="form-select" data-init-plugin="select2" id="Rol"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-md-end">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <label class="control-label">Tipo De Analisis</label>
+                        <select class="form-select" data-init-plugin="select2" id="TipoDeAnalisis">
+                            <option value="0">Seleccione...</option>
+                            <option value="1">Cuadro Uno</option>
+                            <option value="2">Cuadro Dos</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3  text-center">
+                        <button class="btn btn-primary mt-4" type="button" onclick="Filter()">Graficar Filtro</button>
+                    </div>
                 </div>
             </div>
-            using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
-            {
-                InsertionMode = InsertionMode.Replace,
-                UpdateTargetId = "ListUser",
-                LoadingElementId = "divLoading",
-                OnComplete = "loadSelect"
-            }, new { @class = "col-12 col-md-3 text-center" }))
-            {
-                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)"  />
-                <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
-                <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
-            }
-        }
-        else if (Model.User.RolId == (int)Measure.Enums.UserRol.Cliente)
-        {
-            <div class="col-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">Encuestas</label>
-                    <select class="form-select" data-init-plugin="select2" id="Encuestas" name="Modelo_EncuestaId" onchange="Selected(this)">
-                        @foreach (var item in Model.Encuestas)
-                        {
-                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                        }
-                    </select>
-                </div>
-            </div>
-            <div class="col-12 col-md-6">
-                <div class="form-group">
-                    <label class="control-label">Aliados</label>
-                    <select class="form-select" data-init-plugin="select2" id="Aliados" name="Modelo_AliadoId" onchange="Selected(this)">
-                        @foreach (var item in Model.Aliados)
-                        {
-                            <option value="@item.Value" @(item.Selected ? "selected" : string.Empty)>@item.Text</option>
-                        }
-                    </select>
-                </div>
-            </div>
-            using (Ajax.BeginForm("ListaDeEncuestados", "Dashboard", FormMethod.Post, new AjaxOptions
-            {
-                InsertionMode = InsertionMode.Replace,
-                UpdateTargetId = "ListUser",
-                LoadingElementId = "divLoading",
-                OnComplete = "loadSelect"
-            }, new { @class = "col-12 col-md-3 text-center" }))
-            {
-                <input type="hidden" name="IdEncuesta" id="Modelo_EncuestaId" value="@(Model.Encuestas.Count() > 0 ? Model.Encuestas[0].Value : string.Empty)" />
-                <input type="hidden" name="IdAliado" id="Modelo_AliadoId" />
-                <button class="btn btn-primary mt-4" type="submit">Ver Encuestados</button>
-            }
-        }
-    </div>
-    <div class="row justify-content-end">
-        <div class="col-12 col-md-3">
-            <div class="form-group">
-                <label class="control-label">Talla Analisis</label>
-                <select class="form-select" data-init-plugin="select2" id="Talla">
-                    <option value="1">Talla XS</option>
-                    <option value="2">Talla S</option>
-                    <option value="3">Talla M</option>
-                    <option value="4">Talla L</option>
-                    <option value="5">Talla XL</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 text-center">
-            <button class="btn btn-primary mt-4" type="button" onclick="GenerarAnalisis()">Generar Analisis</button>
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="table-responsive-lg" id="ListUser">
-                @Html.Partial("_ListaEncuestados", Model.PartialIndex)
-            </div>
-            <div id="ResultadoAnalisis"></div>
         </div>
     </div>
 </div>
@@ -192,6 +249,13 @@
                     "theme": "bootstrap-5",
                     "language": SelectedTranslate,
                 });
+                 $('#smartwizard').smartWizard({
+                     showStepURLhash: false,
+                     toolbarSettings: {
+                         showNextButton: false,
+                         showPreviousButton: false,
+                     }
+                 });
             });
 
             function LoadItems(ClienteId) {
@@ -263,6 +327,7 @@
         var Sucursales = Array();
         var Gerencias = Array();
         var Roles = Array();
+        var Data = Array();
 
         function onBlur(Obj) {
             var Id = $(Obj).data("id");
@@ -409,13 +474,12 @@
             return result;
         }
 
-        function GenerarAnalisis() {
+        function GenerarDataAnalisis() {
             var Result = Validate();
 
             if (Result != '') {
                 ToastError(Result);
             } else {
-                var Data = Array();
                 var Seleccionados = $('.chkValidate:checked');
                 $.each(Seleccionados, function (pos, Obj) {
                     var Id = $(Obj).data("id");
@@ -430,9 +494,81 @@
                     })
                 })
 
-                $("#Data").val(JSON.stringify({ 'Encuestados': Data, 'TipoAnalisis': $("#Talla").val(), 'EncuestaId': $("#Encuestas").val() }));
+                var BaseOption = "<option value='0'>@Measure.Recursos.Recurso.Seleccione</option>";
+                var html = BaseOption;
+
+                var BasicPais = $.unique(Data.map(function (d) { return d.Pais; }));
+                var _Paises = BasicPais.filter((v, i, a) => a.indexOf(v) === i);
+                $("#Pais").html("");
+                $.each(_Paises, function (pos, item) {
+                    html += "<option value='" + item + "'>" + item + "</option>";
+                });
+                $("#Pais").html(html);
+                var html = BaseOption;
+
+                var BasicSucursal = $.unique(Data.map(function (d) { return d.Sucursal; }));
+                var _Sucursales = BasicSucursal.filter((v, i, a) => a.indexOf(v) === i);
+                $("#Sucursal").html("");
+                $.each(_Sucursales, function (pos, item) {
+                    html += "<option value='" + item + "'>" + item + "</option>";
+                });
+                $("#Sucursal").html(html);
+                var html = BaseOption;
+
+                var BasicGerencia = $.unique(Data.map(function (d) { return d.Gerencia; }));
+                var _Gerencias = BasicGerencia.filter((v, i, a) => a.indexOf(v) === i);
+                $("#Gerencia").html("");
+                $.each(_Gerencias, function (pos, item) {
+                    html += "<option value='" + item + "'>" + item + "</option>";
+                });
+                $("#Gerencia").html(html);
+                var html = BaseOption;
+
+                var BasicRol = $.unique(Data.map(function (d) { return d.Rol; }));
+                var _Roles = BasicRol.filter((v, i, a) => a.indexOf(v) === i);
+                $("#Rol").html("");
+                $.each(_Roles, function (pos, item) {
+                    html += "<option value='" + item + "'>" + item + "</option>";
+                });
+                $("#Rol").html(html);
+
+                $('#smartwizard').smartWizard("next");
+            }
+        }
+
+        function Filter() {
+            
+            if ($("#TipoDeAnalisis").val() == "0") {
+                ToastError("Debe seleccionar un tipo de analísis.");
+            } else {
+                var SendData = Data;
+                var Filtros = {
+                    "TipoDeAnalisis": parseInt($("#TipoDeAnalisis").val())
+                };
+                
+                if ($("#Pais").val() != "0") {
+                    SendData = SendData.filter(f => f.Pais == $("#Pais").val());
+                    Filtros["Pais"] = $("#Pais").val();
+                }
+
+                if ($("#Sucursal").val() != "0") {
+                    SendData = SendData.filter(f => f.Sucursal == $("#Sucursal").val());
+                    Filtros["Sucursal"] = $("#Sucursal").val();
+                }
+
+                if ($("#Gerencia").val() != "0") {
+                    SendData = SendData.filter(f => f.Gerencia == $("#Gerencia").val());
+                    Filtros["Gerencia"] = $("#Gerencia").val();
+                }
+
+                if ($("#Rol").val() != "0") {
+                    SendData = SendData.filter(f => f.Rol == $("#Rol").val());
+                    Filtros["Rol"] = $("#Rol").val();
+                }
+                $("#Data").val(JSON.stringify({ 'Encuestados': SendData, 'EncuestaId': $("#Encuestas").val(), 'Filtros': Filtros }));
                 $("#FrmAnalisis").submit();
             }
+            
         }
 
         function ToastError(message) {
@@ -442,6 +578,7 @@
             var dismissible = true;
             var positionX = 'center';
             var positionY = 'top';
+
             window.notyf.open({
                 type,
                 message,
@@ -469,8 +606,12 @@
                 "theme": "bootstrap-5",
                 "language": SelectedTranslate,
             });
+
+            LoadDataTable("TblLista", null, true, null, 100, false);
+            var TableHeight = $("#step-1").height() + 100;
+            $(".tab-content").height(TableHeight);
+            $("#divFiltro").show();
             divLoading();
         }
     </script>
-
 }

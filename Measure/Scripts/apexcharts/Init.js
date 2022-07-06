@@ -164,6 +164,17 @@ function ColumnasBasicas(Titulo, Nombre, Series, Categories, Colors, querySelect
             min: 0,
             max: 10,
         },
+        responsive: [{
+            breakpoint: 450,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }],
     };
 
     if (Colors != null) {
@@ -205,7 +216,18 @@ function ColumnasBasicasGeneral(Titulo, Series, Categories, Colors, querySelecto
         },
         xaxis: {
             categories: Categories
-        }
+        },
+        responsive: [{
+            breakpoint: 450,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
     };
 
     if (Colors != null) {
@@ -252,6 +274,77 @@ function AreaPolar(Titulo, Series, Labels, Colors) {
     }
 
     var querySelector = "[data-name='" + Titulo + "']";
+    var chart = new ApexCharts(document.querySelector(querySelector), options);
+    chart.render();
+}
+
+function Radar(Titulo, Series, Categories, querySelector) {
+    var options = {
+        series: Series,
+        chart: {
+            height: 450,
+            type: 'radar',
+            dropShadow: {
+                enabled: true,
+                blur: 1,
+                left: 1,
+                top: 1
+            }
+        },
+        title: {
+            text: Titulo
+        },
+        stroke: {
+            width: 2
+        },
+        fill: {
+            opacity: 0.1
+        },
+        markers: {
+            size: 0
+        },
+        xaxis: {
+            categories: Categories
+        },
+        yaxis: {
+            min: 0,
+            max: 10,
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector(querySelector), options);
+    chart.render();
+}
+
+function Pie(Titulo, Series, Labels, querySelector) {
+    var DataS = Array();
+    $.each(Series, function (pos, item) {
+        DataS.push(parseInt(item));
+    })
+
+    var options = {
+        series: DataS,
+        chart: {
+            width: 450,
+            type: 'pie',
+        },
+        title: {
+            text: Titulo
+        },
+        labels: Labels,
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    };
+
     var chart = new ApexCharts(document.querySelector(querySelector), options);
     chart.render();
 }

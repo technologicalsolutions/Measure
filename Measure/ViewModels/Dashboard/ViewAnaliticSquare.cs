@@ -5,7 +5,9 @@ namespace Measure.ViewModels.Dashboard
 {
     public class ViewAnaliticSquare
     {
-        public GraphicBase CuadroUno { get; set; }
+        public string TituloGeneral { get; set; }
+        public List<GraphicBase> CuadroUno { get; set; }
         public GraphicTwo CuadroDos { get; set; }
+
     }    
 }

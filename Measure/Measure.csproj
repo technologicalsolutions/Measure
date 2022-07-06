@@ -148,6 +148,7 @@
     <Compile Include="Enums\ControlAbierto.cs" />
     <Compile Include="Enums\DbAcciones.cs" />
     <Compile Include="Enums\Idiomas.cs" />
+    <Compile Include="Enums\TipoAnalisis.cs" />
     <Compile Include="Enums\TipoComponente.cs" />
     <Compile Include="Enums\TipoContenido.cs" />
     <Compile Include="Enums\TipoDato.cs" />
@@ -190,7 +191,7 @@
     <Compile Include="Utilidades\ClsUtilities.cs" />
     <Compile Include="ViewModels\Analitic\DataGeneral.cs" />
     <Compile Include="ViewModels\Analitic\DataSeries.cs" />
-    <Compile Include="ViewModels\Analitic\GraphicOne.cs" />
+    <Compile Include="ViewModels\Analitic\GraphicBase.cs" />
     <Compile Include="ViewModels\Analitic\GraphicTwo.cs" />
     <Compile Include="ViewModels\Analitic\GraphicTwoBase.cs" />
     <Compile Include="ViewModels\Analitic\SquareDetail.cs" />
@@ -200,6 +201,8 @@
     <Compile Include="ViewModels\Analitic\SquareSix.cs" />
     <Compile Include="ViewModels\Analitic\SquareThree.cs" />
     <Compile Include="ViewModels\Analitic\ViewAnalitic.cs" />
+    <Compile Include="ViewModels\Analitic\ViewAnaliticFilter.cs" />
+    <Compile Include="ViewModels\Analitic\ViewAnaliticResultQuestion.cs" />
     <Compile Include="ViewModels\Analitic\ViewIndex.cs" />
     <Compile Include="ViewModels\ContenidoPorEncuesta\ViewContenidosEncuesta.cs" />
     <Compile Include="ViewModels\Contenidos\ViewContenidoEncuesta.cs" />
@@ -651,6 +654,7 @@
     <Content Include="Views\Analitica\_Detail.cshtml" />
     <Content Include="Views\Analitica\CreateOrEdit.cshtml" />
     <Content Include="Views\Analitica\_PartialPage.cshtml" />
+    <Content Include="Views\Dashboard\_GenerarAnalisis.cshtml" />
     <Content Include="Views\Dashboard\GenerarAnalisis.cshtml" />
   </ItemGroup>
   <ItemGroup>

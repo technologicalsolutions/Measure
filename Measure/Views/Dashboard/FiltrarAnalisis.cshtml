@@ -1,0 +1,78 @@
+﻿@model Measure.ViewModels.Analitic.ViewAnaliticFilter
+@{
+    ViewBag.Title = "Filtro Analisis";
+    ViewBag.DashShow = "show";
+    ViewBag.DsTActive = "active";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section style{
+    @Styles.Render("~/Content/select2")
+}
+@section scriptsHead{
+    @Scripts.Render("~/bundles/select2")
+    @Scripts.Render("~/bundles/unobtrusive")
+}
+<div class="container">
+    @using (Ajax.BeginForm("GenerarAnalisis", "Dashboard", FormMethod.Post, new AjaxOptions
+    {
+        InsertionMode = InsertionMode.Replace,
+        UpdateTargetId = "DashboardPrint",
+        OnBegin = "divLoading",
+        OnComplete = "divLoading"
+    }, new { @class = "row text-center", id = "frmFilter" }))
+    {
+        
+    }
+    <div class="row" id="DashboardPrint"></div>
+</div>
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    <script src="~/Scripts/apexcharts/Init.js"></script>
+    <script type="text/javascript">
+       
+
+        function divLoading() {
+            $("#loader").toggle();
+        }
+
+        function Filter() {
+            var FilterSelect = 0;
+            $.each($("select"), function (pos, item) {
+                if (item.value != "0") {
+                    FilterSelect++;
+                    return false;
+                }
+            })
+            if (FilterSelect > 0) {
+                $("#frmFilter").submit();
+            }
+            else {
+                ToastError("Debe de seleccionar Minimo un filtro.");
+            }
+        }
+
+
+
+        function ToastError(message) {
+            var type = 'danger';
+            var duration = '5000';
+            var ripple = true;
+            var dismissible = true;
+            var positionX = 'center';
+            var positionY = 'top';
+            window.notyf.open({
+                type,
+                message,
+                duration,
+                ripple,
+                dismissible,
+                position: {
+                    x: positionX,
+                    y: positionY
+                }
+            });
+        }
+    </script>
+}

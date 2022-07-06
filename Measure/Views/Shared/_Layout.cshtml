@@ -136,12 +136,12 @@
                         </a>
                         <ul id="Dashboard" class="sidebar-dropdown list-unstyled collapse @ViewBag.DashShow" data-bs-parent="#sidebar">
                             <li class="sidebar-item @ViewBag.DsgActive">
-                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardGeneral",new { Id = ClienteID.ToString() })">
+                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardDataGeneral",new { Id = ClienteID.ToString() })">
                                     <i class="align-middle me-2 fas fa-fw fa-chart-line"></i>General
                                 </a>
                             </li>
                             <li class="sidebar-item @ViewBag.DsgDActive">
-                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardGeneralDescripcion",new { Id = ClienteID.ToString() })">
+                                <a class="sidebar-link" href="@Url.RouteUrl("DashboardDataGeneralDescripcion",new { Id = ClienteID.ToString() })">
                                     <i class="align-middle me-2 fas fa-fw fa-chart-bar"></i>Descripción
                                 </a>
                             </li>

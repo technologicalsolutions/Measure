@@ -1,4 +1,5 @@
-﻿using Measure.Models;
+﻿using Measure.Enums;
+using Measure.Models;
 using Measure.Utilidades;
 using Measure.ViewModels.Analitic;
 using Measure.ViewModels.Dashboard;
@@ -14,6 +15,8 @@ namespace Measure.Controllers
 {
     public class DashboardController : Controller
     {
+        private readonly Random _random = new Random();
+
         [HttpGet]
         [Route("DashboardDataGeneral/{Id?}")]
         public ActionResult Index(string Id)
@@ -71,7 +74,7 @@ namespace Measure.Controllers
 
                     using (ModeloEncuesta db = new ModeloEncuesta())
                     {
-                        Model.GraphGeneral  = (from b in db.Usuario
+                        Model.GraphGeneral = (from b in db.Usuario
                                               where b.RolId == (int)Enums.UserRol.Cliente
                                               select new ViewDashboardClientForPoll
                                               {
@@ -557,27 +560,141 @@ namespace Measure.Controllers
         public ActionResult GenerarAnalisis(string Data)
         {
             ViewDataAnalitic DatosBrutos = JsonConvert.DeserializeObject<ViewDataAnalitic>(Data);
-            string IdAsignaciones = string.Join("|", DatosBrutos.Encuestados.Select(s => s.Id.ToString()).ToList());
-            string DataJson = JsonConvert.SerializeObject(DatosBrutos.Encuestados);
+            ViewAnaliticSquare Modelo = new ViewAnaliticSquare();
 
-            ViewAnaliticBasic TempData = new ViewAnaliticBasic();
-            using (ClsAnalitics Analitica = new ClsAnalitics())
+            int totalGraficos = 0;
+            if ((TipoAnalisis)DatosBrutos.Filtros.TipoDeAnalisis == TipoAnalisis.CuadroUno)
             {
-                TempData.CuadroUno = Analitica.AnaliticSquareOne(DatosBrutos.EncuestaId, IdAsignaciones);
-                TempData.CuadroDos = Analitica.AnaliticSquareTwo(DatosBrutos.EncuestaId, DataJson);
-                TempData.CuadroTres = Analitica.AnaliticSquareThree(DatosBrutos.EncuestaId, DataJson);
-                TempData.CuadroCuatro = Analitica.AnaliticSquareFourth(DatosBrutos.EncuestaId, DataJson);
-                TempData.CuadroCinco = Analitica.AnaliticSquareFive(DatosBrutos.EncuestaId, IdAsignaciones);
-                TempData.CuadroSeis = Analitica.AnaliticSquareSix(DatosBrutos.EncuestaId, DataJson);
+                List<ViewDataAnaliticDetail> DataBase = (from a in DatosBrutos.Encuestados
+                                                         where ((string.IsNullOrEmpty(DatosBrutos.Filtros.Pais)) || (a.Pais.Equals(DatosBrutos.Filtros.Pais)))
+                                                         && ((string.IsNullOrEmpty(DatosBrutos.Filtros.Sucursal)) || (a.Sucursal.Equals(DatosBrutos.Filtros.Sucursal)))
+                                                         && ((string.IsNullOrEmpty(DatosBrutos.Filtros.Gerencia)) || (a.Gerencia.Equals(DatosBrutos.Filtros.Gerencia)))
+                                                         && ((string.IsNullOrEmpty(DatosBrutos.Filtros.Rol)) || (a.Rol.Equals(DatosBrutos.Filtros.Rol)))
+                                                         select a).ToList();
+
+                Modelo.CuadroUno = ViewAnaliticSquareOne(DatosBrutos.EncuestaId, DataBase, DatosBrutos.Encuestados);
+                totalGraficos = Modelo.CuadroUno.Count();
+            }
+            else if ((TipoAnalisis)DatosBrutos.Filtros.TipoDeAnalisis == TipoAnalisis.CuadroDos)
+            {
+                List<ViewDataAnaliticDetail> DataBase = (from a in DatosBrutos.Encuestados
+                                                         where ((string.IsNullOrEmpty(DatosBrutos.Filtros.Pais)) || (a.Pais.Equals(DatosBrutos.Filtros.Pais)))
+                                                         && ((string.IsNullOrEmpty(DatosBrutos.Filtros.Sucursal)) || (a.Sucursal.Equals(DatosBrutos.Filtros.Sucursal)))
+                                                         select a).ToList();
+
+                Modelo.CuadroDos = CuadroDosGrafico(DatosBrutos.EncuestaId, DataBase);
+                totalGraficos = 2 + Modelo.CuadroDos.GrafBase.Count();
             }
 
-            ViewAnaliticSquare Modelo = new ViewAnaliticSquare
+            string TituloGeneral = "Graficos ";
+            List<string> TituloFiltro = new List<string>();
+            foreach (var property in DatosBrutos.Filtros.GetType().GetProperties())
             {
-                CuadroUno = CuadroUnoGrafico(TempData.CuadroUno),
-                CuadroDos = CuadriDosGrafico(TempData.CuadroDos),
-            };
+                if (property.GetValue(DatosBrutos.Filtros) != null)
+                {
+                    TituloFiltro.Add($"{property.Name}: {property.GetValue(DatosBrutos.Filtros)}");
+                }
+            }
+
+            if (TituloFiltro.Count() > 0)
+            {
+
+
+                TituloGeneral += $"Filtrados, {string.Join(", ", TituloFiltro)}, Cantidad de Graficos: {totalGraficos}.";
+            }
+            else
+            {
+                TituloGeneral += $"Generales, Cantidad de Graficos: {Modelo.CuadroUno.Count()}.";
+            }
+
+            Modelo.TituloGeneral = TituloGeneral;
 
             return View(Modelo);
+        }
+
+        private List<GraphicBase> ViewAnaliticSquareOne(Guid EncuestaId, List<ViewDataAnaliticDetail> DataBase, List<ViewDataAnaliticDetail> DatosBrutos)
+        {
+            List<GraphicBase> Result = new List<GraphicBase>();
+
+            List<string> Paises = DataBase.Select(s => s.Pais).Distinct().ToList();
+            List<string> Sucursales = DataBase.Select(s => s.Sucursal).Distinct().ToList();
+            List<string> Gerencias = DataBase.Select(s => s.Gerencia).Distinct().ToList();
+            List<string> Roles = DataBase.Select(s => s.Rol).Distinct().ToList();
+
+            int Id = 0;
+            foreach (string item in Paises)
+            {
+                string IdAsignaciones = string.Join("|", DatosBrutos.Where(e => e.Pais.Equals(item)).Select(s => s.Id.ToString()).ToList());
+                List<SquareOne> TempCuadroUno = new List<SquareOne>();
+                using (ClsAnalitics Analitica = new ClsAnalitics())
+                {
+                    TempCuadroUno = Analitica.AnaliticSquareOne(EncuestaId, IdAsignaciones);
+                }
+                if (TempCuadroUno.Count() > 0)
+                {
+                    GraphicBase CuadroUno = CuadroUnoGrafico(TempCuadroUno);
+                    CuadroUno.Id = $"PaisUno_{Id}";
+                    Id++;
+                    CuadroUno.Titulo = $"General Pais {item}";
+                    Result.Add(CuadroUno);
+                }
+            }
+
+            foreach (string item in Sucursales)
+            {
+                string IdAsignaciones = string.Join("|", DatosBrutos.Where(e => e.Sucursal.Equals(item)).Select(s => s.Id.ToString()).ToList());
+                List<SquareOne> TempCuadroUno = new List<SquareOne>();
+                using (ClsAnalitics Analitica = new ClsAnalitics())
+                {
+                    TempCuadroUno = Analitica.AnaliticSquareOne(EncuestaId, IdAsignaciones);
+                }
+                if (TempCuadroUno.Count() > 0)
+                {
+                    GraphicBase CuadroUno = CuadroUnoGrafico(TempCuadroUno);
+                    CuadroUno.Id = $"SucursalUno_{Id}";
+                    Id++;
+                    CuadroUno.Titulo = $"General Sucursal {item}";
+                    Result.Add(CuadroUno);
+                }
+            }
+
+            foreach (string item in Gerencias)
+            {
+                string IdAsignaciones = string.Join("|", DatosBrutos.Where(e => e.Gerencia.Equals(item)).Select(s => s.Id.ToString()).ToList());
+                List<SquareOne> TempCuadroUno = new List<SquareOne>();
+                using (ClsAnalitics Analitica = new ClsAnalitics())
+                {
+                    TempCuadroUno = Analitica.AnaliticSquareOne(EncuestaId, IdAsignaciones);
+                }
+                if (TempCuadroUno.Count() > 0)
+                {
+                    GraphicBase CuadroUno = CuadroUnoGrafico(TempCuadroUno);
+                    CuadroUno.Id = $"GerenciaUno_{Id}";
+                    Id++;
+                    CuadroUno.Titulo = $"General Gerencia {item}";
+                    Result.Add(CuadroUno);
+                }
+            }
+
+            foreach (string item in Roles)
+            {
+                string IdAsignaciones = string.Join("|", DatosBrutos.Where(e => e.Rol.Equals(item)).Select(s => s.Id.ToString()).ToList());
+                List<SquareOne> TempCuadroUno = new List<SquareOne>();
+                using (ClsAnalitics Analitica = new ClsAnalitics())
+                {
+                    TempCuadroUno = Analitica.AnaliticSquareOne(EncuestaId, IdAsignaciones);
+                }
+                if (TempCuadroUno.Count() > 0)
+                {
+                    GraphicBase CuadroUno = CuadroUnoGrafico(TempCuadroUno);
+                    CuadroUno.Id = $"RolUno_{Id}";
+                    Id++;
+                    CuadroUno.Titulo = $"General Rol {item}";
+                    Result.Add(CuadroUno);
+                }
+            }
+
+            return Result;
         }
 
         private GraphicBase CuadroUnoGrafico(List<SquareOne> Data)
@@ -606,88 +723,83 @@ namespace Measure.Controllers
                 Moda.AddRange(Data.Where(c => c.Grupo.Equals(item)).Select(s => Convert.ToDecimal(s.Moda)).ToList());
             }
 
-            Result.Series.Add(new DataSeries { data = Minimo, type = "line", name = "Minimo" });
-            Result.Series.Add(new DataSeries { data = Moda, type = "area", name = "Moda" });
-            Result.Series.Add(new DataSeries { data = Promedio, type = "column", name = "Promedio" });
-            Result.Series.Add(new DataSeries { data = Maximo, type = "line", name = "Máximo" });
+            Result.Series.Add(new DataSeries { data = Minimo, name = "Minimo" });
+            Result.Series.Add(new DataSeries { data = Moda, name = "Moda" });
+            Result.Series.Add(new DataSeries { data = Promedio, name = "Promedio" });
+            Result.Series.Add(new DataSeries { data = Maximo, name = "Máximo" });
 
             return Result;
         }
 
-        private GraphicTwo CuadriDosGrafico(List<SquareDetail> Data)
+        private GraphicTwo CuadroDosGrafico(Guid EncuestaId, List<ViewDataAnaliticDetail> DataBase)
         {
-            GraphicTwo Result = new GraphicTwo
+            GraphicTwo Result = new GraphicTwo();
+
+            string DataJson = JsonConvert.SerializeObject(DataBase);
+            List<SquareDetail> Data = new List<SquareDetail>();
+
+            using (ClsAnalitics Analitica = new ClsAnalitics())
             {
-                GenGrupo = new DataGeneral
-                {
-                    Series = new List<string>(),
-                    Labels = Data.Select(s => s.Grupo).Distinct().ToList(),
-                    Data = new List<decimal>(),
-                    Colors = new List<string>()
-                },
-                GenGerencia = new DataGeneral { Labels = new List<string>(), Series = new List<string>() },                
-                GenPais = new DataGeneral { Labels = new List<string>(), Series = new List<string>() },
-                GenRol = new DataGeneral { Labels = new List<string>(), Series = new List<string>() },
-                GenSucursal = new DataGeneral { Labels = new List<string>(), Series = new List<string>() },
-                GerenciaGrupo = new List<GraphicTwoBase>(),
-                Grupos = new List<string>()
+                Data = Analitica.AnaliticSquareTwo(EncuestaId, DataJson);
+            }
+
+            List<string> Paises = Data.Select(d => d.Pais).Distinct().ToList();
+            List<string> Sucursales = Data.Select(d => d.Sucursal).Distinct().ToList();
+            List<string> Grupos = Data.Select(d => d.Grupo).Distinct().ToList();
+            List<string> Colores = Data.Select(d => d.Color).Distinct().ToList();            
+
+            Result.GenPais = new DataGeneral
+            {
+                Labels = new List<string>(),
+                Data = new List<decimal>()
             };
 
-            foreach (string _pais in Data.Select(s => s.Pais).Distinct().ToList())
+            foreach (string Pais in Paises)
             {
-                decimal PromPa = Data.Where(d => d.Pais.Equals(_pais)).Sum(s => s.Promedio) / Data.Where(d => d.Pais.Equals(_pais)).Count();
-                Result.GenPais.Labels.Add(_pais);
-                Result.GenPais.Series.Add(PromPa.ToString("0.##").Replace(',', '.'));
+                Result.GenPais.Labels.Add(Pais);
+                List<Tuple<Guid, string>> AsignacionesPais = Data.GroupBy(d => d.IdAsignacion, d => d.Pais, (key, g) => new Tuple<Guid, string>(key, g.First())).ToList();                
+                Result.GenPais.Data.Add(AsignacionesPais.Count(s => s.Item2.Equals(Pais)));
+            }
+            
+            Result.GenSucursal = new DataGeneral
+            {
+                Labels = new List<string>(),
+                Data = new List<decimal>()
+            };
+
+            foreach (string Sucursal in Sucursales)
+            {
+                Result.GenSucursal.Labels.Add(Sucursal);
+                List<Tuple<Guid, string>> AsignacionesSucursal = Data.GroupBy(d => d.IdAsignacion, d => d.Sucursal, (key, g) => new Tuple<Guid, string>(key, g.First())).ToList();
+                Result.GenSucursal.Data.Add(AsignacionesSucursal.Count(s => s.Item2.Equals(Sucursal)));
             }
 
-            foreach (string _sucursal in Data.Select(s => s.Sucursal).Distinct().ToList())
-            {
-                decimal PromGen = decimal.Round(Data.Where(d => d.Sucursal.Equals(_sucursal)).Sum(s => s.Promedio) / Data.Where(d => d.Sucursal.Equals(_sucursal)).Count(), 2);
-                Result.GenSucursal.Labels.Add(_sucursal);
-                Result.GenSucursal.Series.Add(PromGen.ToString("0.##").Replace(',', '.'));
-            }
+            List<GraphicTwoBase> Base = new List<GraphicTwoBase>();
 
-            foreach (string _gerencia in Data.Select(s => s.Gerencia).Distinct().ToList())
+            for (int a = 0; a < Paises.Count(); a++)
             {
-                decimal PromGen = decimal.Round(Data.Where(d => d.Gerencia.Equals(_gerencia)).Sum(s => s.Promedio) / Data.Where(d => d.Gerencia.Equals(_gerencia)).Count(), 2);
-                Result.GenGerencia.Labels.Add(_gerencia);
-                Result.GenGerencia.Series.Add(PromGen.ToString("0.##").Replace(',', '.'));
-            }
-
-            foreach (string _rol in Data.Select(s => s.Rol).Distinct().ToList())
-            {
-                decimal PromGen = decimal.Round(Data.Where(d => d.Rol.Equals(_rol)).Sum(s => s.Promedio) / Data.Where(d => d.Rol.Equals(_rol)).Count(), 2);
-                Result.GenRol.Labels.Add(_rol);
-                Result.GenRol.Series.Add(PromGen.ToString("0.##").Replace(',', '.'));
-            }
-
-            List<decimal> DataSeries = new List<decimal>();
-            foreach (string _grupo in Data.Select(s => s.Grupo).Distinct().ToList())
-            {
-                decimal PromGen = decimal.Round(Data.Where(d => d.Grupo.Equals(_grupo)).Sum(s => s.Promedio) / Data.Where(d => d.Grupo.Equals(_grupo)).Count(), 2);                
-                Result.GenGrupo.Colors.Add(Data.Where(c => c.Grupo.Equals(_grupo)).Select(s => s.Color).FirstOrDefault());
-                Result.GenGrupo.Data.Add(PromGen);
-            }
-
-            foreach (string _grupo in Data.Select(s => s.Grupo).Distinct())
-            {
-                GraphicTwoBase AddItem = new GraphicTwoBase
+                int b = 0;
+                foreach (var Sucursal in Data.Where(d => d.Pais.Equals(Paises[a])).Select(s => s.Sucursal).Distinct())
                 {
-                    Titulo = _grupo,
-                    Colors = new List<string>(),
-                    Labels = new List<string>(),
-                    Series = new List<string>(),
-                };
-
-                foreach (string _gerencia in Data.Select(s => s.Gerencia).Distinct().ToList())
-                {
-                    AddItem.Labels.Add(_gerencia);
-                    AddItem.Colors.AddRange(Data.Where(c => c.Grupo.Equals(_grupo) && c.Gerencia.Equals(_gerencia)).Select(s => s.Color).ToList());
-                    AddItem.Series.AddRange(Data.Where(c => c.Grupo.Equals(_grupo) && c.Gerencia.Equals(_gerencia)).Select(s => Convert.ToDecimal(s.Promedio).ToString("0.##").Replace(',', '.')).ToList());
+                    GraphicTwoBase addItem = new GraphicTwoBase
+                    {
+                        Id = $"Pais_{a}_Sucursal_{b}_Dos",
+                        Colors = Colores,
+                        Labels = Grupos,
+                        Titulo = $"Pais: {Paises[a]}, Sucursal: {Sucursal}",
+                        Series = new List<decimal>()
+                    };
+                    foreach (var Grupo in Grupos)
+                    {                        
+                        IQueryable<decimal> DataAverage = Data.Where(d => d.Pais.Equals(Paises[a]) && d.Sucursal.Equals(Sucursal) && d.Grupo.Equals(Grupo)).Select(s => s.Promedio).AsQueryable();
+                        addItem.Series.Add(Queryable.Average(DataAverage));
+                    }
+                    Base.Add(addItem);
+                    b++;
                 }
-
-                Result.GerenciaGrupo.Add(AddItem);
             }
+
+            Result.GrafBase = Base;
 
             return Result;
         }
@@ -729,11 +841,76 @@ namespace Measure.Controllers
                                    Correo = s.Correo,
                                    Nombres = s.Nombres,
                                    Apellidos = s.Apellidos,
-                                   FechaRespuesta = (DateTime)a.FechaResuelta
+                                   PaisId = s.PaisId,
+                                   FechaRespuesta = (DateTime)a.FechaResuelta,
                                }).OrderBy(o => o.Correo).ToList();
             }
 
+            foreach (ViewResponsePollUser item in Encuestados)
+            {
+                item.Sucursal = RamdomSucursal();
+                item.Gerencia = RamdomGerencia();
+                item.Rol = RamdomRol();
+            }
+
             return Encuestados;
+        }
+
+        public int RandomNumber(int max)
+        {
+            return _random.Next(0, max);
+        }
+
+        private string RamdomSucursal()
+        {
+            List<string> Lista = new List<string>
+            {
+                "Colina",
+                "Mayor",
+                "Cedritos",
+                "Americas",
+                "Barbara",
+                "Market",
+                "Plaza",
+                "Estación"
+            };
+
+            int Position = RandomNumber(Lista.Count);
+            return Lista[Position];
+        }
+
+        private string RamdomGerencia()
+        {
+            List<string> Lista = new List<string>
+            {
+                "Economia",
+                "Informatica",
+                "Legal",
+                "RH",
+                "Gerencia",
+                "Deportes",
+            };
+
+            int Position = RandomNumber(Lista.Count);
+            return Lista[Position];
+        }
+
+        private string RamdomRol()
+        {
+            List<string> Lista = new List<string>
+            {
+                "Bachiller",
+                "Tecnico",
+                "Tecnologo",
+                "Profesional",
+                "Especialista",
+                "Maestros",
+                "Doctores",
+                "Ceo"
+            };
+
+            int Position = RandomNumber(Lista.Count);
+            return Lista[Position];
         }
     }
 }

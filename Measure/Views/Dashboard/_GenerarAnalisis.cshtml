@@ -1,0 +1,64 @@
+﻿@model Measure.ViewModels.Dashboard.ViewAnaliticSquare
+@{
+    ViewBag.Title = "Generar Analisis";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-header">
+            Cuadro Uno
+        </div>
+        <div id="CuadroUno"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card-header">
+            Cuadro Dos
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-12 col-sm-6">
+        <div id="GeneralPais"></div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div id="GeneralSucursal"></div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div id="GeneralGerencia"></div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div id="GeneralRol"></div>
+    </div>
+    <div class="col-12">
+        <div id="GeneralGrupo"></div>
+    </div>
+</div>
+<div class="row" id="GraphicGroup"></div>
+@section styleFoot{
+    @Styles.Render("~/Content/apx")
+}
+@section scripts{
+    <script src="~/Scripts/apexcharts/Init.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            ComboMixto(@Html.Raw(Json.Encode(Model.CuadroUno.Series)), ("@Html.Raw(string.Join("|", Model.CuadroUno.Categories))").split('|'), ("@Html.Raw(string.Join("|", Model.CuadroUno.Colors))").split('|'), "#CuadroUno");
+            ColumnasBasicas("General Pais", 'Pais', ('@Html.Raw(string.Join("|", Model.CuadroDos.GenPais.Series))').split('|'), ("@Html.Raw(string.Join("|", Model.CuadroDos.GenPais.Labels))").split('|'), null, "#GeneralPais")
+            ColumnasBasicas("General Sucursal", 'Sucursal', ('@Html.Raw(string.Join("|", Model.CuadroDos.GenSucursal.Series))').split('|'), ("@Html.Raw(string.Join("|", Model.CuadroDos.GenSucursal.Labels))").split('|'), null, "#GeneralSucursal")
+            ColumnasBasicas("General Gerencia", 'Gerencia', ('@Html.Raw(string.Join("|", Model.CuadroDos.GenGerencia.Series))').split('|'), ("@Html.Raw(string.Join("|", Model.CuadroDos.GenGerencia.Labels))").split('|'), null, "#GeneralGerencia")
+            ColumnasBasicas("General Rol", 'Rol', ('@Html.Raw(string.Join("|", Model.CuadroDos.GenRol.Series))').split('|'), ("@Html.Raw(string.Join("|", Model.CuadroDos.GenRol.Labels))").split('|'), null, "#GeneralRol")
+            ColumnasBasicasGeneral("General Grupo", ("@Html.Raw(string.Join("|", Model.CuadroDos.GenGrupo.Data))").split('|'), ("@Html.Raw(string.Join("|", Model.CuadroDos.GenGrupo.Labels))").split('|'),("@Html.Raw(string.Join("|", Model.CuadroDos.GenGrupo.Colors))").split('|'), "#GeneralGrupo")
+            CreateGroup(('@Html.Raw(string.Join("|", Model.CuadroDos.GenGrupo.Labels))').split('|'));
+        });
+    </script>
+    @foreach (var item in Model.CuadroDos.GerenciaGrupo)
+    {
+<script type="text/javascript">
+		    $(document).ready(function () {
+			    AreaPolar('@Html.Raw(item.Titulo)', ('@Html.Raw(string.Join("|", item.Series))').split('|'), ('@Html.Raw(string.Join("|", item.Labels))').split('|'),null);
+		    });
+</script>
+    }
+}

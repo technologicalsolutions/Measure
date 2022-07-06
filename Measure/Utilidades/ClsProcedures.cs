@@ -66,6 +66,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = dbFactory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -132,6 +133,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = dbFactory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -202,6 +204,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = dbFactory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -362,6 +365,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = dbFactory.CreateCommand())
                         {
                             cmd.Connection = con;
@@ -509,6 +513,7 @@ namespace Measure.Utilidades
                     con.ConnectionString = db.Database.Connection.ConnectionString;
                     using (con)
                     {
+                        con.Open();
                         using (DbCommand cmd = dbFactory.CreateCommand())
                         {
                             cmd.Connection = con;
